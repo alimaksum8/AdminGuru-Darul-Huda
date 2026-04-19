@@ -108,11 +108,11 @@ const App = () => {
   
   const jpMateriGanjil = sumJp(materiGanjil);
   const jpExtraGanjil = (Number(formData.jpUlanganHarianGanjil) || 0) + (Number(formData.jpCadanganGanjil) || 0);
-  const totalGanjil = jpMateriGanjil + jpExtraGanjil + 4; // 4 for STS/SAS
+  const totalGanjil = jpMateriGanjil + jpExtraGanjil; 
 
   const jpMateriGenap = sumJp(materiGenap);
   const jpExtraGenap = (Number(formData.jpUlanganHarianGenap) || 0) + (Number(formData.jpCadanganGenap) || 0);
-  const totalGenap = jpMateriGenap + jpExtraGenap + 4; // 4 for STS/SAS
+  const totalGenap = jpMateriGenap + jpExtraGenap; 
 
   const totalJpKeseluruhan = 
     (formData.semester.includes('Ganjil') ? totalGanjil : 0) + 
@@ -748,12 +748,32 @@ const App = () => {
               <span className="font-bold text-indigo-700">{totalJpExtra} JP</span>
             </div>
             <div className="flex justify-between border-b border-indigo-100 pb-1">
-              <span className="text-gray-500">STS & SAS:</span>
-              <span className="font-bold text-indigo-700">8 JP</span>
-            </div>
-            <div className="flex justify-between border-b border-indigo-100 pb-1">
               <span className="text-gray-500">Total Akhir:</span>
               <span className="font-bold text-indigo-900">{totalJpKeseluruhan} JP</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+          <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <Calendar size={12} /> Ringkasan Pekan Efektif
+          </h3>
+          <div className="grid grid-cols-1 gap-1 text-[10px]">
+            <div className="flex justify-between border-b border-slate-200 pb-1">
+              <span className="text-gray-500 font-medium italic underline">Parameter</span>
+              <span className="font-bold text-slate-700">Jumlah Minggu</span>
+            </div>
+            <div className="flex justify-between border-b border-slate-100 pb-1">
+              <span className="text-gray-500">Total Minggu Semester:</span>
+              <span className="font-bold text-slate-700">{totalPekanTahun} Minggu</span>
+            </div>
+            <div className="flex justify-between border-b border-slate-100 pb-1 text-red-600">
+              <span className="opacity-70">Minggu Tidak Efektif:</span>
+              <span className="font-bold">-{totalNonTahun} Minggu</span>
+            </div>
+            <div className="flex justify-between border-b border-indigo-100 pb-1 pt-1 bg-indigo-50/30 px-1 rounded">
+              <span className="text-indigo-600 font-black">Total Pekan Efektif:</span>
+              <span className="font-black text-indigo-700">{totalEfektifTahun} Minggu</span>
             </div>
           </div>
         </section>
@@ -1252,14 +1272,6 @@ const App = () => {
                             <span>Cadangan / Ulangan Harian (Extra):</span>
                             <span className="font-bold">{totalJpExtra} JP</span>
                           </li>
-                          <li className="flex justify-between border-b pb-1">
-                            <span>Asesmen Sumatif Tengah Semester:</span>
-                            <span className="font-bold">4 JP</span>
-                          </li>
-                          <li className="flex justify-between border-b pb-1">
-                            <span>Asesmen Sumatif Akhir Semester:</span>
-                            <span className="font-bold">4 JP</span>
-                          </li>
                           <li className="flex justify-between pt-2 text-indigo-600 font-black text-sm">
                             <span>Total Distribusi Jam Pelajaran:</span>
                             <span>{totalJpKeseluruhan} JP</span>
@@ -1505,20 +1517,6 @@ const App = () => {
                               )}
                             </>
                           )}
-                          <tr className="bg-slate-100 font-bold">
-                            <td colSpan={2} className="border p-1 text-right px-2 uppercase">Sumatif Tengah Semester</td>
-                            <td className="border p-1 text-center">4 JP</td>
-                            {[...Array(30)].map((_, j) => (
-                              <td key={j} className="border p-1 text-center"></td>
-                            ))}
-                          </tr>
-                          <tr className="bg-slate-100 font-bold">
-                            <td colSpan={2} className="border p-1 text-right px-2 uppercase">Sumatif Akhir Semester</td>
-                            <td className="border p-1 text-center">4 JP</td>
-                            {[...Array(30)].map((_, j) => (
-                              <td key={j} className="border p-1 text-center"></td>
-                            ))}
-                          </tr>
                         </tbody>
                       </table>
                       
