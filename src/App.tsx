@@ -96,7 +96,15 @@ const App = () => {
     ...(formData.semester.includes('Genap') ? materiGenap : [])
   ];
 
-  const sumJp = (list: { judul: string, jp: string }[]) => list.reduce((acc, curr) => acc + (Number(curr.jp) || 0), 0);
+  const flatSubMateriList = materiList.flatMap(m => 
+    m.subMateri.map(sub => ({
+      materiJudul: m.judul,
+      judul: sub.judul,
+      jp: sub.jp
+    }))
+  );
+
+  const sumJp = (list: Materi[]) => list.reduce((acc, curr) => acc + (Number(curr.jp) || 0), 0);
   
   const jpMateriGanjil = sumJp(materiGanjil);
   const jpExtraGanjil = (Number(formData.jpUlanganHarianGanjil) || 0) + (Number(formData.jpCadanganGanjil) || 0);
@@ -182,13 +190,19 @@ const App = () => {
   };
 
   const handleMateriChange = (sem: 'Ganjil' | 'Genap', index: number, field: 'judul' | 'jp', value: string) => {
+    let finalValue = value;
+    if (field === 'jp' && value !== '') {
+      const num = Number(value);
+      if (num % 2 !== 0) finalValue = (num + 1).toString();
+    }
+
     if (sem === 'Ganjil') {
       const newList = [...materiGanjil];
-      newList[index] = { ...newList[index], [field]: value };
+      newList[index] = { ...newList[index], [field]: finalValue };
       setMateriGanjil(newList);
     } else {
       const newList = [...materiGenap];
-      newList[index] = { ...newList[index], [field]: value };
+      newList[index] = { ...newList[index], [field]: finalValue };
       setMateriGenap(newList);
     }
     setIsGenerated(false);
@@ -221,13 +235,19 @@ const App = () => {
   };
 
   const handleSubMateriChange = (sem: 'Ganjil' | 'Genap', materiIdx: number, subIdx: number, field: 'judul' | 'jp', value: string) => {
+    let finalValue = value;
+    if (field === 'jp' && value !== '') {
+      const num = Number(value);
+      if (num % 2 !== 0) finalValue = (num + 1).toString();
+    }
+
     if (sem === 'Ganjil') {
       const newList = [...materiGanjil];
-      newList[materiIdx].subMateri[subIdx] = { ...newList[materiIdx].subMateri[subIdx], [field]: value };
+      newList[materiIdx].subMateri[subIdx] = { ...newList[materiIdx].subMateri[subIdx], [field]: finalValue };
       setMateriGanjil(newList);
     } else {
       const newList = [...materiGenap];
-      newList[materiIdx].subMateri[subIdx] = { ...newList[materiIdx].subMateri[subIdx], [field]: value };
+      newList[materiIdx].subMateri[subIdx] = { ...newList[materiIdx].subMateri[subIdx], [field]: finalValue };
       setMateriGenap(newList);
     }
     setIsGenerated(false);
@@ -236,31 +256,34 @@ const App = () => {
   const distributeJp = (sem: 'Ganjil' | 'Genap', materiIdx: number) => {
     const list = sem === 'Ganjil' ? [...materiGanjil] : [...materiGenap];
     const materi = list[materiIdx];
-    const totalJp = Number(materi.jp) || 0;
-    const subCount = materi.subMateri.length;
-    const jpPerSessi = Number(formData.jpPerPertemuan) || 2;
+    
+    // Ensure total JP is even (Snap to nearest even up)
+    let totalJp = Number(materi.jp) || 0;
+    if (totalJp % 2 !== 0) totalJp += 1;
 
+    const subCount = materi.subMateri.length;
     if (totalJp <= 0 || subCount === 0) return;
 
-    // Distribute JP logically based on jpPerPertemuan
-    // We want each sub to have a multiple of jpPerPertemuan if possible, 
-    // or at least have the sum match totalJp.
-    
     let remaining = totalJp;
     const newSubMateri = materi.subMateri.map((sub, idx) => {
       if (idx === subCount - 1) {
         return { ...sub, jp: remaining.toString() };
       }
       
-      // Calculate a "fair" share but snap to jpPerPertemuan
-      const initialShare = Math.max(jpPerSessi, Math.floor(totalJp / subCount));
-      const share = Math.min(remaining - (subCount - 1 - idx) * 1, initialShare); // ensure at least 1 for remaining
+      // Calculate even share
+      let share = Math.floor(totalJp / subCount);
+      if (share % 2 !== 0) share += 1; // Round to even
+      
+      // Ensure we leave at least 2 for each remaining sub
+      const minNeededForOthers = (subCount - 1 - idx) * 2;
+      share = Math.min(share, remaining - minNeededForOthers);
+      if (share < 2) share = 2;
       
       remaining -= share;
       return { ...sub, jp: share.toString() };
     });
 
-    list[materiIdx].subMateri = newSubMateri;
+    list[materiIdx] = { ...materi, jp: totalJp.toString(), subMateri: newSubMateri };
     if (sem === 'Ganjil') setMateriGanjil(list);
     else setMateriGenap(list);
   };
@@ -513,7 +536,8 @@ const App = () => {
                       <label className="text-[8px] font-bold text-gray-400 uppercase">Tot JP</label>
                       <input 
                         type="number"
-                        min="0"
+                        min="2"
+                        step="2"
                         value={materi.jp} 
                         onChange={(e) => handleMateriChange('Ganjil', idx, 'jp', e.target.value)}
                         placeholder="JP"
@@ -557,7 +581,8 @@ const App = () => {
                           />
                           <input 
                             type="number"
-                            min="0"
+                            min="2"
+                            step="2"
                             value={sub.jp} 
                             onChange={(e) => handleSubMateriChange('Ganjil', idx, sIdx, 'jp', e.target.value)}
                             placeholder="jp"
@@ -610,7 +635,8 @@ const App = () => {
                       <label className="text-[8px] font-bold text-gray-400 uppercase">Tot JP</label>
                       <input 
                         type="number"
-                        min="0"
+                        min="2"
+                        step="2"
                         value={materi.jp} 
                         onChange={(e) => handleMateriChange('Genap', idx, 'jp', e.target.value)}
                         placeholder="JP"
@@ -654,7 +680,8 @@ const App = () => {
                           />
                           <input 
                             type="number"
-                            min="0"
+                            min="2"
+                            step="2"
                             value={sub.jp} 
                             onChange={(e) => handleSubMateriChange('Genap', idx, sIdx, 'jp', e.target.value)}
                             placeholder="jp"
@@ -916,36 +943,68 @@ const App = () => {
 
                       {/* Komponen Inti per Materi */}
                       <div className="space-y-10 mt-6">
-                        {materiList.slice(0, 3).map((m, i) => (
-                          <div key={i} className="border-l-4 border-indigo-600 pl-6 space-y-4">
-                            <h4 className="bg-indigo-600 text-white px-3 py-1 inline-block font-black uppercase text-xs">Modul Materi {i+1}: {m.judul}</h4>
-                            
-                            <div className="space-y-2">
-                              <p className="font-bold underline text-xs">1. Pertanyaan Pemantik:</p>
-                              <p className="italic text-slate-600">"Pernahkah Anda terpikir bagaimana konsep {m.judul} mempengaruhi kenyamanan hidup kita setiap harinya? Apa yang terjadi jika {m.judul} tidak ada?"</p>
-                            </div>
+                        {flatSubMateriList.slice(0, 5).map((sm, i) => {
+                          const jpPerSessi = Number(formData.jpPerPertemuan) || 2;
+                          const totalJp = Number(sm.jp) || 0;
+                          const jmlPertemuan = Math.ceil(totalJp / jpPerSessi);
 
-                            <div className="space-y-3">
-                              <p className="font-bold underline text-xs uppercase">2. Rincian Kegiatan Pembelajaran:</p>
-                              <ul className="list-decimal ml-5 space-y-3 text-xs leading-relaxed">
-                                <li>
-                                  <span className="font-bold">Kegiatan Awal (15 Menit):</span> Melakukan teknik K-W-L (Know, Want, Learn) dan memberikan stimulasi berupa video atau demonstrasi fisik terkait {m.judul}.
-                                </li>
-                                <li>
-                                  <span className="font-bold">Kegiatan Inti (50 Menit):</span> Peserta didik dibagi menjadi kelompok kecil untuk melakukan investigasi literasi and eksperimen terbimbing mengenai struktur {m.judul}. Guru bertindak sebagai fasilitator yang memberikan pertanyaan pelacak.
-                                </li>
-                                <li>
-                                  <span className="font-bold">Kegiatan Penutup (15 Menit):</span> Melakukan konfirmasi pemahaman melalui kuis interaktif dan penarikan kesimpulan secara kolaboratif.
-                                </li>
-                              </ul>
-                            </div>
+                          return (
+                            <div key={i} className="border-l-4 border-indigo-600 pl-6 space-y-4 break-inside-avoid">
+                              <div className="flex justify-between items-start">
+                                <div className="space-y-1">
+                                  <h4 className="bg-indigo-600 text-white px-3 py-1 inline-block font-black uppercase text-[10px]">
+                                    Modul {i+1}: {sm.materiJudul}
+                                  </h4>
+                                  <p className="text-[11px] font-bold text-slate-700">SUB MATERI: <span className="text-indigo-600 uppercase">{sm.judul || '...'}</span></p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-[9px] font-black text-slate-400 uppercase">Alokasi Waktu</p>
+                                  <p className="text-xs font-bold">{sm.jp} JP ({jmlPertemuan} Pertemuan)</p>
+                                </div>
+                              </div>
 
-                            <div className="bg-slate-50 p-3 rounded text-[10px] border border-slate-200">
-                              <p className="font-bold mb-1">Media & Sumber Belajar:</p>
-                              <p>Buku Teks, Platform Merdeka Mengajar (PMM), Objek fisik sekitar, dan Lembar Kerja.</p>
+                              {/* Checklist Pertemuan */}
+                              <div className="flex gap-4 p-2 bg-indigo-50/50 rounded-lg border border-indigo-100 mb-4">
+                                <span className="text-[9px] font-black text-indigo-400 uppercase self-center">Pertemuan Ke:</span>
+                                <div className="flex gap-3 flex-wrap">
+                                  {[...Array(jmlPertemuan || 1)].map((_, pIdx) => (
+                                    <div key={pIdx} className="flex items-center gap-1.5">
+                                      <div className="w-4 h-4 border-2 border-indigo-300 rounded flex items-center justify-center">
+                                        <div className="w-2 h-2 bg-indigo-500 rounded-sm opacity-20"></div>
+                                      </div>
+                                      <span className="text-[10px] font-bold text-slate-600">{pIdx + 1}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              
+                              <div className="space-y-2">
+                                <p className="font-bold underline text-xs">1. Pertanyaan Pemantik:</p>
+                                <p className="italic text-slate-600">"Pernahkah Anda terpikir bagaimana konsep {sm.judul} mempengaruhi kenyamanan hidup kita setiap harinya? Apa yang terjadi jika {sm.judul} tidak ada?"</p>
+                              </div>
+
+                              <div className="space-y-3">
+                                <p className="font-bold underline text-xs uppercase">2. Rincian Kegiatan Pembelajaran:</p>
+                                <ul className="list-decimal ml-5 space-y-3 text-xs leading-relaxed">
+                                  <li>
+                                    <span className="font-bold">Kegiatan Awal (15 Menit):</span> Melakukan teknik K-W-L (Know, Want, Learn) dan memberikan stimulasi berupa video atau demonstrasi fisik terkait {sm.judul}.
+                                  </li>
+                                  <li>
+                                    <span className="font-bold">Kegiatan Inti (50 Menit):</span> Peserta didik dibagi menjadi kelompok kecil untuk melakukan investigasi literasi and eksperimen terbimbing mengenai struktur {sm.judul}. Guru bertindak sebagai fasilitator yang memberikan pertanyaan pelacak.
+                                  </li>
+                                  <li>
+                                    <span className="font-bold">Kegiatan Penutup (15 Menit):</span> Melakukan konfirmasi pemahaman melalui kuis interaktif dan penarikan kesimpulan secara kolaboratif.
+                                  </li>
+                                </ul>
+                              </div>
+
+                              <div className="bg-slate-50 p-3 rounded text-[10px] border border-slate-200">
+                                <p className="font-bold mb-1">Media & Sumber Belajar:</p>
+                                <p>Buku Teks, Platform Merdeka Mengajar (PMM), Objek fisik sekitar, dan Lembar Kerja.</p>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   </PageContainer>
