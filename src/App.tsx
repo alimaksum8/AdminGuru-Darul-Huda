@@ -49,9 +49,9 @@ const App = () => {
   });
 
   const paperStyles = {
-    A4: { width: '800px', height: '1123px' },
-    F4: { width: '812px', height: '1247px' },
-    A3: { width: '1123px', height: '1587px' }
+    A4: { width: '210mm', height: '297mm' },
+    F4: { width: '215mm', height: '330mm' },
+    A3: { width: '297mm', height: '420mm' }
   };
 
   // State for Dynamic Materials - Split by Semester
@@ -194,10 +194,14 @@ const App = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       id={id} 
-      className="bg-white pt-12 pb-12 pl-28 pr-16 shadow-2xl mx-auto my-8 border border-gray-100 print:shadow-none print:p-0 w-full relative break-after-page"
+      className="bg-white shadow-2xl mx-auto my-8 border border-gray-100 print:shadow-none print:p-0 relative break-after-page"
       style={{ 
-        maxWidth: paperStyles[formData.paperSize as keyof typeof paperStyles].width,
-        minHeight: paperStyles[formData.paperSize as keyof typeof paperStyles].height
+        width: paperStyles[formData.paperSize as keyof typeof paperStyles].width,
+        minHeight: paperStyles[formData.paperSize as keyof typeof paperStyles].height,
+        paddingTop: '12.5mm',
+        paddingBottom: '12.5mm',
+        paddingLeft: '30mm',
+        paddingRight: '15mm'
       }}
     >
       <div className="print:block">
@@ -530,7 +534,10 @@ const App = () => {
 
       {/* Main Preview Area */}
       <div className="flex-1 overflow-y-auto p-4 md:p-12 print:overflow-visible print:p-0 print:bg-white bg-slate-200/50">
-        <div className="max-w-[800px] mx-auto print:max-w-none print:w-full">
+        <div 
+          className="mx-auto print:max-w-none print:w-full"
+          style={{ width: paperStyles[formData.paperSize as keyof typeof paperStyles].width }}
+        >
           
           {!isGenerated && !isGenerating && (
             <div className="h-[70vh] flex flex-col items-center justify-center text-gray-400 border-4 border-dashed border-gray-300 rounded-3xl bg-white/50 backdrop-blur-sm">
