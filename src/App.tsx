@@ -31,9 +31,9 @@ const App = () => {
     fase: 'Fase D',
     mapel: '',
     namaGuru: '',
-    namaSekolah: '',
+    namaSekolah: 'AdminGuru Darul Huda',
     namaKepalaSekolah: '',
-    kabupaten: '',
+    kabupaten: 'Bondowoso',
     tanggalTtd: new Date().toISOString().split('T')[0],
     kelas: 'VII',
     semester: 'Ganjil',
@@ -128,7 +128,7 @@ const App = () => {
     >
       <div className="text-center border-b-4 border-double border-gray-800 pb-4 mb-8">
         <h1 className="text-xl font-bold uppercase tracking-wider leading-tight">{formData.namaSekolah || 'NAMA SEKOLAH ANDA'}</h1>
-        <p className="text-sm italic text-gray-600">{formData.kabupaten || 'Kabupaten'}, Indonesia</p>
+        <p className="text-[10px] italic text-gray-600">Jl. KH. Moch. Chozin Toyib No.2 Rt 01/ Rw 01 Desa pengarang Kec. Jambesari Darus Sholah Kab. Bondowoso</p>
         <div className="mt-4 flex justify-between text-[10px] font-bold text-gray-500 uppercase">
           <span>Mapel: {formData.mapel || '...'}</span>
           <span>{formData.kurikulum}</span>
@@ -179,6 +179,13 @@ const App = () => {
             <Settings size={12} /> Data Identitas
           </h3>
           <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-2">
+              <select name="semester" value={formData.semester} onChange={handleInputChange} className="p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                <option value="Ganjil">Semester Ganjil</option>
+                <option value="Genap">Semester Genap</option>
+              </select>
+              <input name="tahunAjaran" value={formData.tahunAjaran} onChange={handleInputChange} placeholder="Tahun Ajaran" className="p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+            </div>
             <select name="kurikulum" value={formData.kurikulum} onChange={handleInputChange} className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
               <option value="Kurikulum Merdeka">Kurikulum Merdeka</option>
               <option value="Deep Learning">Deep Learning</option>
