@@ -31,7 +31,7 @@ const App = () => {
     fase: 'Fase D',
     mapel: '',
     namaGuru: '',
-    namaSekolah: 'AdminGuru Darul Huda',
+    namaSekolah: 'KURIKULUM CINTA DARUL HUDA',
     namaKepalaSekolah: '',
     kabupaten: 'Bondowoso',
     tanggalTtd: new Date().toISOString().split('T')[0],
@@ -251,7 +251,7 @@ const App = () => {
           >
             <GraduationCap size={24} />
           </motion.div>
-          <h1 className="text-xl font-bold text-gray-800 leading-tight tracking-tight">AdminGuru <span className="text-indigo-600 block text-xs tracking-widest font-black uppercase">Darul Huda</span></h1>
+          <h1 className="text-xl font-bold text-gray-800 leading-tight tracking-tight">Kurikulum <span className="text-indigo-600 block text-xs tracking-widest font-black uppercase">Cinta Darul Huda</span></h1>
         </div>
 
         {/* Identity Inputs */}
