@@ -31,7 +31,7 @@ const App = () => {
     fase: 'Fase D',
     mapel: '',
     namaGuru: '',
-    namaSekolah: 'KURIKULUM CINTA DARUL HUDA',
+    namaSekolah: 'MTs DARUL HUDA',
     namaKepalaSekolah: '',
     kabupaten: 'Bondowoso',
     tanggalTtd: new Date().toISOString().split('T')[0],
@@ -206,6 +206,7 @@ const App = () => {
     >
       <div className="print:block">
         <div className="text-center border-b-4 border-double border-gray-800 pb-4 mb-8">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-gray-700">YAYASAN PON-PES DARUL HUDA</h2>
           <h1 className="text-xl font-bold uppercase tracking-wider leading-tight">{formData.namaSekolah || 'NAMA SEKOLAH ANDA'}</h1>
           <p className="text-[10px] italic text-gray-600">Jl. KH. Moch. Chozin Toyib No.2 Rt 01/ Rw 01 Desa pengarang Kec. Jambesari Darus Sholah Kab. Bondowoso</p>
           <div className="mt-4 flex justify-between text-[10px] font-bold text-gray-500 uppercase">
