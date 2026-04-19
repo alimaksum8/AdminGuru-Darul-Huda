@@ -20,7 +20,8 @@ import {
   Square,
   Plus,
   Trash2,
-  Wand2
+  Wand2,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -58,6 +59,26 @@ const App = () => {
   const [materiGanjil, setMateriGanjil] = useState([{ judul: '', jp: '' }]);
   const [materiGenap, setMateriGenap] = useState([{ judul: '', jp: '' }]);
 
+  const [pekanDataGanjil, setPekanDataGanjil] = useState([
+    { bulan: 'Juli', total: 4, nonEfektif: 2, keterangan: 'Libur Semester' },
+    { bulan: 'Agustus', total: 5, nonEfektif: 0, keterangan: '-' },
+    { bulan: 'September', total: 4, nonEfektif: 1, keterangan: 'STS / Jeda Semester' },
+    { bulan: 'Oktober', total: 4, nonEfektif: 0, keterangan: '-' },
+    { bulan: 'November', total: 4, nonEfektif: 0, keterangan: '-' },
+    { bulan: 'Desember', total: 5, nonEfektif: 3, keterangan: 'SAS / Libur Semester' },
+  ]);
+
+  const [pekanDataGenap, setPekanDataGenap] = useState([
+    { bulan: 'Januari', total: 4, nonEfektif: 1, keterangan: 'Libur Semester' },
+    { bulan: 'Februari', total: 4, nonEfektif: 0, keterangan: '-' },
+    { bulan: 'Maret', total: 5, nonEfektif: 1, keterangan: 'STS / Jeda Semester' },
+    { bulan: 'April', total: 4, nonEfektif: 0, keterangan: '-' },
+    { bulan: 'Mei', total: 4, nonEfektif: 0, keterangan: '-' },
+    { bulan: 'Juni', total: 5, nonEfektif: 3, keterangan: 'SAS / Libur Semester' },
+  ]);
+
+  const [showPekanModal, setShowPekanModal] = useState(false);
+
   // Derived combined list for backward compatibility where needed
   const materiList = [
     ...(formData.semester.includes('Ganjil') ? materiGanjil : []),
@@ -85,6 +106,18 @@ const App = () => {
   const totalJpExtra = 
     (formData.semester.includes('Ganjil') ? jpExtraGanjil : 0) + 
     (formData.semester.includes('Genap') ? jpExtraGenap : 0);
+
+  const totalPekanGanjil = pekanDataGanjil.reduce((acc, curr) => acc + curr.total, 0);
+  const totalNonGanjil = pekanDataGanjil.reduce((acc, curr) => acc + curr.nonEfektif, 0);
+  const totalEfektifGanjil = totalPekanGanjil - totalNonGanjil;
+
+  const totalPekanGenap = pekanDataGenap.reduce((acc, curr) => acc + curr.total, 0);
+  const totalNonGenap = pekanDataGenap.reduce((acc, curr) => acc + curr.nonEfektif, 0);
+  const totalEfektifGenap = totalPekanGenap - totalNonGenap;
+
+  const totalPekanTahun = (formData.semester.includes('Ganjil') ? totalPekanGanjil : 0) + (formData.semester.includes('Genap') ? totalPekanGenap : 0);
+  const totalNonTahun = (formData.semester.includes('Ganjil') ? totalNonGanjil : 0) + (formData.semester.includes('Genap') ? totalNonGenap : 0);
+  const totalEfektifTahun = totalPekanTahun - totalNonTahun;
 
   // State for Selected Documents (Multi-select)
   const [selectedDocs, setSelectedDocs] = useState<string[]>([]);
@@ -252,7 +285,16 @@ const App = () => {
           >
             <GraduationCap size={24} />
           </motion.div>
-          <h1 className="text-xl font-bold text-gray-800 leading-tight tracking-tight">Kurikulum <span className="text-indigo-600 block text-xs tracking-widest font-black uppercase">Cinta Darul Huda</span></h1>
+          <div className="flex-1 flex items-center justify-between">
+            <h1 className="text-xl font-bold text-gray-800 leading-tight tracking-tight">Kurikulum <span className="text-indigo-600 block text-xs tracking-widest font-black uppercase">Cinta Darul Huda</span></h1>
+            <button 
+              onClick={() => setShowPekanModal(true)}
+              className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition-all border border-slate-200 shadow-sm"
+              title="Pengaturan Pekan Efektif"
+            >
+              <Calendar size={18} />
+            </button>
+          </div>
         </div>
 
         {/* Identity Inputs */}
@@ -866,44 +908,87 @@ const App = () => {
 
                       <section>
                         <h4 className="font-bold border-b-2 mb-4 text-sm uppercase">I. Perhitungan Pekan (Distribusi Waktu)</h4>
-                        <table className="w-full border-collapse border border-slate-300 text-[11px]">
-                          <thead className="bg-slate-200 uppercase font-bold text-center">
-                            <tr>
-                              <th className="border p-2">Bulan</th>
-                              <th className="border p-2">Jml Pekan</th>
-                              <th className="border p-2">Pekan Tidak Efektif</th>
-                              <th className="border p-2">Pekan Efektif</th>
-                              <th className="border p-2">Keterangan</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {[
-                              { bln: 'Juli', tot: 4, non: 2, ket: 'Libur Semester' },
-                              { bln: 'Agustus', tot: 5, non: 0, ket: '-' },
-                              { bln: 'September', tot: 4, non: 1, ket: 'STS / Jeda Semester' },
-                              { bln: 'Oktober', tot: 4, non: 0, ket: '-' },
-                              { bln: 'November', tot: 4, non: 0, ket: '-' },
-                              { bln: 'Desember', tot: 5, non: 3, ket: 'SAS / Libur Semester' },
-                            ].map((row, i) => (
-                              <tr key={i} className="text-center">
-                                <td className="border p-2 font-bold text-left px-4">{row.bln}</td>
-                                <td className="border p-2">{row.tot}</td>
-                                <td className="border p-2 text-red-500 font-medium">{row.non}</td>
-                                <td className="border p-2 bg-green-50 font-bold">{row.tot - row.non}</td>
-                                <td className="border p-2 text-left italic">{row.ket}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                          <tfoot className="bg-slate-800 text-white font-bold text-center uppercase">
-                            <tr>
-                              <td className="border p-2">JUMLAH</td>
-                              <td className="border p-2">26</td>
-                              <td className="border p-2">6</td>
-                              <td className="border p-2">20</td>
-                              <td className="border p-2">-</td>
-                            </tr>
-                          </tfoot>
-                        </table>
+                        
+                        {formData.semester.includes('Ganjil') && (
+                          <div className="mb-8">
+                            <h5 className="text-[10px] font-bold text-indigo-700 mb-2 uppercase tracking-wider italic bg-indigo-50 px-2 py-1 inline-block rounded">Semester Ganjil (Gasal)</h5>
+                            <table className="w-full border-collapse border border-slate-300 text-[11px]">
+                              <thead className="bg-slate-200 uppercase font-bold text-center">
+                                <tr>
+                                  <th className="border p-2">Bulan</th>
+                                  <th className="border p-2">Jml Pekan</th>
+                                  <th className="border p-2">Pekan Tidak Efektif</th>
+                                  <th className="border p-2">Pekan Efektif</th>
+                                  <th className="border p-2">Keterangan</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {pekanDataGanjil.map((row, i) => (
+                                  <tr key={`ganjil-pekan-${i}`} className="text-center">
+                                    <td className="border p-2 font-bold text-left px-4">{row.bulan}</td>
+                                    <td className="border p-2">{row.total}</td>
+                                    <td className="border p-2 text-red-500 font-medium">{row.nonEfektif}</td>
+                                    <td className="border p-2 bg-green-50 font-bold">{row.total - row.nonEfektif}</td>
+                                    <td className="border p-2 text-left italic">{row.keterangan}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                              <tfoot className="bg-slate-800 text-white font-bold text-center uppercase">
+                                <tr>
+                                  <td className="border p-2 text-left px-4">JUMLAH GANJIL</td>
+                                  <td className="border p-2">{totalPekanGanjil}</td>
+                                  <td className="border p-2">{totalNonGanjil}</td>
+                                  <td className="border p-2">{totalEfektifGanjil}</td>
+                                  <td className="border p-2">-</td>
+                                </tr>
+                              </tfoot>
+                            </table>
+                          </div>
+                        )}
+
+                        {formData.semester.includes('Genap') && (
+                          <div>
+                            <h5 className="text-[10px] font-bold text-orange-700 mb-2 uppercase tracking-wider italic bg-orange-50 px-2 py-1 inline-block rounded">Semester Genap (Dua)</h5>
+                            <table className="w-full border-collapse border border-slate-300 text-[11px]">
+                              <thead className="bg-slate-200 uppercase font-bold text-center">
+                                <tr>
+                                  <th className="border p-2">Bulan</th>
+                                  <th className="border p-2">Jml Pekan</th>
+                                  <th className="border p-2">Pekan Tidak Efektif</th>
+                                  <th className="border p-2">Pekan Efektif</th>
+                                  <th className="border p-2">Keterangan</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {pekanDataGenap.map((row, i) => (
+                                  <tr key={`genap-pekan-${i}`} className="text-center">
+                                    <td className="border p-2 font-bold text-left px-4">{row.bulan}</td>
+                                    <td className="border p-2">{row.total}</td>
+                                    <td className="border p-2 text-red-500 font-medium">{row.nonEfektif}</td>
+                                    <td className="border p-2 bg-green-50 font-bold">{row.total - row.nonEfektif}</td>
+                                    <td className="border p-2 text-left italic">{row.keterangan}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                              <tfoot className="bg-slate-800 text-white font-bold text-center uppercase">
+                                <tr>
+                                  <td className="border p-2 text-left px-4">JUMLAH GENAP</td>
+                                  <td className="border p-2">{totalPekanGenap}</td>
+                                  <td className="border p-2">{totalNonGenap}</td>
+                                  <td className="border p-2">{totalEfektifGenap}</td>
+                                  <td className="border p-2">-</td>
+                                </tr>
+                              </tfoot>
+                            </table>
+                          </div>
+                        )}
+
+                        {formData.semester.length > 1 && (
+                          <div className="mt-4 p-2 bg-slate-100 border border-slate-300 flex justify-between items-center text-[10px] font-black uppercase text-slate-800">
+                             <span>TOTAL PEKAN EFEKTIF SELURUH TAHUN:</span>
+                             <span className="text-indigo-700 text-xs">{totalEfektifTahun} PEKAN</span>
+                          </div>
+                        )}
                       </section>
 
                       <section>
@@ -1187,6 +1272,151 @@ const App = () => {
           .border { border-color: #000 !important; }
         }
       `}</style>
+      {/* Modal Pengaturan Pekan */}
+      <AnimatePresence>
+        {showPekanModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
+            >
+              <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-indigo-600 text-white">
+                <div className="flex items-center gap-3">
+                  <Calendar size={24} />
+                  <h2 className="text-xl font-bold uppercase tracking-tight">Pengaturan Pekan Efektif</h2>
+                </div>
+                <button 
+                  onClick={() => setShowPekanModal(false)}
+                  className="p-2 hover:bg-white/20 rounded-full transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                 <div className="grid md:grid-cols-2 gap-8">
+                   {/* Semester Ganjil */}
+                   <div className="space-y-4">
+                     <h3 className="font-black text-indigo-600 uppercase tracking-widest text-xs flex items-center gap-2">
+                       <div className="w-2 h-2 rounded-full bg-indigo-600"></div> Semester Ganjil
+                     </h3>
+                     <div className="space-y-2">
+                       {pekanDataGanjil.map((row, i) => (
+                         <div key={i} className="grid grid-cols-12 gap-2 items-center p-2 bg-slate-50 rounded-lg border border-slate-200">
+                           <div className="col-span-3 font-bold text-[10px] uppercase text-slate-500">{row.bulan}</div>
+                           <div className="col-span-2">
+                             <label className="text-[8px] block uppercase text-gray-400 font-bold">Total</label>
+                             <input 
+                               type="number" 
+                               value={row.total} 
+                               onChange={(e) => {
+                                 const newData = [...pekanDataGanjil];
+                                 newData[i].total = Number(e.target.value);
+                                 setPekanDataGanjil(newData);
+                               }}
+                               className="w-full text-xs font-bold p-1 border rounded focus:ring-1 focus:ring-indigo-500 outline-none"
+                             />
+                           </div>
+                           <div className="col-span-2">
+                             <label className="text-[8px] block uppercase text-gray-400 font-bold">Non</label>
+                             <input 
+                               type="number" 
+                               value={row.nonEfektif} 
+                               onChange={(e) => {
+                                 const newData = [...pekanDataGanjil];
+                                 newData[i].nonEfektif = Number(e.target.value);
+                                 setPekanDataGanjil(newData);
+                               }}
+                               className="w-full text-xs font-bold p-1 border rounded focus:ring-1 focus:ring-indigo-500 outline-none"
+                             />
+                           </div>
+                           <div className="col-span-5">
+                             <label className="text-[8px] block uppercase text-gray-400 font-bold">Keterangan</label>
+                             <input 
+                               type="text" 
+                               value={row.keterangan} 
+                               onChange={(e) => {
+                                 const newData = [...pekanDataGanjil];
+                                 newData[i].keterangan = e.target.value;
+                                 setPekanDataGanjil(newData);
+                               }}
+                               className="w-full text-xs font-medium p-1 border rounded focus:ring-1 focus:ring-indigo-500 outline-none"
+                             />
+                           </div>
+                         </div>
+                       ))}
+                     </div>
+                   </div>
+
+                   {/* Semester Genap */}
+                   <div className="space-y-4">
+                     <h3 className="font-black text-orange-600 uppercase tracking-widest text-xs flex items-center gap-2">
+                       <div className="w-2 h-2 rounded-full bg-orange-600"></div> Semester Genap
+                     </h3>
+                     <div className="space-y-2">
+                       {pekanDataGenap.map((row, i) => (
+                         <div key={i} className="grid grid-cols-12 gap-2 items-center p-2 bg-slate-50 rounded-lg border border-slate-200">
+                           <div className="col-span-3 font-bold text-[10px] uppercase text-slate-500">{row.bulan}</div>
+                           <div className="col-span-2">
+                             <label className="text-[8px] block uppercase text-gray-400 font-bold">Total</label>
+                             <input 
+                               type="number" 
+                               value={row.total} 
+                               onChange={(e) => {
+                                 const newData = [...pekanDataGenap];
+                                 newData[i].total = Number(e.target.value);
+                                 setPekanDataGenap(newData);
+                               }}
+                               className="w-full text-xs font-bold p-1 border rounded focus:ring-1 focus:ring-indigo-500 outline-none"
+                             />
+                           </div>
+                           <div className="col-span-2">
+                             <label className="text-[8px] block uppercase text-gray-400 font-bold">Non</label>
+                             <input 
+                               type="number" 
+                               value={row.nonEfektif} 
+                               onChange={(e) => {
+                                 const newData = [...pekanDataGenap];
+                                 newData[i].nonEfektif = Number(e.target.value);
+                                 setPekanDataGenap(newData);
+                               }}
+                               className="w-full text-xs font-bold p-1 border rounded focus:ring-1 focus:ring-indigo-500 outline-none"
+                             />
+                           </div>
+                           <div className="col-span-5">
+                             <label className="text-[8px] block uppercase text-gray-400 font-bold">Keterangan</label>
+                             <input 
+                               type="text" 
+                               value={row.keterangan} 
+                               onChange={(e) => {
+                                 const newData = [...pekanDataGenap];
+                                 newData[i].keterangan = e.target.value;
+                                 setPekanDataGenap(newData);
+                               }}
+                               className="w-full text-xs font-medium p-1 border rounded focus:ring-1 focus:ring-indigo-500 outline-none"
+                             />
+                           </div>
+                         </div>
+                       ))}
+                     </div>
+                   </div>
+                 </div>
+              </div>
+              
+              <div className="p-6 bg-slate-50 border-t border-gray-200 flex justify-end">
+                <button 
+                  onClick={() => setShowPekanModal(false)}
+                  className="px-6 py-2 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-all uppercase tracking-widest text-sm"
+                >
+                  Simpan Pengaturan
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
