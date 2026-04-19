@@ -48,7 +48,7 @@ const App = () => {
     namaKepalaSekolah: '',
     kabupaten: 'Bondowoso',
     tanggalTtd: new Date().toISOString().split('T')[0],
-    kelas: 'VII',
+    kelas: 'Kelas VII',
     semester: ['Ganjil'], // Changed to array for multiple selection
     tahunAjaran: '2024/2025',
     paperSize: 'A4',
@@ -135,14 +135,19 @@ const App = () => {
   const totalNonGenap = pekanDataGenap.reduce((acc, curr) => acc + curr.nonEfektif, 0);
   const totalEfektifGenap = totalPekanGenap - totalNonGenap;
 
+  const jpSessi = Number(formData.jpPerPertemuan) || 0;
+  
+  const hasilJpEfektifGanjil = totalPekanGanjil * jpSessi;
+  const hasilJpTidakEfektifGanjil = totalNonGanjil * jpSessi;
+  const hasilJpNettoGanjil = hasilJpEfektifGanjil - hasilJpTidakEfektifGanjil;
+
+  const hasilJpEfektifGenap = totalPekanGenap * jpSessi;
+  const hasilJpTidakEfektifGenap = totalNonGenap * jpSessi;
+  const hasilJpNettoGenap = hasilJpEfektifGenap - hasilJpTidakEfektifGenap;
+
   const totalPekanTahun = (formData.semester.includes('Ganjil') ? totalPekanGanjil : 0) + (formData.semester.includes('Genap') ? totalPekanGenap : 0);
   const totalNonTahun = (formData.semester.includes('Ganjil') ? totalNonGanjil : 0) + (formData.semester.includes('Genap') ? totalNonGenap : 0);
   const totalEfektifTahun = totalPekanTahun - totalNonTahun;
-
-  const jpSessi = Number(formData.jpPerPertemuan) || 0;
-  const hasilJpEfektifRaw = totalPekanTahun * jpSessi;
-  const hasilJpTidakEfektifRaw = totalNonTahun * jpSessi;
-  const hasilJpNetto = hasilJpEfektifRaw - hasilJpTidakEfektifRaw;
 
   // State for Selected Documents (Multi-select)
   const [selectedDocs, setSelectedDocs] = useState<string[]>([]);
@@ -437,15 +442,19 @@ const App = () => {
             </div>
             <input name="tahunAjaran" value={formData.tahunAjaran} onChange={handleInputChange} placeholder="Tahun Ajaran" className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
             
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-1">
-                <label className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Total JP Ganjil</label>
-                <input type="number" name="totalJpGanjil" value={formData.totalJpGanjil} onChange={handleInputChange} placeholder="JP" className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Total JP Genap</label>
-                <input type="number" name="totalJpGenap" value={formData.totalJpGenap} onChange={handleInputChange} placeholder="JP" className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
-              </div>
+            <div className={`grid ${formData.semester.length === 2 ? 'grid-cols-2' : 'grid-cols-1'} gap-2`}>
+              {formData.semester.includes('Ganjil') && (
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Total JP Ganjil</label>
+                  <input type="number" name="totalJpGanjil" value={formData.totalJpGanjil} onChange={handleInputChange} placeholder="JP" className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+                </div>
+              )}
+              {formData.semester.includes('Genap') && (
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Total JP Genap</label>
+                  <input type="number" name="totalJpGenap" value={formData.totalJpGenap} onChange={handleInputChange} placeholder="JP" className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+                </div>
+              )}
             </div>
             <select name="kurikulum" value={formData.kurikulum} onChange={handleInputChange} className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
               <option value="Kurikulum Merdeka">Kurikulum Merdeka</option>
@@ -459,6 +468,21 @@ const App = () => {
               </select>
               <input name="mapel" placeholder="Mata Pelajaran" onChange={handleInputChange} className="p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
             </div>
+            <select name="kelas" value={formData.kelas} onChange={handleInputChange} className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+              <option value="">Pilih Kelas</option>
+              <option value="Kelas I">Kelas I</option>
+              <option value="Kelas II">Kelas II</option>
+              <option value="Kelas III">Kelas III</option>
+              <option value="Kelas IV">Kelas IV</option>
+              <option value="Kelas V">Kelas V</option>
+              <option value="Kelas VI">Kelas VI</option>
+              <option value="Kelas VII">Kelas VII</option>
+              <option value="Kelas VIII">Kelas VIII</option>
+              <option value="Kelas IX">Kelas IX</option>
+              <option value="Kelas X">Kelas X</option>
+              <option value="Kelas XI">Kelas XI</option>
+              <option value="Kelas XII">Kelas XII</option>
+            </select>
             <input name="namaGuru" placeholder="Nama Guru Pengampu" onChange={handleInputChange} className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
             <input name="namaSekolah" placeholder="Nama Instansi/Sekolah" onChange={handleInputChange} className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
             <input name="namaKepalaSekolah" placeholder="Nama Kepala Sekolah" onChange={handleInputChange} className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
@@ -760,53 +784,97 @@ const App = () => {
           </div>
         </section>
 
-        <section className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-          <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-            <Calendar size={12} /> Ringkasan Pekan Efektif
-          </h3>
-          <div className="grid grid-cols-1 gap-1 text-[10px]">
-            <div className="flex justify-between border-b border-slate-200 pb-1">
-              <span className="text-gray-500 font-medium italic underline">Parameter</span>
-              <span className="font-bold text-slate-700">Jumlah Minggu</span>
-            </div>
-            <div className="flex justify-between border-b border-slate-100 pb-1">
-              <span className="text-gray-500">Total Minggu Semester:</span>
-              <span className="font-bold text-slate-700">{totalPekanTahun} Minggu</span>
-            </div>
-            <div className="flex justify-between border-b border-slate-100 pb-1 text-red-600">
-              <span className="opacity-70">Minggu Tidak Efektif:</span>
-              <span className="font-bold">-{totalNonTahun} Minggu</span>
-            </div>
-            <div className="flex justify-between border-b border-indigo-100 pb-1 pt-1 bg-indigo-50/30 px-1 rounded">
-              <span className="text-indigo-600 font-black">Total Pekan Efektif:</span>
-              <span className="font-black text-indigo-700">{totalEfektifTahun} Minggu</span>
-            </div>
-          </div>
-        </section>
+        {formData.semester.includes('Ganjil') && (
+          <div className="space-y-2 border-l-2 border-indigo-200 pl-2 bg-indigo-50/20 py-2 rounded-r-xl">
+            <h4 className="text-[9px] font-black text-indigo-500 uppercase px-1">Semester Ganjil</h4>
+            
+            <section className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+              <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                <Calendar size={12} /> Pekan Efektif (Ganjil)
+              </h3>
+              <div className="grid grid-cols-1 gap-1 text-[10px]">
+                <div className="flex justify-between border-b border-slate-100 pb-1">
+                  <span className="text-gray-500">Total Minggu:</span>
+                  <span className="font-bold text-slate-700">{totalPekanGanjil} Minggu</span>
+                </div>
+                <div className="flex justify-between border-b border-slate-100 pb-1 text-red-600">
+                  <span className="opacity-70">Tidak Efektif:</span>
+                  <span className="font-bold">-{totalNonGanjil} Minggu</span>
+                </div>
+                <div className="flex justify-between border-b border-indigo-100 pb-1 pt-1 bg-indigo-50/30 px-1 rounded">
+                  <span className="text-indigo-600 font-black">Pekan Efektif:</span>
+                  <span className="font-black text-indigo-700">{totalEfektifGanjil} Minggu</span>
+                </div>
+              </div>
+            </section>
 
-        <section className="p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-2">
-          <h3 className="text-[10px] font-bold text-amber-600 uppercase tracking-widest flex items-center gap-2">
-            <Zap size={12} /> Parameter Jumlah JP
-          </h3>
-          <div className="grid grid-cols-1 gap-1 text-[10px]">
-            <div className="flex justify-between border-b border-amber-200 pb-1">
-              <span className="text-amber-700 font-medium italic underline">Rumus (Pekan x {jpSessi} JP)</span>
-              <span className="font-bold text-amber-900">Hasil JP</span>
-            </div>
-            <div className="flex justify-between border-b border-amber-100 pb-1">
-              <span className="text-gray-600">Jumlah Hasil JP Efektif:</span>
-              <span className="font-bold text-slate-700">{hasilJpEfektifRaw} JP</span>
-            </div>
-            <div className="flex justify-between border-b border-amber-100 pb-1 text-red-600">
-              <span className="opacity-70">Jumlah Hasil JP Tidak Efektif:</span>
-              <span className="font-bold">-{hasilJpTidakEfektifRaw} JP</span>
-            </div>
-            <div className="flex justify-between border-b border-amber-300 pb-1 pt-1 bg-amber-100/50 px-1 rounded">
-              <span className="text-amber-800 font-black uppercase">Hasil Akhir JP:</span>
-              <span className="font-black text-amber-900">{hasilJpNetto} JP</span>
-            </div>
+            <section className="p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-2">
+              <h3 className="text-[10px] font-bold text-amber-600 uppercase tracking-widest flex items-center gap-2">
+                <Zap size={12} /> Parameter JP (Ganjil)
+              </h3>
+              <div className="grid grid-cols-1 gap-1 text-[10px]">
+                <div className="flex justify-between border-b border-amber-100 pb-1">
+                  <span className="text-gray-600">Hasil JP Efektif:</span>
+                  <span className="font-bold text-slate-700">{hasilJpEfektifGanjil} JP</span>
+                </div>
+                <div className="flex justify-between border-b border-amber-100 pb-1 text-red-600">
+                  <span className="opacity-70">JP Tidak Efektif:</span>
+                  <span className="font-bold">-{hasilJpTidakEfektifGanjil} JP</span>
+                </div>
+                <div className="flex justify-between border-b border-amber-300 pb-1 pt-1 bg-amber-100/50 px-1 rounded">
+                  <span className="text-amber-800 font-black uppercase tracking-tighter">Hasil Akhir JP:</span>
+                  <span className="font-black text-amber-900">{hasilJpNettoGanjil} JP</span>
+                </div>
+              </div>
+            </section>
           </div>
-        </section>
+        )}
+
+        {formData.semester.includes('Genap') && (
+          <div className="space-y-2 border-l-2 border-orange-200 pl-2 bg-orange-50/20 py-2 rounded-r-xl">
+            <h4 className="text-[9px] font-black text-orange-500 uppercase px-1">Semester Genap</h4>
+
+            <section className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+              <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                <Calendar size={12} /> Pekan Efektif (Genap)
+              </h3>
+              <div className="grid grid-cols-1 gap-1 text-[10px]">
+                <div className="flex justify-between border-b border-slate-100 pb-1">
+                  <span className="text-gray-500">Total Minggu:</span>
+                  <span className="font-bold text-slate-700">{totalPekanGenap} Minggu</span>
+                </div>
+                <div className="flex justify-between border-b border-slate-100 pb-1 text-red-600">
+                  <span className="opacity-70">Tidak Efektif:</span>
+                  <span className="font-bold">-{totalNonGenap} Minggu</span>
+                </div>
+                <div className="flex justify-between border-b border-orange-100 pb-1 pt-1 bg-orange-50/30 px-1 rounded">
+                  <span className="text-orange-600 font-black">Pekan Efektif:</span>
+                  <span className="font-black text-orange-700">{totalEfektifGenap} Minggu</span>
+                </div>
+              </div>
+            </section>
+
+            <section className="p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-2">
+              <h3 className="text-[10px] font-bold text-amber-600 uppercase tracking-widest flex items-center gap-2">
+                <Zap size={12} /> Parameter JP (Genap)
+              </h3>
+              <div className="grid grid-cols-1 gap-1 text-[10px]">
+                <div className="flex justify-between border-b border-amber-100 pb-1">
+                  <span className="text-gray-600">Hasil JP Efektif:</span>
+                  <span className="font-bold text-slate-700">{hasilJpEfektifGenap} JP</span>
+                </div>
+                <div className="flex justify-between border-b border-amber-100 pb-1 text-red-600">
+                  <span className="opacity-70">JP Tidak Efektif:</span>
+                  <span className="font-bold">-{hasilJpTidakEfektifGenap} JP</span>
+                </div>
+                <div className="flex justify-between border-b border-amber-300 pb-1 pt-1 bg-amber-100/50 px-1 rounded">
+                  <span className="text-amber-800 font-black uppercase tracking-tighter">Hasil Akhir JP:</span>
+                  <span className="font-black text-amber-900">{hasilJpNettoGenap} JP</span>
+                </div>
+              </div>
+            </section>
+          </div>
+        )}
 
         <div className="space-y-2 pt-4">
           <button 
@@ -1068,7 +1136,7 @@ const App = () => {
                           <p>Nama Kelompok: .................................</p>
                           <p>Anggota: ...........................................</p>
                         </div>
-                        <div className="font-bold">Kelas: {formData.kelas}</div>
+                        <div className="font-bold">{formData.kelas}</div>
                       </div>
 
                       <h3 className="text-center text-xl font-black mb-10 tracking-widest uppercase">Eksplorasi Materi: {materiList[0].judul}</h3>
@@ -1197,8 +1265,8 @@ const App = () => {
                           <p className="font-bold text-indigo-900 mb-1 uppercase">Identitas Waktu</p>
                           <p>Semester: {formData.semester.join(' / ')}</p>
                           <p>Tahun Ajaran: {formData.tahunAjaran}</p>
-                          {formData.totalJpGanjil && <p>Total JP Ganjil: {formData.totalJpGanjil} JP</p>}
-                          {formData.totalJpGenap && <p>Total JP Genap: {formData.totalJpGenap} JP</p>}
+                          {(formData.totalJpGanjil && formData.semester.includes('Ganjil')) && <p>Total JP Ganjil: {formData.totalJpGanjil} JP</p>}
+                          {(formData.totalJpGenap && formData.semester.includes('Genap')) && <p>Total JP Genap: {formData.totalJpGenap} JP</p>}
                         </div>
                         <div className="p-3 border rounded-lg bg-slate-50 border-slate-200 text-right">
                           <p className="font-bold text-slate-900 mb-1 uppercase">Total Jam Pelajaran</p>
@@ -1318,7 +1386,7 @@ const App = () => {
                         <p>Mata Pelajaran: {formData.mapel}</p>
                         <p>Satuan Pendidikan: {formData.namaSekolah}</p>
                         <p>Tahun Pelajaran: {formData.tahunAjaran}</p>
-                        <p>Fase: {formData.fase} / Kelas: {formData.kelas}</p>
+                        <p>Fase: {formData.fase} / {formData.kelas}</p>
                       </div>
 
                       <table className="w-full border-collapse border-2 border-slate-800 text-[11px]">
@@ -1428,8 +1496,8 @@ const App = () => {
                         <p>Semester: {formData.semester.join(' / ')}</p>
                         <p>Mata Pelajaran: {formData.mapel}</p>
                         <p>Tahun Pelajaran: {formData.tahunAjaran}</p>
-                        {formData.totalJpGanjil && <p>Total JP Semester Ganjil: {formData.totalJpGanjil} JP</p>}
-                        {formData.totalJpGenap && <p>Total JP Semester Genap: {formData.totalJpGenap} JP</p>}
+                        {(formData.totalJpGanjil && formData.semester.includes('Ganjil')) && <p>Total JP Semester Ganjil: {formData.totalJpGanjil} JP</p>}
+                        {(formData.totalJpGenap && formData.semester.includes('Genap')) && <p>Total JP Semester Genap: {formData.totalJpGenap} JP</p>}
                       </div>
 
                       <table className="w-full border-collapse border-2 border-slate-800 text-[9px]">
