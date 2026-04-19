@@ -43,7 +43,9 @@ const App = () => {
     jpCadanganGanjil: '',
     jpUlanganHarianGenap: '',
     jpCadanganGenap: '',
-    jpPerPertemuan: '2'
+    jpPerPertemuan: '2',
+    totalJpGanjil: '',
+    totalJpGenap: ''
   });
 
   const paperStyles = {
@@ -192,41 +194,43 @@ const App = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       id={id} 
-      className="bg-white p-12 shadow-2xl mx-auto my-8 border border-gray-100 print:shadow-none print:m-0 print:p-8 w-full relative overflow-hidden break-after-page"
+      className="bg-white p-16 shadow-2xl mx-auto my-8 border border-gray-100 print:shadow-none print:p-0 w-full relative break-after-page"
       style={{ 
         maxWidth: paperStyles[formData.paperSize as keyof typeof paperStyles].width,
         minHeight: paperStyles[formData.paperSize as keyof typeof paperStyles].height
       }}
     >
-      <div className="text-center border-b-4 border-double border-gray-800 pb-4 mb-8">
-        <h1 className="text-xl font-bold uppercase tracking-wider leading-tight">{formData.namaSekolah || 'NAMA SEKOLAH ANDA'}</h1>
-        <p className="text-[10px] italic text-gray-600">Jl. KH. Moch. Chozin Toyib No.2 Rt 01/ Rw 01 Desa pengarang Kec. Jambesari Darus Sholah Kab. Bondowoso</p>
-        <div className="mt-4 flex justify-between text-[10px] font-bold text-gray-500 uppercase">
-          <span>Mapel: {formData.mapel || '...'}</span>
-          <span>Semester: {formData.semester.join(' / ')}</span>
-          <span>{formData.kurikulum}</span>
-          <span>{formData.fase}</span>
+      <div className="print:block">
+        <div className="text-center border-b-4 border-double border-gray-800 pb-4 mb-8">
+          <h1 className="text-xl font-bold uppercase tracking-wider leading-tight">{formData.namaSekolah || 'NAMA SEKOLAH ANDA'}</h1>
+          <p className="text-[10px] italic text-gray-600">Jl. KH. Moch. Chozin Toyib No.2 Rt 01/ Rw 01 Desa pengarang Kec. Jambesari Darus Sholah Kab. Bondowoso</p>
+          <div className="mt-4 flex justify-between text-[10px] font-bold text-gray-500 uppercase">
+            <span>Mapel: {formData.mapel || '...'}</span>
+            <span>Semester: {formData.semester.join(' / ')}</span>
+            <span>{formData.kurikulum}</span>
+            <span>{formData.fase}</span>
+          </div>
         </div>
-      </div>
 
-      <h2 className="text-2xl font-bold text-center mb-10 text-gray-800 underline decoration-indigo-500 underline-offset-8 uppercase">
-        {title}
-      </h2>
+        <h2 className="text-2xl font-bold text-center mb-10 text-gray-800 underline decoration-indigo-500 underline-offset-8 uppercase">
+          {title}
+        </h2>
 
-      <div className="text-sm leading-relaxed text-gray-800">
-        {children}
-      </div>
-
-      <div className="mt-16 grid grid-cols-2 gap-20 text-center">
-        <div className="print:break-inside-avoid">
-          <p className="mb-20">Mengetahui,<br/>Kepala Sekolah</p>
-          <p className="font-bold underline uppercase">{formData.namaKepalaSekolah || '..........................'}</p>
-          <p className="text-xs text-gray-500 italic">NIP. ..........................</p>
+        <div className="text-sm leading-relaxed text-gray-800 printable-content">
+          {children}
         </div>
-        <div className="print:break-inside-avoid">
-          <p className="mb-20 uppercase">{formData.kabupaten || 'Kabupaten'}, {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(formData.tanggalTtd))}<br/>Guru Mata Pelajaran</p>
-          <p className="font-bold underline uppercase">{formData.namaGuru || '..........................'}</p>
-          <p className="text-xs text-gray-500 italic">NIP. ..........................</p>
+
+        <div className="mt-16 grid grid-cols-2 gap-20 text-center print:break-inside-avoid">
+          <div className="print:break-inside-avoid">
+            <p className="mb-20">Mengetahui,<br/>Kepala Sekolah</p>
+            <p className="font-bold underline uppercase">{formData.namaKepalaSekolah || '..........................'}</p>
+            <p className="text-xs text-gray-500 italic">NIP. ..........................</p>
+          </div>
+          <div className="print:break-inside-avoid">
+            <p className="mb-20 uppercase">{formData.kabupaten || 'Kabupaten'}, {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(formData.tanggalTtd))}<br/>Guru Mata Pelajaran</p>
+            <p className="font-bold underline uppercase">{formData.namaGuru || '..........................'}</p>
+            <p className="text-xs text-gray-500 italic">NIP. ..........................</p>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -283,6 +287,17 @@ const App = () => {
               </select>
             </div>
             <input name="tahunAjaran" value={formData.tahunAjaran} onChange={handleInputChange} placeholder="Tahun Ajaran" className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+            
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Total JP Ganjil</label>
+                <input type="number" name="totalJpGanjil" value={formData.totalJpGanjil} onChange={handleInputChange} placeholder="JP" className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Total JP Genap</label>
+                <input type="number" name="totalJpGenap" value={formData.totalJpGenap} onChange={handleInputChange} placeholder="JP" className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+              </div>
+            </div>
             <select name="kurikulum" value={formData.kurikulum} onChange={handleInputChange} className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
               <option value="Kurikulum Merdeka">Kurikulum Merdeka</option>
               <option value="Deep Learning">Deep Learning</option>
@@ -842,6 +857,8 @@ const App = () => {
                           <p className="font-bold text-indigo-900 mb-1 uppercase">Identitas Waktu</p>
                           <p>Semester: {formData.semester.join(' / ')}</p>
                           <p>Tahun Ajaran: {formData.tahunAjaran}</p>
+                          {formData.totalJpGanjil && <p>Total JP Ganjil: {formData.totalJpGanjil} JP</p>}
+                          {formData.totalJpGenap && <p>Total JP Genap: {formData.totalJpGenap} JP</p>}
                         </div>
                         <div className="p-3 border rounded-lg bg-slate-50 border-slate-200 text-right">
                           <p className="font-bold text-slate-900 mb-1 uppercase">Total Jam Pelajaran</p>
@@ -1016,6 +1033,8 @@ const App = () => {
                         <p>Semester: {formData.semester.join(' / ')}</p>
                         <p>Mata Pelajaran: {formData.mapel}</p>
                         <p>Tahun Pelajaran: {formData.tahunAjaran}</p>
+                        {formData.totalJpGanjil && <p>Total JP Semester Ganjil: {formData.totalJpGanjil} JP</p>}
+                        {formData.totalJpGenap && <p>Total JP Semester Genap: {formData.totalJpGenap} JP</p>}
                       </div>
 
                       <table className="w-full border-collapse border-2 border-slate-800 text-[9px]">
@@ -1024,154 +1043,83 @@ const App = () => {
                             <th rowSpan={2} className="border p-1 w-8">No</th>
                             <th rowSpan={2} className="border p-1">Materi Pokok / Tujuan Pembelajaran</th>
                             <th rowSpan={2} className="border p-1 w-10">JML JP</th>
-                            <th colSpan={4} className="border p-1">Juli</th>
-                            <th colSpan={4} className="border p-1">Agustus</th>
-                            <th colSpan={4} className="border p-1">September</th>
-                            <th colSpan={4} className="border p-1">Oktober</th>
-                            <th colSpan={4} className="border p-1">November</th>
-                            <th colSpan={4} className="border p-1">Desember</th>
+                            <th colSpan={5} className="border p-1">Juli</th>
+                            <th colSpan={5} className="border p-1">Agustus</th>
+                            <th colSpan={5} className="border p-1">September</th>
+                            <th colSpan={5} className="border p-1">Oktober</th>
+                            <th colSpan={5} className="border p-1">November</th>
+                            <th colSpan={5} className="border p-1">Desember</th>
                           </tr>
                           <tr>
-                            {[...Array(24)].map((_, i) => (
-                              <th key={i} className="border p-1 w-4 text-[7px]">{ (i % 4) + 1 }</th>
+                            {[...Array(30)].map((_, i) => (
+                              <th key={i} className="border p-1 w-4 text-[7px]">{ (i % 5) + 1 }</th>
                             ))}
                           </tr>
                         </thead>
                         <tbody>
-                          {(() => {
-                            let currentWeek = 0;
-                            const jpPerMeet = Number(formData.jpPerPertemuan) || 2;
-                            
-                            return (
-                              <>
-                                {materiList.map((m, i) => {
-                                  const jp = Number(m.jp) || 0;
-                                  const weeks = Math.ceil(jp / jpPerMeet);
-                                  const start = currentWeek;
-                                  currentWeek += weeks;
+                          {materiList.map((m, i) => (
+                            <tr key={i}>
+                              <td className="border p-1 text-center font-bold">{i + 1}</td>
+                              <td className="border p-1 font-medium">{m.judul || '...'}</td>
+                              <td className="border p-1 text-center font-bold">{m.jp || '...'} JP</td>
+                              {[...Array(30)].map((_, j) => (
+                                <td key={j} className="border p-1 text-center font-bold h-6"></td>
+                              ))}
+                            </tr>
+                          ))}
+                          {formData.jpUlanganHarianGanjil && formData.semester.includes('Ganjil') && (
+                            <tr className="bg-slate-50 italic">
+                               <td className="border p-1 text-center font-bold">-</td>
+                               <td className="border p-1 font-medium text-indigo-700">Ulangan Harian (Ganjil)</td>
+                               <td className="border p-1 text-center font-bold">{formData.jpUlanganHarianGanjil} JP</td>
+                               {[...Array(30)].map((_, j) => (
+                                <td key={j} className="border p-1 text-center font-bold"></td>
+                              ))}
+                            </tr>
+                          )}
+                          {formData.jpCadanganGanjil && formData.semester.includes('Ganjil') && (
+                            <tr className="bg-slate-50 italic">
+                               <td className="border p-1 text-center font-bold">-</td>
+                               <td className="border p-1 font-medium text-indigo-700">Materi Cadangan (Ganjil)</td>
+                               <td className="border p-1 text-center font-bold">{formData.jpCadanganGanjil} JP</td>
+                               {[...Array(30)].map((_, j) => (
+                                <td key={j} className="border p-1 text-center font-bold"></td>
+                              ))}
+                            </tr>
+                          )}
 
-                                  return (
-                                    <tr key={i}>
-                                      <td className="border p-1 text-center font-bold">{i + 1}</td>
-                                      <td className="border p-1 font-medium">{m.judul || '...'}</td>
-                                      <td className="border p-1 text-center font-bold">{jp} JP</td>
-                                      {[...Array(24)].map((_, j) => {
-                                        const isActive = j >= start && j < currentWeek;
-                                        return (
-                                          <td key={j} className={`border p-1 text-center font-bold ${isActive ? 'bg-indigo-400 text-white' : ''}`}>
-                                            {isActive ? jpPerMeet : ''}
-                                          </td>
-                                        );
-                                      })}
-                                    </tr>
-                                  );
-                                })}
-
-                                {formData.jpUlanganHarianGanjil && formData.semester.includes('Ganjil') && (() => {
-                                  const jp = Number(formData.jpUlanganHarianGanjil);
-                                  const weeks = Math.ceil(jp / jpPerMeet);
-                                  const start = currentWeek;
-                                  currentWeek += weeks;
-                                  return (
-                                    <tr className="bg-slate-50 italic">
-                                      <td className="border p-1 text-center font-bold">-</td>
-                                      <td className="border p-1 font-medium text-indigo-700">Ulangan Harian (Ganjil)</td>
-                                      <td className="border p-1 text-center font-bold">{jp} JP</td>
-                                      {[...Array(24)].map((_, j) => {
-                                        const isActive = j >= start && j < currentWeek;
-                                        return (
-                                          <td key={j} className={`border p-1 text-center font-bold ${isActive ? 'bg-amber-400 text-white' : ''}`}>
-                                            {isActive ? jpPerMeet : ''}
-                                          </td>
-                                        );
-                                      })}
-                                    </tr>
-                                  );
-                                })()}
-
-                                {formData.jpCadanganGanjil && formData.semester.includes('Ganjil') && (() => {
-                                  const jp = Number(formData.jpCadanganGanjil);
-                                  const weeks = Math.ceil(jp / jpPerMeet);
-                                  const start = currentWeek;
-                                  currentWeek += weeks;
-                                  return (
-                                    <tr className="bg-slate-50 italic">
-                                      <td className="border p-1 text-center font-bold">-</td>
-                                      <td className="border p-1 font-medium text-indigo-700">Materi Cadangan (Ganjil)</td>
-                                      <td className="border p-1 text-center font-bold">{jp} JP</td>
-                                      {[...Array(24)].map((_, j) => {
-                                        const isActive = j >= start && j < currentWeek;
-                                        return (
-                                          <td key={j} className={`border p-1 text-center font-bold ${isActive ? 'bg-green-400 text-white' : ''}`}>
-                                            {isActive ? jpPerMeet : ''}
-                                          </td>
-                                        );
-                                      })}
-                                    </tr>
-                                  );
-                                })()}
-
-                                {formData.jpUlanganHarianGenap && formData.semester.includes('Genap') && (() => {
-                                  const jp = Number(formData.jpUlanganHarianGenap);
-                                  const weeks = Math.ceil(jp / jpPerMeet);
-                                  const start = currentWeek;
-                                  currentWeek += weeks;
-                                  return (
-                                    <tr className="bg-slate-50 italic border-t-2 border-orange-100">
-                                      <td className="border p-1 text-center font-bold">-</td>
-                                      <td className="border p-1 font-medium text-orange-700">Ulangan Harian (Genap)</td>
-                                      <td className="border p-1 text-center font-bold">{jp} JP</td>
-                                      {[...Array(24)].map((_, j) => {
-                                        const isActive = j >= start && j < currentWeek;
-                                        return (
-                                          <td key={j} className={`border p-1 text-center font-bold ${isActive ? 'bg-amber-400 text-white' : ''}`}>
-                                            {isActive ? jpPerMeet : ''}
-                                          </td>
-                                        );
-                                      })}
-                                    </tr>
-                                  );
-                                })()}
-                                {formData.jpCadanganGenap && formData.semester.includes('Genap') && (() => {
-                                  const jp = Number(formData.jpCadanganGenap);
-                                  const weeks = Math.ceil(jp / jpPerMeet);
-                                  const start = currentWeek;
-                                  currentWeek += weeks;
-                                  return (
-                                    <tr className="bg-slate-50 italic">
-                                      <td className="border p-1 text-center font-bold">-</td>
-                                      <td className="border p-1 font-medium text-orange-700">Materi Cadangan (Genap)</td>
-                                      <td className="border p-1 text-center font-bold">{jp} JP</td>
-                                      {[...Array(24)].map((_, j) => {
-                                        const isActive = j >= start && j < currentWeek;
-                                        return (
-                                          <td key={j} className={`border p-1 text-center font-bold ${isActive ? 'bg-green-400 text-white' : ''}`}>
-                                            {isActive ? jpPerMeet : ''}
-                                          </td>
-                                        );
-                                      })}
-                                    </tr>
-                                  );
-                                })()}
-                              </>
-                            );
-                          })()}
+                          {formData.jpUlanganHarianGenap && formData.semester.includes('Genap') && (
+                            <tr className="bg-slate-50 italic border-t-2 border-orange-100">
+                               <td className="border p-1 text-center font-bold">-</td>
+                               <td className="border p-1 font-medium text-orange-700">Ulangan Harian (Genap)</td>
+                               <td className="border p-1 text-center font-bold">{formData.jpUlanganHarianGenap} JP</td>
+                               {[...Array(30)].map((_, j) => (
+                                <td key={j} className="border p-1 text-center font-bold"></td>
+                              ))}
+                            </tr>
+                          )}
+                          {formData.jpCadanganGenap && formData.semester.includes('Genap') && (
+                            <tr className="bg-slate-50 italic">
+                               <td className="border p-1 text-center font-bold">-</td>
+                               <td className="border p-1 font-medium text-orange-700">Materi Cadangan (Genap)</td>
+                               <td className="border p-1 text-center font-bold">{formData.jpCadanganGenap} JP</td>
+                               {[...Array(30)].map((_, j) => (
+                                <td key={j} className="border p-1 text-center font-bold"></td>
+                              ))}
+                            </tr>
+                          )}
                           <tr className="bg-slate-100 font-bold">
                             <td colSpan={2} className="border p-1 text-right px-2 uppercase">Sumatif Tengah Semester</td>
                             <td className="border p-1 text-center">4 JP</td>
-                            {[...Array(24)].map((_, j) => (
-                              <td key={j} className={`border p-1 text-center ${j === 10 ? 'bg-red-400 text-white' : ''}`}>
-                                {j === 10 ? 'S' : ''}
-                              </td>
+                            {[...Array(30)].map((_, j) => (
+                              <td key={j} className="border p-1 text-center"></td>
                             ))}
                           </tr>
                           <tr className="bg-slate-100 font-bold">
                             <td colSpan={2} className="border p-1 text-right px-2 uppercase">Sumatif Akhir Semester</td>
                             <td className="border p-1 text-center">4 JP</td>
-                            {[...Array(24)].map((_, j) => (
-                              <td key={j} className={`border p-1 text-center ${j === 22 ? 'bg-red-400 text-white' : ''}`}>
-                                {j === 22 ? 'S' : ''}
-                              </td>
+                            {[...Array(30)].map((_, j) => (
+                              <td key={j} className="border p-1 text-center"></td>
                             ))}
                           </tr>
                         </tbody>
@@ -1197,10 +1145,17 @@ const App = () => {
         .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         
         @media print {
-          @page { size: A4; margin: 0; }
-          body { background: white !important; }
-          .break-after-page { page-break-after: always; margin: 0 !important; border: none !important; box-shadow: none !important; }
+          @page { 
+            size: ${formData.paperSize === 'F4' ? '215mm 330mm' : formData.paperSize}; 
+            margin: 20mm; 
+          }
+          body { background: white !important; margin: 0 !important; }
+          .break-after-page { page-break-after: always; border: none !important; box-shadow: none !important; width: 100% !important; max-width: none !important; min-height: 0 !important; }
           .print\\:break-inside-avoid { break-inside: avoid; }
+          .printable-content table { break-inside: auto; }
+          .printable-content tr { break-inside: avoid; break-after: auto; }
+          .printable-content thead { display: table-header-group; }
+          .printable-content tfoot { display: table-footer-group; }
         }
       `}</style>
     </div>
