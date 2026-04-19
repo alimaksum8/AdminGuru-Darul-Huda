@@ -194,7 +194,7 @@ const App = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       id={id} 
-      className="bg-white pt-16 pb-16 pl-28 pr-16 shadow-2xl mx-auto my-8 border border-gray-100 print:shadow-none print:p-0 w-full relative break-after-page"
+      className="bg-white pt-12 pb-12 pl-28 pr-16 shadow-2xl mx-auto my-8 border border-gray-100 print:shadow-none print:p-0 w-full relative break-after-page"
       style={{ 
         maxWidth: paperStyles[formData.paperSize as keyof typeof paperStyles].width,
         minHeight: paperStyles[formData.paperSize as keyof typeof paperStyles].height
@@ -1047,56 +1047,76 @@ const App = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {materiList.map((m, i) => (
-                            <tr key={i}>
-                              <td className="border p-1 text-center font-bold">{i + 1}</td>
-                              <td className="border p-1 font-medium">{m.judul || '...'}</td>
-                              <td className="border p-1 text-center font-bold">{m.jp || '...'} JP</td>
-                              {[...Array(30)].map((_, j) => (
-                                <td key={j} className="border p-1 text-center font-bold h-6"></td>
+                          {/* SEMESTER GANJIL SECTION */}
+                          {formData.semester.includes('Ganjil') && (
+                            <>
+                              {materiGanjil.map((m, i) => (
+                                <tr key={`prosem-ganjil-${i}`}>
+                                  <td className="border p-1 text-center font-bold">{i + 1}</td>
+                                  <td className="border p-1 font-medium">{m.judul || '...'}</td>
+                                  <td className="border p-1 text-center font-bold">{m.jp || '...'} JP</td>
+                                  {[...Array(30)].map((_, j) => (
+                                    <td key={j} className="border p-1 text-center font-bold h-6"></td>
+                                  ))}
+                                </tr>
                               ))}
-                            </tr>
-                          ))}
-                          {formData.jpUlanganHarianGanjil && formData.semester.includes('Ganjil') && (
-                            <tr className="bg-slate-50 italic">
-                               <td className="border p-1 text-center font-bold">-</td>
-                               <td className="border p-1 font-medium text-indigo-700">Ulangan Harian (Ganjil)</td>
-                               <td className="border p-1 text-center font-bold">{formData.jpUlanganHarianGanjil} JP</td>
-                               {[...Array(30)].map((_, j) => (
-                                <td key={j} className="border p-1 text-center font-bold"></td>
-                              ))}
-                            </tr>
-                          )}
-                          {formData.jpCadanganGanjil && formData.semester.includes('Ganjil') && (
-                            <tr className="bg-slate-50 italic">
-                               <td className="border p-1 text-center font-bold">-</td>
-                               <td className="border p-1 font-medium text-indigo-700">Materi Cadangan (Ganjil)</td>
-                               <td className="border p-1 text-center font-bold">{formData.jpCadanganGanjil} JP</td>
-                               {[...Array(30)].map((_, j) => (
-                                <td key={j} className="border p-1 text-center font-bold"></td>
-                              ))}
-                            </tr>
+                              {formData.jpUlanganHarianGanjil && (
+                                <tr className="bg-slate-50 italic">
+                                   <td className="border p-1 text-center font-bold">-</td>
+                                   <td className="border p-1 font-medium text-indigo-700">Ulangan Harian (Ganjil)</td>
+                                   <td className="border p-1 text-center font-bold">{formData.jpUlanganHarianGanjil} JP</td>
+                                   {[...Array(30)].map((_, j) => (
+                                    <td key={j} className="border p-1 text-center font-bold"></td>
+                                  ))}
+                                </tr>
+                              )}
+                              {formData.jpCadanganGanjil && (
+                                <tr className="bg-slate-50 italic">
+                                   <td className="border p-1 text-center font-bold">-</td>
+                                   <td className="border p-1 font-medium text-indigo-700">Materi Cadangan (Ganjil)</td>
+                                   <td className="border p-1 text-center font-bold">{formData.jpCadanganGanjil} JP</td>
+                                   {[...Array(30)].map((_, j) => (
+                                    <td key={j} className="border p-1 text-center font-bold"></td>
+                                  ))}
+                                </tr>
+                              )}
+                            </>
                           )}
 
-                          {formData.jpUlanganHarianGenap && formData.semester.includes('Genap') && (
-                            <tr className="bg-slate-50 italic border-t-2 border-orange-100">
-                               <td className="border p-1 text-center font-bold">-</td>
-                               <td className="border p-1 font-medium text-orange-700">Ulangan Harian (Genap)</td>
-                               <td className="border p-1 text-center font-bold">{formData.jpUlanganHarianGenap} JP</td>
-                               {[...Array(30)].map((_, j) => (
-                                <td key={j} className="border p-1 text-center font-bold"></td>
+                          {/* SEMESTER GENAP SECTION */}
+                          {formData.semester.includes('Genap') && (
+                            <>
+                              {materiGenap.map((m, i) => (
+                                <tr key={`prosem-genap-${i}`}>
+                                  <td className="border p-1 text-center font-bold">{(formData.semester.includes('Ganjil') ? materiGanjil.length : 0) + i + 1}</td>
+                                  <td className="border p-1 font-medium">{m.judul || '...'}</td>
+                                  <td className="border p-1 text-center font-bold">{m.jp || '...'} JP</td>
+                                  {[...Array(30)].map((_, j) => (
+                                    <td key={j} className="border p-1 text-center font-bold h-6"></td>
+                                  ))}
+                                </tr>
                               ))}
-                            </tr>
-                          )}
-                          {formData.jpCadanganGenap && formData.semester.includes('Genap') && (
-                            <tr className="bg-slate-50 italic">
-                               <td className="border p-1 text-center font-bold">-</td>
-                               <td className="border p-1 font-medium text-orange-700">Materi Cadangan (Genap)</td>
-                               <td className="border p-1 text-center font-bold">{formData.jpCadanganGenap} JP</td>
-                               {[...Array(30)].map((_, j) => (
-                                <td key={j} className="border p-1 text-center font-bold"></td>
-                              ))}
-                            </tr>
+                              {formData.jpUlanganHarianGenap && (
+                                <tr className="bg-slate-50 italic border-t-2 border-orange-100">
+                                   <td className="border p-1 text-center font-bold">-</td>
+                                   <td className="border p-1 font-medium text-orange-700">Ulangan Harian (Genap)</td>
+                                   <td className="border p-1 text-center font-bold">{formData.jpUlanganHarianGenap} JP</td>
+                                   {[...Array(30)].map((_, j) => (
+                                    <td key={j} className="border p-1 text-center font-bold"></td>
+                                  ))}
+                                </tr>
+                              )}
+                              {formData.jpCadanganGenap && (
+                                <tr className="bg-slate-50 italic">
+                                   <td className="border p-1 text-center font-bold">-</td>
+                                   <td className="border p-1 font-medium text-orange-700">Materi Cadangan (Genap)</td>
+                                   <td className="border p-1 text-center font-bold">{formData.jpCadanganGenap} JP</td>
+                                   {[...Array(30)].map((_, j) => (
+                                    <td key={j} className="border p-1 text-center font-bold"></td>
+                                  ))}
+                                </tr>
+                              )}
+                            </>
                           )}
                           <tr className="bg-slate-100 font-bold">
                             <td colSpan={2} className="border p-1 text-right px-2 uppercase">Sumatif Tengah Semester</td>
@@ -1137,8 +1157,8 @@ const App = () => {
         @media print {
           @page { 
             size: ${formData.paperSize === 'F4' ? '215mm 330mm' : formData.paperSize}; 
-            margin-top: 15mm;
-            margin-bottom: 15mm;
+            margin-top: 12.5mm;
+            margin-bottom: 12.5mm;
             margin-left: 30mm;
             margin-right: 15mm; 
           }
