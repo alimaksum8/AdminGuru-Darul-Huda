@@ -194,7 +194,7 @@ const App = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       id={id} 
-      className="bg-white p-16 shadow-2xl mx-auto my-8 border border-gray-100 print:shadow-none print:p-0 w-full relative break-after-page"
+      className="bg-white pt-16 pb-16 pl-28 pr-16 shadow-2xl mx-auto my-8 border border-gray-100 print:shadow-none print:p-0 w-full relative break-after-page"
       style={{ 
         maxWidth: paperStyles[formData.paperSize as keyof typeof paperStyles].width,
         minHeight: paperStyles[formData.paperSize as keyof typeof paperStyles].height
@@ -237,17 +237,7 @@ const App = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col md:flex-row font-sans">
-      {/* Dynamic Print Size Style */}
-      <style>{`
-        @media print {
-          @page {
-            size: ${formData.paperSize === 'F4' ? '215mm 330mm' : formData.paperSize};
-            margin: 0;
-          }
-        }
-      `}</style>
-
+    <div className="min-h-screen bg-slate-100 flex flex-col md:flex-row font-sans print:bg-white print:block">
       {/* Sidebar Controls */}
       <div className="w-full md:w-80 bg-white border-r border-gray-200 p-6 space-y-6 overflow-y-auto max-h-screen sticky top-0 print:hidden shadow-xl z-20">
         <div className="flex items-center gap-3 mb-6">
@@ -539,8 +529,8 @@ const App = () => {
       </div>
 
       {/* Main Preview Area */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-12 print:p-0 print:bg-white bg-slate-200/50">
-        <div className="max-w-[800px] mx-auto">
+      <div className="flex-1 overflow-y-auto p-4 md:p-12 print:overflow-visible print:p-0 print:bg-white bg-slate-200/50">
+        <div className="max-w-[800px] mx-auto print:max-w-none print:w-full">
           
           {!isGenerated && !isGenerating && (
             <div className="h-[70vh] flex flex-col items-center justify-center text-gray-400 border-4 border-dashed border-gray-300 rounded-3xl bg-white/50 backdrop-blur-sm">
@@ -1147,15 +1137,24 @@ const App = () => {
         @media print {
           @page { 
             size: ${formData.paperSize === 'F4' ? '215mm 330mm' : formData.paperSize}; 
-            margin: 20mm; 
+            margin-top: 15mm;
+            margin-bottom: 15mm;
+            margin-left: 30mm;
+            margin-right: 15mm; 
           }
-          body { background: white !important; margin: 0 !important; }
-          .break-after-page { page-break-after: always; border: none !important; box-shadow: none !important; width: 100% !important; max-width: none !important; min-height: 0 !important; }
-          .print\\:break-inside-avoid { break-inside: avoid; }
-          .printable-content table { break-inside: auto; }
+          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          body { background: white !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: auto !important; overflow: visible !important; }
+          .min-h-screen { min-height: 0 !important; }
+          .break-after-page { page-break-after: always; border: none !important; box-shadow: none !important; width: 100% !important; max-width: none !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; }
+          .print\\:hidden, #sidebar, header, nav { display: none !important; }
+          .print\\:block { display: block !important; }
+          .print\\:overflow-visible { overflow: visible !important; }
+          .printable-content table { break-inside: auto; width: 100% !important; border-collapse: collapse !important; }
           .printable-content tr { break-inside: avoid; break-after: auto; }
           .printable-content thead { display: table-header-group; }
           .printable-content tfoot { display: table-footer-group; }
+          .shadow-2xl, .shadow-xl, .shadow-md, .shadow-lg { box-shadow: none !important; }
+          .border { border-color: #000 !important; }
         }
       `}</style>
     </div>
