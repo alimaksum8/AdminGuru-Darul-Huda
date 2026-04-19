@@ -25,6 +25,17 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
+interface SubMateri {
+  judul: string;
+  jp: string;
+}
+
+interface Materi {
+  judul: string;
+  jp: string;
+  subMateri: SubMateri[];
+}
+
 const App = () => {
   // State for Form Identity
   const [formData, setFormData] = useState({
@@ -56,8 +67,8 @@ const App = () => {
   };
 
   // State for Dynamic Materials - Split by Semester
-  const [materiGanjil, setMateriGanjil] = useState([{ judul: '', jp: '' }]);
-  const [materiGenap, setMateriGenap] = useState([{ judul: '', jp: '' }]);
+  const [materiGanjil, setMateriGanjil] = useState<Materi[]>([{ judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
+  const [materiGenap, setMateriGenap] = useState<Materi[]>([{ judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
 
   const [pekanDataGanjil, setPekanDataGanjil] = useState([
     { bulan: 'Juli', total: 4, nonEfektif: 2, keterangan: 'Libur Semester' },
@@ -155,17 +166,18 @@ const App = () => {
   };
 
   const addMateri = (sem: 'Ganjil' | 'Genap') => {
-    if (sem === 'Ganjil') setMateriGanjil([...materiGanjil, { judul: '', jp: '' }]);
-    else setMateriGenap([...materiGenap, { judul: '', jp: '' }]);
+    const defaultMateri = { judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] };
+    if (sem === 'Ganjil') setMateriGanjil([...materiGanjil, defaultMateri]);
+    else setMateriGenap([...materiGenap, defaultMateri]);
   };
 
   const removeMateri = (sem: 'Ganjil' | 'Genap', index: number) => {
     if (sem === 'Ganjil') {
       const newList = materiGanjil.filter((_, i) => i !== index);
-      setMateriGanjil(newList.length ? newList : [{ judul: '', jp: '' }]);
+      setMateriGanjil(newList.length ? newList : [{ judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
     } else {
       const newList = materiGenap.filter((_, i) => i !== index);
-      setMateriGenap(newList.length ? newList : [{ judul: '', jp: '' }]);
+      setMateriGenap(newList.length ? newList : [{ judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
     }
   };
 
@@ -180,6 +192,77 @@ const App = () => {
       setMateriGenap(newList);
     }
     setIsGenerated(false);
+  };
+
+  const addSubMateri = (sem: 'Ganjil' | 'Genap', materiIdx: number) => {
+    if (sem === 'Ganjil') {
+      const newList = [...materiGanjil];
+      newList[materiIdx].subMateri.push({ judul: '', jp: '' });
+      setMateriGanjil(newList);
+    } else {
+      const newList = [...materiGenap];
+      newList[materiIdx].subMateri.push({ judul: '', jp: '' });
+      setMateriGenap(newList);
+    }
+  };
+
+  const removeSubMateri = (sem: 'Ganjil' | 'Genap', materiIdx: number, subIdx: number) => {
+    if (sem === 'Ganjil') {
+      const newList = [...materiGanjil];
+      newList[materiIdx].subMateri = newList[materiIdx].subMateri.filter((_, i) => i !== subIdx);
+      if (newList[materiIdx].subMateri.length === 0) newList[materiIdx].subMateri = [{ judul: '', jp: '' }];
+      setMateriGanjil(newList);
+    } else {
+      const newList = [...materiGenap];
+      newList[materiIdx].subMateri = newList[materiIdx].subMateri.filter((_, i) => i !== subIdx);
+      if (newList[materiIdx].subMateri.length === 0) newList[materiIdx].subMateri = [{ judul: '', jp: '' }];
+      setMateriGenap(newList);
+    }
+  };
+
+  const handleSubMateriChange = (sem: 'Ganjil' | 'Genap', materiIdx: number, subIdx: number, field: 'judul' | 'jp', value: string) => {
+    if (sem === 'Ganjil') {
+      const newList = [...materiGanjil];
+      newList[materiIdx].subMateri[subIdx] = { ...newList[materiIdx].subMateri[subIdx], [field]: value };
+      setMateriGanjil(newList);
+    } else {
+      const newList = [...materiGenap];
+      newList[materiIdx].subMateri[subIdx] = { ...newList[materiIdx].subMateri[subIdx], [field]: value };
+      setMateriGenap(newList);
+    }
+    setIsGenerated(false);
+  };
+
+  const distributeJp = (sem: 'Ganjil' | 'Genap', materiIdx: number) => {
+    const list = sem === 'Ganjil' ? [...materiGanjil] : [...materiGenap];
+    const materi = list[materiIdx];
+    const totalJp = Number(materi.jp) || 0;
+    const subCount = materi.subMateri.length;
+    const jpPerSessi = Number(formData.jpPerPertemuan) || 2;
+
+    if (totalJp <= 0 || subCount === 0) return;
+
+    // Distribute JP logically based on jpPerPertemuan
+    // We want each sub to have a multiple of jpPerPertemuan if possible, 
+    // or at least have the sum match totalJp.
+    
+    let remaining = totalJp;
+    const newSubMateri = materi.subMateri.map((sub, idx) => {
+      if (idx === subCount - 1) {
+        return { ...sub, jp: remaining.toString() };
+      }
+      
+      // Calculate a "fair" share but snap to jpPerPertemuan
+      const initialShare = Math.max(jpPerSessi, Math.floor(totalJp / subCount));
+      const share = Math.min(remaining - (subCount - 1 - idx) * 1, initialShare); // ensure at least 1 for remaining
+      
+      remaining -= share;
+      return { ...sub, jp: share.toString() };
+    });
+
+    list[materiIdx].subMateri = newSubMateri;
+    if (sem === 'Ganjil') setMateriGanjil(list);
+    else setMateriGenap(list);
   };
 
   const toggleDoc = (id: string) => {
@@ -403,36 +486,90 @@ const App = () => {
               <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                  <PenTool size={12} className="text-indigo-600" /> Materi Pokok (Ganjil)
               </h3>
-              <button onClick={() => addMateri('Ganjil')} className="p-1 text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
-                <Plus size={16} />
+              <button 
+                onClick={() => addMateri('Ganjil')} 
+                className="flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all border border-indigo-100"
+              >
+                <Plus size={12} /> Materi
               </button>
             </div>
-            <div className="space-y-2 max-h-40 overflow-y-auto pr-2 scrollbar-thin">
+            <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin">
               {materiGanjil.map((materi, idx) => (
                 <motion.div 
                   layout
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   key={`ganjil-${idx}`} 
-                  className="flex gap-1 group items-center"
+                  className="space-y-2 p-3 bg-slate-50/50 rounded-xl border border-slate-200"
                 >
-                  <input 
-                    value={materi.judul} 
-                    onChange={(e) => handleMateriChange('Ganjil', idx, 'judul', e.target.value)}
-                    placeholder={`Ganjil ${idx + 1}`}
-                    className="flex-1 p-2 bg-gray-50 border border-gray-200 rounded text-xs focus:ring-1 focus:ring-indigo-500 outline-none"
-                  />
-                  <input 
-                    type="number"
-                    min="0"
-                    value={materi.jp} 
-                    onChange={(e) => handleMateriChange('Ganjil', idx, 'jp', e.target.value)}
-                    placeholder="JP"
-                    className="w-12 p-2 bg-gray-50 border border-gray-200 rounded text-xs focus:ring-1 focus:ring-indigo-500 outline-none text-center"
-                  />
-                  <button onClick={() => removeMateri('Ganjil', idx)} className="text-gray-300 hover:text-red-500 transition-colors p-1">
-                    <Trash2 size={14} />
-                  </button>
+                  <div className="flex gap-1 group items-center">
+                    <input 
+                      value={materi.judul} 
+                      onChange={(e) => handleMateriChange('Ganjil', idx, 'judul', e.target.value)}
+                      placeholder={`Materi Ganjil ${idx + 1}`}
+                      className="flex-1 p-2 bg-white border border-gray-200 rounded-lg text-xs font-bold focus:ring-1 focus:ring-indigo-500 outline-none"
+                    />
+                    <div className="flex flex-col items-center">
+                      <label className="text-[8px] font-bold text-gray-400 uppercase">Tot JP</label>
+                      <input 
+                        type="number"
+                        min="0"
+                        value={materi.jp} 
+                        onChange={(e) => handleMateriChange('Ganjil', idx, 'jp', e.target.value)}
+                        placeholder="JP"
+                        className="w-12 p-2 bg-white border border-gray-200 rounded-lg text-xs font-black focus:ring-1 focus:ring-indigo-500 outline-none text-center"
+                      />
+                    </div>
+                    <button onClick={() => removeMateri('Ganjil', idx)} className="text-gray-300 hover:text-red-500 transition-colors p-1">
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+
+                  {/* Sub Materi Section */}
+                  <div className="pl-4 space-y-2 border-l-2 border-indigo-100 mt-2">
+                    <div className="flex justify-between items-center">
+                      <p className="text-[9px] font-black text-indigo-400 uppercase">Sub Materi</p>
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => distributeJp('Ganjil', idx)}
+                          className="flex items-center gap-1 text-[8px] font-bold text-slate-500 hover:text-indigo-600 bg-white border px-1.5 py-0.5 rounded shadow-sm"
+                          title="Bagi JP Otomatis"
+                        >
+                          <Wand2 size={10} /> Auto JP
+                        </button>
+                        <button 
+                          onClick={() => addSubMateri('Ganjil', idx)}
+                          className="flex items-center gap-1 text-[8px] font-bold text-indigo-600 hover:bg-white border border-indigo-100 px-1.5 py-0.5 rounded shadow-sm"
+                        >
+                          <Plus size={10} /> Sub
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-1.5">
+                      {materi.subMateri.map((sub, sIdx) => (
+                        <div key={`sub-ganjil-${idx}-${sIdx}`} className="flex gap-1 items-center animate-in fade-in slide-in-from-left-2">
+                          <input 
+                            value={sub.judul} 
+                            onChange={(e) => handleSubMateriChange('Ganjil', idx, sIdx, 'judul', e.target.value)}
+                            placeholder={`Sub ${sIdx + 1}`}
+                            className="flex-1 p-1.5 bg-white border border-gray-100 rounded text-[10px] focus:ring-1 focus:ring-indigo-500 outline-none"
+                          />
+                          <input 
+                            type="number"
+                            min="0"
+                            value={sub.jp} 
+                            onChange={(e) => handleSubMateriChange('Ganjil', idx, sIdx, 'jp', e.target.value)}
+                            placeholder="jp"
+                            className="w-10 p-1.5 bg-white border border-gray-100 rounded text-[10px] focus:ring-1 focus:ring-indigo-500 outline-none text-center font-bold"
+                          />
+                          <button onClick={() => removeSubMateri('Ganjil', idx, sIdx)} className="text-gray-200 hover:text-red-400 p-1">
+                            <X size={10} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -446,36 +583,90 @@ const App = () => {
               <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                  <PenTool size={12} className="text-orange-600" /> Materi Pokok (Genap)
               </h3>
-              <button onClick={() => addMateri('Genap')} className="p-1 text-orange-600 hover:bg-orange-50 rounded-full transition-colors">
-                <Plus size={16} />
+              <button 
+                onClick={() => addMateri('Genap')} 
+                className="flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-orange-600 hover:bg-orange-50 rounded-lg transition-all border border-orange-100"
+              >
+                <Plus size={12} /> Materi
               </button>
             </div>
-            <div className="space-y-2 max-h-40 overflow-y-auto pr-2 scrollbar-thin">
+            <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin">
               {materiGenap.map((materi, idx) => (
                 <motion.div 
                   layout
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   key={`genap-${idx}`} 
-                  className="flex gap-1 group items-center"
+                  className="space-y-2 p-3 bg-slate-50/50 rounded-xl border border-slate-200"
                 >
-                  <input 
-                    value={materi.judul} 
-                    onChange={(e) => handleMateriChange('Genap', idx, 'judul', e.target.value)}
-                    placeholder={`Genap ${idx + 1}`}
-                    className="flex-1 p-2 bg-gray-50 border border-gray-200 rounded text-xs focus:ring-1 focus:ring-orange-500 outline-none"
-                  />
-                  <input 
-                    type="number"
-                    min="0"
-                    value={materi.jp} 
-                    onChange={(e) => handleMateriChange('Genap', idx, 'jp', e.target.value)}
-                    placeholder="JP"
-                    className="w-12 p-2 bg-gray-50 border border-gray-200 rounded text-xs focus:ring-1 focus:ring-orange-500 outline-none text-center"
-                  />
-                  <button onClick={() => removeMateri('Genap', idx)} className="text-gray-300 hover:text-red-500 transition-colors p-1">
-                    <Trash2 size={14} />
-                  </button>
+                  <div className="flex gap-1 group items-center">
+                    <input 
+                      value={materi.judul} 
+                      onChange={(e) => handleMateriChange('Genap', idx, 'judul', e.target.value)}
+                      placeholder={`Materi Genap ${idx + 1}`}
+                      className="flex-1 p-2 bg-white border border-gray-200 rounded-lg text-xs font-bold focus:ring-1 focus:ring-orange-500 outline-none"
+                    />
+                    <div className="flex flex-col items-center">
+                      <label className="text-[8px] font-bold text-gray-400 uppercase">Tot JP</label>
+                      <input 
+                        type="number"
+                        min="0"
+                        value={materi.jp} 
+                        onChange={(e) => handleMateriChange('Genap', idx, 'jp', e.target.value)}
+                        placeholder="JP"
+                        className="w-12 p-2 bg-white border border-gray-200 rounded-lg text-xs font-black focus:ring-1 focus:ring-orange-500 outline-none text-center"
+                      />
+                    </div>
+                    <button onClick={() => removeMateri('Genap', idx)} className="text-gray-300 hover:text-red-500 transition-colors p-1">
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+
+                  {/* Sub Materi Section */}
+                  <div className="pl-4 space-y-2 border-l-2 border-orange-100 mt-2">
+                    <div className="flex justify-between items-center">
+                      <p className="text-[9px] font-black text-orange-400 uppercase">Sub Materi</p>
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => distributeJp('Genap', idx)}
+                          className="flex items-center gap-1 text-[8px] font-bold text-slate-500 hover:text-orange-600 bg-white border px-1.5 py-0.5 rounded shadow-sm"
+                          title="Bagi JP Otomatis"
+                        >
+                          <Wand2 size={10} /> Auto JP
+                        </button>
+                        <button 
+                          onClick={() => addSubMateri('Genap', idx)}
+                          className="flex items-center gap-1 text-[8px] font-bold text-orange-600 hover:bg-white border border-orange-100 px-1.5 py-0.5 rounded shadow-sm"
+                        >
+                          <Plus size={10} /> Sub
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-1.5">
+                      {materi.subMateri.map((sub, sIdx) => (
+                        <div key={`sub-genap-${idx}-${sIdx}`} className="flex gap-1 items-center animate-in fade-in slide-in-from-left-2">
+                          <input 
+                            value={sub.judul} 
+                            onChange={(e) => handleSubMateriChange('Genap', idx, sIdx, 'judul', e.target.value)}
+                            placeholder={`Sub ${sIdx + 1}`}
+                            className="flex-1 p-1.5 bg-white border border-gray-100 rounded text-[10px] focus:ring-1 focus:ring-orange-500 outline-none"
+                          />
+                          <input 
+                            type="number"
+                            min="0"
+                            value={sub.jp} 
+                            onChange={(e) => handleSubMateriChange('Genap', idx, sIdx, 'jp', e.target.value)}
+                            placeholder="jp"
+                            className="w-10 p-1.5 bg-white border border-gray-100 rounded text-[10px] focus:ring-1 focus:ring-orange-500 outline-none text-center font-bold"
+                          />
+                          <button onClick={() => removeSubMateri('Genap', idx, sIdx)} className="text-gray-200 hover:text-red-400 p-1">
+                            <X size={10} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -1046,11 +1237,20 @@ const App = () => {
                                 <td className="border p-2 text-center">{totalGanjil} JP</td>
                               </tr>
                               {materiGanjil.map((m, i) => (
-                                <tr key={`prota-ganjil-${i}`}>
-                                  <td className="border p-2 text-center">{i + 1}</td>
-                                  <td className="border p-2">{m.judul || '...'}</td>
-                                  <td className="border p-2 text-center">{m.jp || '4'} JP</td>
-                                </tr>
+                                <React.Fragment key={`prota-ganjil-${i}`}>
+                                  <tr className="bg-slate-50/50 font-bold">
+                                    <td className="border p-2 text-center">{i + 1}</td>
+                                    <td className="border p-2">{m.judul || '...'}</td>
+                                    <td className="border p-2 text-center">{m.jp || '...'} JP</td>
+                                  </tr>
+                                  {m.subMateri.map((sub, sIdx) => (
+                                    <tr key={`prota-ganjil-sub-${i}-${sIdx}`}>
+                                      <td className="border p-2 text-center text-[10px] text-gray-400 opacity-50">•</td>
+                                      <td className="border p-2 pl-6 italic text-gray-600">{sub.judul || '...'}</td>
+                                      <td className="border p-2 text-center text-gray-500 font-medium">{sub.jp || '...'} JP</td>
+                                    </tr>
+                                  ))}
+                                </React.Fragment>
                               ))}
                               {formData.jpUlanganHarianGanjil && (
                                 <tr className="bg-slate-50 italic">
@@ -1077,11 +1277,20 @@ const App = () => {
                                 <td className="border p-2 text-center">{totalGenap} JP</td>
                               </tr>
                               {materiGenap.map((m, i) => (
-                                <tr key={`prota-genap-${i}`}>
-                                  <td className="border p-2 text-center">{(formData.semester.includes('Ganjil') ? materiGanjil.length : 0) + i + 1}</td>
-                                  <td className="border p-2">{m.judul || '...'}</td>
-                                  <td className="border p-2 text-center">{m.jp || '4'} JP</td>
-                                </tr>
+                                <React.Fragment key={`prota-genap-${i}`}>
+                                  <tr className="bg-slate-50/50 font-bold">
+                                    <td className="border p-2 text-center">{(formData.semester.includes('Ganjil') ? materiGanjil.length : 0) + i + 1}</td>
+                                    <td className="border p-2">{m.judul || '...'}</td>
+                                    <td className="border p-2 text-center">{m.jp || '...'} JP</td>
+                                  </tr>
+                                  {m.subMateri.map((sub, sIdx) => (
+                                    <tr key={`prota-genap-sub-${i}-${sIdx}`}>
+                                      <td className="border p-2 text-center text-[10px] text-gray-400 opacity-50">•</td>
+                                      <td className="border p-2 pl-6 italic text-gray-600">{sub.judul || '...'}</td>
+                                      <td className="border p-2 text-center text-gray-500 font-medium">{sub.jp || '...'} JP</td>
+                                    </tr>
+                                  ))}
+                                </React.Fragment>
                               ))}
                               {formData.jpUlanganHarianGenap && (
                                 <tr className="bg-slate-50 italic">
@@ -1146,14 +1355,26 @@ const App = () => {
                           {formData.semester.includes('Ganjil') && (
                             <>
                               {materiGanjil.map((m, i) => (
-                                <tr key={`prosem-ganjil-${i}`}>
-                                  <td className="border p-1 text-center font-bold">{i + 1}</td>
-                                  <td className="border p-1 font-medium">{m.judul || '...'}</td>
-                                  <td className="border p-1 text-center font-bold">{m.jp || '...'} JP</td>
-                                  {[...Array(30)].map((_, j) => (
-                                    <td key={j} className="border p-1 text-center font-bold h-6"></td>
+                                <React.Fragment key={`prosem-ganjil-${i}`}>
+                                  <tr className="bg-slate-50/50 font-bold">
+                                    <td className="border p-1 text-center">{i + 1}</td>
+                                    <td className="border p-1">{m.judul || '...'}</td>
+                                    <td className="border p-1 text-center">{m.jp || '...'} JP</td>
+                                    {[...Array(30)].map((_, j) => (
+                                      <td key={j} className="border p-1 text-center h-6"></td>
+                                    ))}
+                                  </tr>
+                                  {m.subMateri.map((sub, sIdx) => (
+                                    <tr key={`prosem-ganjil-sub-${i}-${sIdx}`}>
+                                      <td className="border p-1 text-center text-[10px] text-gray-400 opacity-50">•</td>
+                                      <td className="border p-1 pl-4 italic text-gray-600 font-medium">{sub.judul || '...'}</td>
+                                      <td className="border p-1 text-center text-gray-500 font-bold">{sub.jp || '...'} JP</td>
+                                      {[...Array(30)].map((_, j) => (
+                                        <td key={j} className="border p-1 text-center h-6"></td>
+                                      ))}
+                                    </tr>
                                   ))}
-                                </tr>
+                                </React.Fragment>
                               ))}
                               {formData.jpUlanganHarianGanjil && (
                                 <tr className="bg-slate-50 italic">
@@ -1182,14 +1403,26 @@ const App = () => {
                           {formData.semester.includes('Genap') && (
                             <>
                               {materiGenap.map((m, i) => (
-                                <tr key={`prosem-genap-${i}`}>
-                                  <td className="border p-1 text-center font-bold">{(formData.semester.includes('Ganjil') ? materiGanjil.length : 0) + i + 1}</td>
-                                  <td className="border p-1 font-medium">{m.judul || '...'}</td>
-                                  <td className="border p-1 text-center font-bold">{m.jp || '...'} JP</td>
-                                  {[...Array(30)].map((_, j) => (
-                                    <td key={j} className="border p-1 text-center font-bold h-6"></td>
+                                <React.Fragment key={`prosem-genap-${i}`}>
+                                  <tr className="bg-slate-50/50 font-bold">
+                                    <td className="border p-1 text-center font-bold">{(formData.semester.includes('Ganjil') ? materiGanjil.length : 0) + i + 1}</td>
+                                    <td className="border p-1">{m.judul || '...'}</td>
+                                    <td className="border p-1 text-center font-bold">{m.jp || '...'} JP</td>
+                                    {[...Array(30)].map((_, j) => (
+                                      <td key={j} className="border p-1 text-center h-6"></td>
+                                    ))}
+                                  </tr>
+                                  {m.subMateri.map((sub, sIdx) => (
+                                    <tr key={`prosem-genap-sub-${i}-${sIdx}`}>
+                                      <td className="border p-1 text-center text-[10px] text-gray-400 opacity-50">•</td>
+                                      <td className="border p-1 pl-4 italic text-gray-600 font-medium">{sub.judul || '...'}</td>
+                                      <td className="border p-1 text-center text-gray-500 font-bold">{sub.jp || '...'} JP</td>
+                                      {[...Array(30)].map((_, j) => (
+                                        <td key={j} className="border p-1 text-center h-6"></td>
+                                      ))}
+                                    </tr>
                                   ))}
-                                </tr>
+                                </React.Fragment>
                               ))}
                               {formData.jpUlanganHarianGenap && (
                                 <tr className="bg-slate-50 italic border-t-2 border-orange-100">
