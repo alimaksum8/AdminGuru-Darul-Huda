@@ -21,7 +21,8 @@ import {
   Plus,
   Trash2,
   Wand2,
-  X
+  X,
+  Zap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -137,6 +138,11 @@ const App = () => {
   const totalPekanTahun = (formData.semester.includes('Ganjil') ? totalPekanGanjil : 0) + (formData.semester.includes('Genap') ? totalPekanGenap : 0);
   const totalNonTahun = (formData.semester.includes('Ganjil') ? totalNonGanjil : 0) + (formData.semester.includes('Genap') ? totalNonGenap : 0);
   const totalEfektifTahun = totalPekanTahun - totalNonTahun;
+
+  const jpSessi = Number(formData.jpPerPertemuan) || 0;
+  const hasilJpEfektifRaw = totalPekanTahun * jpSessi;
+  const hasilJpTidakEfektifRaw = totalNonTahun * jpSessi;
+  const hasilJpNetto = hasilJpEfektifRaw - hasilJpTidakEfektifRaw;
 
   // State for Selected Documents (Multi-select)
   const [selectedDocs, setSelectedDocs] = useState<string[]>([]);
@@ -774,6 +780,30 @@ const App = () => {
             <div className="flex justify-between border-b border-indigo-100 pb-1 pt-1 bg-indigo-50/30 px-1 rounded">
               <span className="text-indigo-600 font-black">Total Pekan Efektif:</span>
               <span className="font-black text-indigo-700">{totalEfektifTahun} Minggu</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-2">
+          <h3 className="text-[10px] font-bold text-amber-600 uppercase tracking-widest flex items-center gap-2">
+            <Zap size={12} /> Parameter Jumlah JP
+          </h3>
+          <div className="grid grid-cols-1 gap-1 text-[10px]">
+            <div className="flex justify-between border-b border-amber-200 pb-1">
+              <span className="text-amber-700 font-medium italic underline">Rumus (Pekan x {jpSessi} JP)</span>
+              <span className="font-bold text-amber-900">Hasil JP</span>
+            </div>
+            <div className="flex justify-between border-b border-amber-100 pb-1">
+              <span className="text-gray-600">Jumlah Hasil JP Efektif:</span>
+              <span className="font-bold text-slate-700">{hasilJpEfektifRaw} JP</span>
+            </div>
+            <div className="flex justify-between border-b border-amber-100 pb-1 text-red-600">
+              <span className="opacity-70">Jumlah Hasil JP Tidak Efektif:</span>
+              <span className="font-bold">-{hasilJpTidakEfektifRaw} JP</span>
+            </div>
+            <div className="flex justify-between border-b border-amber-300 pb-1 pt-1 bg-amber-100/50 px-1 rounded">
+              <span className="text-amber-800 font-black uppercase">Hasil Akhir JP:</span>
+              <span className="font-black text-amber-900">{hasilJpNetto} JP</span>
             </div>
           </div>
         </section>
