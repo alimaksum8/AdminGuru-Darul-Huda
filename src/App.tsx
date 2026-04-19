@@ -967,6 +967,20 @@ const App = () => {
                                   <td className="border p-2 text-center">{m.jp || '4'} JP</td>
                                 </tr>
                               ))}
+                              {formData.jpUlanganHarianGanjil && (
+                                <tr className="bg-slate-50 italic">
+                                  <td className="border p-2 text-center">-</td>
+                                  <td className="border p-2 text-indigo-700 font-medium">Ulangan Harian (Ganjil)</td>
+                                  <td className="border p-2 text-center">{formData.jpUlanganHarianGanjil} JP</td>
+                                </tr>
+                              )}
+                              {formData.jpCadanganGanjil && (
+                                <tr className="bg-slate-50 italic">
+                                  <td className="border p-2 text-center">-</td>
+                                  <td className="border p-2 text-indigo-700 font-medium">Materi Cadangan (Ganjil)</td>
+                                  <td className="border p-2 text-center">{formData.jpCadanganGanjil} JP</td>
+                                </tr>
+                              )}
                             </>
                           )}
                           
@@ -979,38 +993,26 @@ const App = () => {
                               </tr>
                               {materiGenap.map((m, i) => (
                                 <tr key={`prota-genap-${i}`}>
-                                  <td className="border p-2 text-center">{i + 1}</td>
+                                  <td className="border p-2 text-center">{(formData.semester.includes('Ganjil') ? materiGanjil.length : 0) + i + 1}</td>
                                   <td className="border p-2">{m.judul || '...'}</td>
                                   <td className="border p-2 text-center">{m.jp || '4'} JP</td>
                                 </tr>
                               ))}
+                              {formData.jpUlanganHarianGenap && (
+                                <tr className="bg-slate-50 italic">
+                                  <td className="border p-2 text-center">-</td>
+                                  <td className="border p-2 text-orange-700 font-medium">Ulangan Harian (Genap)</td>
+                                  <td className="border p-2 text-center">{formData.jpUlanganHarianGenap} JP</td>
+                                </tr>
+                              )}
+                              {formData.jpCadanganGenap && (
+                                <tr className="bg-slate-50 italic">
+                                  <td className="border p-2 text-center">-</td>
+                                  <td className="border p-2 text-orange-700 font-medium">Materi Cadangan (Genap)</td>
+                                  <td className="border p-2 text-center">{formData.jpCadanganGenap} JP</td>
+                                </tr>
+                              )}
                             </>
-                          )}
-
-                          {(formData.jpUlanganHarianGanjil || formData.jpCadanganGanjil) && formData.semester.includes('Ganjil') && (
-                            <tr className="bg-slate-50">
-                              <td className="border p-2 text-center text-[10px] font-bold text-indigo-600">GANJIL EXTRA</td>
-                              <td className="border p-2">
-                                <div className="space-y-1">
-                                  {formData.jpUlanganHarianGanjil && <p className="italic">Ulangan Harian (Ganjil): {formData.jpUlanganHarianGanjil} JP</p>}
-                                  {formData.jpCadanganGanjil && <p className="italic">Materi Cadangan (Ganjil): {formData.jpCadanganGanjil} JP</p>}
-                                </div>
-                              </td>
-                              <td className="border p-2 text-center font-bold">{(Number(formData.jpUlanganHarianGanjil) || 0) + (Number(formData.jpCadanganGanjil) || 0)} JP</td>
-                            </tr>
-                          )}
-
-                          {(formData.jpUlanganHarianGenap || formData.jpCadanganGenap) && formData.semester.includes('Genap') && (
-                            <tr className="bg-slate-50">
-                              <td className="border p-2 text-center text-[10px] font-bold text-orange-600">GENAP EXTRA</td>
-                              <td className="border p-2">
-                                <div className="space-y-1">
-                                  {formData.jpUlanganHarianGenap && <p className="italic">Ulangan Harian (Genap): {formData.jpUlanganHarianGenap} JP</p>}
-                                  {formData.jpCadanganGenap && <p className="italic">Materi Cadangan (Genap): {formData.jpCadanganGenap} JP</p>}
-                                </div>
-                              </td>
-                              <td className="border p-2 text-center font-bold">{(Number(formData.jpUlanganHarianGenap) || 0) + (Number(formData.jpCadanganGenap) || 0)} JP</td>
-                            </tr>
                           )}
                         </tbody>
                         <tfoot className="bg-slate-200 font-bold text-center">
