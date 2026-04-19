@@ -37,11 +37,20 @@ const App = () => {
     tanggalTtd: new Date().toISOString().split('T')[0],
     kelas: 'VII',
     semester: 'Ganjil',
-    tahunAjaran: '2024/2025'
+    tahunAjaran: '2024/2025',
+    paperSize: 'A4',
+    jpUlanganHarian: '',
+    jpCadangan: ''
   });
 
+  const paperStyles = {
+    A4: { width: '800px', height: '1123px' },
+    F4: { width: '812px', height: '1247px' },
+    A3: { width: '1123px', height: '1587px' }
+  };
+
   // State for Dynamic Materials
-  const [materiList, setMateriList] = useState(['']);
+  const [materiList, setMateriList] = useState([{ judul: '', jp: '' }]);
 
   // State for Selected Documents (Multi-select)
   const [selectedDocs, setSelectedDocs] = useState<string[]>([]);
@@ -67,14 +76,14 @@ const App = () => {
     setIsGenerated(false);
   };
 
-  const addMateri = () => setMateriList([...materiList, '']);
+  const addMateri = () => setMateriList([...materiList, { judul: '', jp: '' }]);
   const removeMateri = (index: number) => {
     const newList = materiList.filter((_, i) => i !== index);
-    setMateriList(newList.length ? newList : ['']);
+    setMateriList(newList.length ? newList : [{ judul: '', jp: '' }]);
   };
-  const handleMateriChange = (index: number, value: string) => {
+  const handleMateriChange = (index: number, field: 'judul' | 'jp', value: string) => {
     const newList = [...materiList];
-    newList[index] = value;
+    newList[index] = { ...newList[index], [field]: value };
     setMateriList(newList);
     setIsGenerated(false);
   };
@@ -100,7 +109,7 @@ const App = () => {
       alert("Pilih minimal satu perangkat untuk di-generate.");
       return;
     }
-    if (materiList.every(m => m.trim() === "")) {
+    if (materiList.every(m => m.judul.trim() === "")) {
       alert("Harap isi setidaknya satu materi pokok.");
       return;
     }
@@ -124,7 +133,11 @@ const App = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       id={id} 
-      className="bg-white p-12 shadow-2xl mx-auto my-8 border border-gray-100 print:shadow-none print:m-0 print:p-8 min-h-[1123px] w-full max-w-[800px] relative overflow-hidden break-after-page"
+      className="bg-white p-12 shadow-2xl mx-auto my-8 border border-gray-100 print:shadow-none print:m-0 print:p-8 w-full relative overflow-hidden break-after-page"
+      style={{ 
+        maxWidth: paperStyles[formData.paperSize as keyof typeof paperStyles].width,
+        minHeight: paperStyles[formData.paperSize as keyof typeof paperStyles].height
+      }}
     >
       <div className="text-center border-b-4 border-double border-gray-800 pb-4 mb-8">
         <h1 className="text-xl font-bold uppercase tracking-wider leading-tight">{formData.namaSekolah || 'NAMA SEKOLAH ANDA'}</h1>
@@ -161,6 +174,16 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col md:flex-row font-sans">
+      {/* Dynamic Print Size Style */}
+      <style>{`
+        @media print {
+          @page {
+            size: ${formData.paperSize === 'F4' ? '215mm 330mm' : formData.paperSize};
+            margin: 0;
+          }
+        }
+      `}</style>
+
       {/* Sidebar Controls */}
       <div className="w-full md:w-80 bg-white border-r border-gray-200 p-6 space-y-6 overflow-y-auto max-h-screen sticky top-0 print:hidden shadow-xl z-20">
         <div className="flex items-center gap-3 mb-6">
@@ -184,8 +207,13 @@ const App = () => {
                 <option value="Ganjil">Semester Ganjil</option>
                 <option value="Genap">Semester Genap</option>
               </select>
-              <input name="tahunAjaran" value={formData.tahunAjaran} onChange={handleInputChange} placeholder="Tahun Ajaran" className="p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+              <select name="paperSize" value={formData.paperSize} onChange={handleInputChange} className="p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                <option value="A4">Ukuran A4</option>
+                <option value="F4">Ukuran F4</option>
+                <option value="A3">Ukuran A3</option>
+              </select>
             </div>
+            <input name="tahunAjaran" value={formData.tahunAjaran} onChange={handleInputChange} placeholder="Tahun Ajaran" className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
             <select name="kurikulum" value={formData.kurikulum} onChange={handleInputChange} className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
               <option value="Kurikulum Merdeka">Kurikulum Merdeka</option>
               <option value="Deep Learning">Deep Learning</option>
@@ -208,6 +236,20 @@ const App = () => {
           </div>
         </section>
 
+        {/* Extra JP Inputs */}
+        <section className="space-y-4 pt-4 border-t border-gray-100">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Ulangan Harian (JP)</label>
+              <input type="number" min="0" name="jpUlanganHarian" value={formData.jpUlanganHarian} onChange={handleInputChange} placeholder="JP" className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Cadangan (JP)</label>
+              <input type="number" min="0" name="jpCadangan" value={formData.jpCadangan} onChange={handleInputChange} placeholder="JP" className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+            </div>
+          </div>
+        </section>
+
         {/* Dynamic Materi Inputs */}
         <section className="space-y-4 pt-4 border-t border-gray-100">
           <div className="flex justify-between items-center">
@@ -225,13 +267,21 @@ const App = () => {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 key={idx} 
-                className="flex gap-1 group"
+                className="flex gap-1 group items-center"
               >
                 <input 
-                  value={materi} 
-                  onChange={(e) => handleMateriChange(idx, e.target.value)}
+                  value={materi.judul} 
+                  onChange={(e) => handleMateriChange(idx, 'judul', e.target.value)}
                   placeholder={`Judul Materi ${idx + 1}`}
                   className="flex-1 p-2 bg-gray-50 border border-gray-200 rounded text-xs focus:ring-1 focus:ring-indigo-500 outline-none"
+                />
+                <input 
+                  type="number"
+                  min="0"
+                  value={materi.jp} 
+                  onChange={(e) => handleMateriChange(idx, 'jp', e.target.value)}
+                  placeholder="JP"
+                  className="w-12 p-2 bg-gray-50 border border-gray-200 rounded text-xs focus:ring-1 focus:ring-indigo-500 outline-none text-center"
                 />
                 <button onClick={() => removeMateri(idx)} className="text-gray-300 hover:text-red-500 transition-colors p-1">
                   <Trash2 size={14} />
@@ -344,8 +394,8 @@ const App = () => {
                         <div className="space-y-4">
                           {materiList.map((m, i) => (
                             <div key={i} className="p-4 border rounded-lg bg-gray-50">
-                              <p className="font-bold text-indigo-700 underline mb-1">Elemen: {m || 'Materi Pokok'}</p>
-                              <p className="text-sm">Pada akhir {formData.fase}, peserta didik mampu mendeskripsikan, menganalisis, serta mengevaluasi konsep-konsep yang berkaitan dengan <strong>{m}</strong>. Peserta didik dapat mengintegrasikan pengetahuan tersebut untuk memecahkan masalah kontekstual dalam kehidupan masyarakat serta mampu mengomunikasikan ide secara terstruktur dan ilmiah.</p>
+                              <p className="font-bold text-indigo-700 underline mb-1">Elemen: {m.judul || 'Materi Pokok'}</p>
+                              <p className="text-sm">Pada akhir {formData.fase}, peserta didik mampu mendeskripsikan, menganalisis, serta mengevaluasi konsep-konsep yang berkaitan dengan <strong>{m.judul}</strong>. Peserta didik dapat mengintegrasikan pengetahuan tersebut untuk memecahkan masalah kontekstual dalam kehidupan masyarakat serta mampu mengomunikasikan ide secara terstruktur dan ilmiah.</p>
                             </div>
                           ))}
                         </div>
@@ -362,18 +412,18 @@ const App = () => {
                       {materiList.map((m, i) => (
                         <div key={i} className="border border-slate-200 rounded-xl overflow-hidden">
                           <div className="bg-slate-800 text-white px-4 py-2 font-bold text-sm flex justify-between">
-                            <span>UNIT 0{i+1}: {m || '...'}</span>
+                            <span>UNIT 0{i+1}: {m.judul || '...'}</span>
                             <span className="text-[10px] opacity-70">Fase {formData.fase.split(' ')[1]}</span>
                           </div>
                           <div className="p-4 space-y-3">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
                               <div className="p-2 border rounded-md bg-green-50">
                                 <p className="font-black text-green-700 uppercase mb-1">Kognitif</p>
-                                <p>Mampu menganalisis struktur dan konsep dasar {m}.</p>
+                                <p>Mampu menganalisis struktur dan konsep dasar {m.judul}.</p>
                               </div>
                               <div className="p-2 border rounded-md bg-blue-50">
                                 <p className="font-black text-blue-700 uppercase mb-1">Psikomotor</p>
-                                <p>Terampil menyajikan data hasil eksperimen terkait {m}.</p>
+                                <p>Terampil menyajikan data hasil eksperimen terkait {m.judul}.</p>
                               </div>
                               <div className="p-2 border rounded-md bg-amber-50">
                                 <p className="font-black text-amber-700 uppercase mb-1">Afektif</p>
@@ -381,7 +431,7 @@ const App = () => {
                               </div>
                             </div>
                             <p className="text-sm font-medium leading-relaxed pt-2">
-                              <strong>Tujuan Akhir:</strong> Melalui serangkaian kegiatan mandiri dan kelompok, peserta didik dapat mengaplikasikan prinsip {m} untuk menciptakan solusi nyata yang berdaya guna bagi lingkungan sekitar.
+                              <strong>Tujuan Akhir:</strong> Melalui serangkaian kegiatan mandiri dan kelompok, peserta didik dapat mengaplikasikan prinsip {m.judul} untuk menciptakan solusi nyata yang berdaya guna bagi lingkungan sekitar.
                             </p>
                           </div>
                         </div>
@@ -407,10 +457,10 @@ const App = () => {
                             <tr key={i}>
                               <td className="border border-slate-300 p-3 text-center font-bold">{i+1}</td>
                               <td className="border border-slate-300 p-3 leading-relaxed">
-                                <strong>Materi: {m}</strong><br/>
-                                Menjelaskan hubungan antara konsep dasar {m} dengan fenomena yang terjadi di masyarakat secara logis.
+                                <strong>Materi: {m.judul}</strong><br/>
+                                Menjelaskan hubungan antara konsep dasar {m.judul} dengan fenomena yang terjadi di masyarakat secara logis.
                               </td>
-                              <td className="border border-slate-300 p-3 text-center font-bold italic">4 JP</td>
+                              <td className="border border-slate-300 p-3 text-center font-bold italic">{m.jp || '4'} JP</td>
                               <td className="border border-slate-300 p-3 italic">Beriman, Mandiri, Bernalar Kritis, Kreatif.</td>
                             </tr>
                           ))}
@@ -444,21 +494,21 @@ const App = () => {
                       <div className="space-y-10 mt-6">
                         {materiList.slice(0, 3).map((m, i) => (
                           <div key={i} className="border-l-4 border-indigo-600 pl-6 space-y-4">
-                            <h4 className="bg-indigo-600 text-white px-3 py-1 inline-block font-black uppercase text-xs">Modul Materi {i+1}: {m}</h4>
+                            <h4 className="bg-indigo-600 text-white px-3 py-1 inline-block font-black uppercase text-xs">Modul Materi {i+1}: {m.judul}</h4>
                             
                             <div className="space-y-2">
                               <p className="font-bold underline text-xs">1. Pertanyaan Pemantik:</p>
-                              <p className="italic text-slate-600">"Pernahkah Anda terpikir bagaimana konsep {m} mempengaruhi kenyamanan hidup kita setiap harinya? Apa yang terjadi jika {m} tidak ada?"</p>
+                              <p className="italic text-slate-600">"Pernahkah Anda terpikir bagaimana konsep {m.judul} mempengaruhi kenyamanan hidup kita setiap harinya? Apa yang terjadi jika {m.judul} tidak ada?"</p>
                             </div>
 
                             <div className="space-y-3">
                               <p className="font-bold underline text-xs uppercase">2. Rincian Kegiatan Pembelajaran:</p>
                               <ul className="list-decimal ml-5 space-y-3 text-xs leading-relaxed">
                                 <li>
-                                  <span className="font-bold">Kegiatan Awal (15 Menit):</span> Melakukan teknik K-W-L (Know, Want, Learn) dan memberikan stimulasi berupa video atau demonstrasi fisik terkait {m}.
+                                  <span className="font-bold">Kegiatan Awal (15 Menit):</span> Melakukan teknik K-W-L (Know, Want, Learn) dan memberikan stimulasi berupa video atau demonstrasi fisik terkait {m.judul}.
                                 </li>
                                 <li>
-                                  <span className="font-bold">Kegiatan Inti (50 Menit):</span> Peserta didik dibagi menjadi kelompok kecil untuk melakukan investigasi literasi dan eksperimen terbimbing mengenai struktur {m}. Guru bertindak sebagai fasilitator yang memberikan pertanyaan pelacak.
+                                  <span className="font-bold">Kegiatan Inti (50 Menit):</span> Peserta didik dibagi menjadi kelompok kecil untuk melakukan investigasi literasi and eksperimen terbimbing mengenai struktur {m.judul}. Guru bertindak sebagai fasilitator yang memberikan pertanyaan pelacak.
                                 </li>
                                 <li>
                                   <span className="font-bold">Kegiatan Penutup (15 Menit):</span> Melakukan konfirmasi pemahaman melalui kuis interaktif dan penarikan kesimpulan secara kolaboratif.
@@ -488,12 +538,12 @@ const App = () => {
                         <div className="font-bold">Kelas: {formData.kelas}</div>
                       </div>
 
-                      <h3 className="text-center text-xl font-black mb-10 tracking-widest uppercase">Eksplorasi Materi: {materiList[0]}</h3>
+                      <h3 className="text-center text-xl font-black mb-10 tracking-widest uppercase">Eksplorasi Materi: {materiList[0].judul}</h3>
                       
                       <div className="space-y-6 text-sm">
                         <p className="font-bold">A. Petunjuk Kerja:</p>
                         <ol className="list-decimal ml-5 space-y-2">
-                          <li>Diskusikan bersama kelompok mengenai kaitan antara {materiList[0]} dengan lingkungan sekitar.</li>
+                          <li>Diskusikan bersama kelompok mengenai kaitan antara {materiList[0].judul} dengan lingkungan sekitar.</li>
                           <li>Lakukan pengamatan pada objek yang telah disediakan guru.</li>
                           <li>Isilah tabel pengamatan di bawah ini berdasarkan hasil diskusi.</li>
                         </ol>
@@ -526,7 +576,7 @@ const App = () => {
                         <div className="space-y-6">
                           {materiList.slice(0, 3).map((m, i) => (
                             <div key={i} className="pl-4">
-                              <p className="font-bold mb-2">{i+1}. Analisislah peran materi <strong>{m}</strong> dalam konteks {formData.kurikulum}. Mengapa pemahaman ini menjadi prasyarat penting dalam penguasaan {formData.mapel}?</p>
+                              <p className="font-bold mb-2">{i+1}. Analisislah peran materi <strong>{m.judul}</strong> dalam konteks {formData.kurikulum}. Mengapa pemahaman ini menjadi prasyarat penting dalam penguasaan {formData.mapel}?</p>
                               <div className="grid grid-cols-1 gap-1 text-xs opacity-80">
                                 <p>A. Jawaban pengecoh yang logis</p>
                                 <p>B. Jawaban yang menunjukkan pemahaman dangkal</p>
@@ -572,7 +622,7 @@ const App = () => {
 
                       {materiList.map((m, i) => (
                         <div key={i} className="space-y-4">
-                          <h4 className="font-bold text-sm bg-slate-100 p-2 border rounded uppercase">Materi {i+1}: {m}</h4>
+                          <h4 className="font-bold text-sm bg-slate-100 p-2 border rounded uppercase">Materi {i+1}: {m.judul}</h4>
                           <table className="w-full border-collapse border border-slate-300 text-[11px]">
                             <thead className="bg-slate-800 text-white uppercase">
                               <tr>
@@ -585,14 +635,14 @@ const App = () => {
                             </thead>
                             <tbody>
                               <tr>
-                                <td className="border p-2 font-bold">Pemahaman Konsep {m}</td>
+                                <td className="border p-2 font-bold">Pemahaman Konsep {m.judul}</td>
                                 <td className="border p-2 text-center italic opacity-60">Belum mampu menjelaskan</td>
                                 <td className="border p-2 text-center font-medium bg-amber-50">Mampu menjelaskan secara parsial</td>
                                 <td className="border p-2 text-center font-medium bg-green-50 text-green-700">Mampu menjelaskan dengan detail</td>
                                 <td className="border p-2 text-center font-medium bg-indigo-50 text-indigo-700">Mampu menganalisis & mengaitkan</td>
                               </tr>
                               <tr>
-                                <td className="border p-2 font-bold">Aplikasi Praktis {m}</td>
+                                <td className="border p-2 font-bold">Aplikasi Praktis {m.judul}</td>
                                 <td className="border p-2 text-center italic opacity-60">Tidak dapat menerapkan</td>
                                 <td className="border p-2 text-center font-medium bg-amber-50">Menerapkan dengan bantuan</td>
                                 <td className="border p-2 text-center font-medium bg-green-50 text-green-700">Menerapkan secara mandiri</td>
@@ -718,10 +768,24 @@ const App = () => {
                           {materiList.map((m, i) => (
                             <tr key={i}>
                               <td className="border p-2 text-center">{i + 1}</td>
-                              <td className="border p-2">{m || '...'}</td>
-                              <td className="border p-2 text-center">4 JP</td>
+                              <td className="border p-2">{m.judul || '...'}</td>
+                              <td className="border p-2 text-center">{m.jp || '4'} JP</td>
                             </tr>
                           ))}
+                          {formData.jpUlanganHarian && (
+                            <tr>
+                              <td className="border p-2 text-center">-</td>
+                              <td className="border p-2 italic">Ulangan Harian / Penilaian Sumatif</td>
+                              <td className="border p-2 text-center">{formData.jpUlanganHarian} JP</td>
+                            </tr>
+                          )}
+                          {formData.jpCadangan && (
+                            <tr>
+                              <td className="border p-2 text-center">-</td>
+                              <td className="border p-2 italic">Materi Cadangan</td>
+                              <td className="border p-2 text-center">{formData.jpCadangan} JP</td>
+                            </tr>
+                          )}
                           <tr className="bg-slate-100 font-bold">
                             <td className="border p-2 text-center">II</td>
                             <td className="border p-2">SEMESTER GENAP</td>
@@ -776,15 +840,39 @@ const App = () => {
                           {materiList.map((m, i) => (
                             <tr key={i}>
                               <td className="border p-1 text-center font-bold">{i + 1}</td>
-                              <td className="border p-1 font-medium">{m || '...'}</td>
-                              <td className="border p-1 text-center font-bold">4 JP</td>
+                              <td className="border p-1 font-medium">{m.judul || '...'}</td>
+                              <td className="border p-1 text-center font-bold">{m.jp || '4'} JP</td>
                               {[...Array(24)].map((_, j) => (
                                 <td key={j} className={`border p-1 text-center font-bold ${j === (i * 2) % 24 ? 'bg-indigo-400 text-white' : ''}`}>
-                                  {j === (i * 2) % 24 ? '4' : ''}
+                                  {j === (i * 2) % 24 ? (m.jp || '4') : ''}
                                 </td>
                               ))}
                             </tr>
                           ))}
+                          {formData.jpUlanganHarian && (
+                            <tr className="bg-slate-50 italic">
+                               <td className="border p-1 text-center font-bold">-</td>
+                               <td className="border p-1 font-medium">Ulangan Harian / Penilaian Sumatif</td>
+                               <td className="border p-1 text-center font-bold">{formData.jpUlanganHarian} JP</td>
+                               {[...Array(24)].map((_, j) => (
+                                <td key={j} className={`border p-1 text-center font-bold ${j === (materiList.length * 2 + 1) % 24 ? 'bg-amber-400 text-white' : ''}`}>
+                                  {j === (materiList.length * 2 + 1) % 24 ? formData.jpUlanganHarian : ''}
+                                </td>
+                              ))}
+                            </tr>
+                          )}
+                          {formData.jpCadangan && (
+                            <tr className="bg-slate-50 italic">
+                               <td className="border p-1 text-center font-bold">-</td>
+                               <td className="border p-1 font-medium">Materi Cadangan / Pengayaan</td>
+                               <td className="border p-1 text-center font-bold">{formData.jpCadangan} JP</td>
+                               {[...Array(24)].map((_, j) => (
+                                <td key={j} className={`border p-1 text-center font-bold ${j === (materiList.length * 2 + 2) % 24 ? 'bg-green-400 text-white' : ''}`}>
+                                  {j === (materiList.length * 2 + 2) % 24 ? formData.jpCadangan : ''}
+                                </td>
+                              ))}
+                            </tr>
+                          )}
                           <tr className="bg-slate-100 font-bold">
                             <td colSpan={2} className="border p-1 text-right px-2 uppercase">Sumatif Tengah Semester</td>
                             <td className="border p-1 text-center">4 JP</td>
