@@ -16,6 +16,7 @@ import {
   GraduationCap,
   Sparkles,
   ClipboardList,
+  BarChart2,
   CheckSquare,
   Square,
   Plus,
@@ -137,6 +138,9 @@ const App = () => {
 
   const jpSessi = Number(formData.jpPerPertemuan) || 0;
   
+  const countAnalisisGanjil = (formData.semester.includes('Ganjil') && jpSessi > 0) ? Math.ceil(Number(formData.jpUlanganHarianGanjil) / jpSessi) : 0;
+  const countAnalisisGenap = (formData.semester.includes('Genap') && jpSessi > 0) ? Math.ceil(Number(formData.jpUlanganHarianGenap) / jpSessi) : 0;
+
   const hasilJpEfektifGanjil = totalPekanGanjil * jpSessi;
   const hasilJpTidakEfektifGanjil = totalNonGanjil * jpSessi;
   const hasilJpNettoGanjil = hasilJpEfektifGanjil - hasilJpTidakEfektifGanjil;
@@ -165,6 +169,7 @@ const App = () => {
     { id: 'PEKAN', name: 'Pekan Efektif', icon: <Calendar size={18} /> },
     { id: 'PROTA', name: 'Prota', icon: <FileText size={18} /> },
     { id: 'PROSEM', name: 'Promis', icon: <ClipboardList size={18} /> },
+    { id: 'ANALISIS', name: 'Analisis Hasil Ulangan', icon: <BarChart2 size={18} /> },
   ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -1624,6 +1629,140 @@ const App = () => {
                       </div>
                     </div>
                   </PageContainer>
+                )}
+
+                {selectedDocs.includes('ANALISIS') && (
+                  <>
+                    {[...Array(countAnalisisGanjil)].map((_, idx) => (
+                      <PageContainer key={`ANALISIS-GANJIL-${idx}`} id={`ANALISIS-GANJIL-${idx}`} title={`ANALISIS HASIL ULANGAN ${idx + 1} (GANJIL)`}>
+                        <div className="space-y-6">
+                          <div className="p-4 bg-slate-50 border rounded-lg text-xs space-y-1">
+                            <p>Mata Pelajaran: {formData.mapel}</p>
+                            <p>Kelas / Semester: {formData.kelas} / Ganjil</p>
+                            <p>Tahun Pelajaran: {formData.tahunAjaran}</p>
+                            <p>Materi: {materiGanjil[idx]?.judul || '...'}</p>
+                          </div>
+
+                          <table className="w-full border-collapse border-2 border-slate-800 text-[10px]">
+                            <thead className="bg-slate-100 text-center font-bold">
+                              <tr>
+                                <th rowSpan={2} className="border p-2 w-8">No</th>
+                                <th rowSpan={2} className="border p-2">Nama Peserta Didik</th>
+                                <th colSpan={10} className="border p-1">Skor Per Nomor Soal</th>
+                                <th rowSpan={2} className="border p-2 w-12">Total Skor</th>
+                                <th rowSpan={2} className="border p-2 w-16">Nilai</th>
+                                <th rowSpan={2} className="border p-2 w-20">Ketuntasan</th>
+                              </tr>
+                              <tr>
+                                {[...Array(10)].map((_, i) => (
+                                  <th key={i} className="border p-1 w-6">{i + 1}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {[...Array(20)].map((_, i) => (
+                                <tr key={i} className="h-8">
+                                  <td className="border p-1 text-center">{i + 1}</td>
+                                  <td className="border p-1"></td>
+                                  {[...Array(10)].map((_, j) => (
+                                    <td key={j} className="border p-1 text-center"></td>
+                                  ))}
+                                  <td className="border p-1 text-center"></td>
+                                  <td className="border p-1 text-center"></td>
+                                  <td className="border p-1 text-center font-bold text-gray-300 italic text-[8px]">TUNTAS / TIDAK</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+
+                          <div className="grid grid-cols-2 gap-8 text-[10px]">
+                            <div className="p-3 border rounded">
+                              <p className="font-bold border-b mb-2">Statistik Hasil:</p>
+                              <div className="space-y-1">
+                                <div className="flex justify-between"><span>Jumlah Peserta:</span> <span>........ Orang</span></div>
+                                <div className="flex justify-between"><span>Rata-rata Nilai:</span> <span>........</span></div>
+                                <div className="flex justify-between"><span>Nilai Tertinggi:</span> <span>........</span></div>
+                                <div className="flex justify-between"><span>Nilai Terendah:</span> <span>........</span></div>
+                              </div>
+                            </div>
+                            <div className="p-3 border rounded">
+                              <p className="font-bold border-b mb-2">Rencana Tindak Lanjut:</p>
+                              <div className="space-y-1 italic text-gray-500">
+                                <p>1. Remedial bagi yang tidak tuntas</p>
+                                <p>2. Pengayaan bagi yang melampaui KKTP</p>
+                                <p>3. Evaluasi butir soal sulit</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </PageContainer>
+                    ))}
+
+                    {[...Array(countAnalisisGenap)].map((_, idx) => (
+                      <PageContainer key={`ANALISIS-GENAP-${idx}`} id={`ANALISIS-GENAP-${idx}`} title={`ANALISIS HASIL ULANGAN ${idx + 1} (GENAP)`}>
+                        <div className="space-y-6">
+                          <div className="p-4 bg-slate-50 border rounded-lg text-xs space-y-1">
+                            <p>Mata Pelajaran: {formData.mapel}</p>
+                            <p>Kelas / Semester: {formData.kelas} / Genap</p>
+                            <p>Tahun Pelajaran: {formData.tahunAjaran}</p>
+                            <p>Materi: {materiGenap[idx]?.judul || '...'}</p>
+                          </div>
+
+                          <table className="w-full border-collapse border-2 border-slate-800 text-[10px]">
+                            <thead className="bg-slate-100 text-center font-bold">
+                              <tr>
+                                <th rowSpan={2} className="border p-2 w-8">No</th>
+                                <th rowSpan={2} className="border p-2">Nama Peserta Didik</th>
+                                <th colSpan={10} className="border p-1">Skor Per Nomor Soal</th>
+                                <th rowSpan={2} className="border p-2 w-12">Total Skor</th>
+                                <th rowSpan={2} className="border p-2 w-16">Nilai</th>
+                                <th rowSpan={2} className="border p-2 w-20">Ketuntasan</th>
+                              </tr>
+                              <tr>
+                                {[...Array(10)].map((_, i) => (
+                                  <th key={i} className="border p-1 w-6">{i + 1}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {[...Array(20)].map((_, i) => (
+                                <tr key={i} className="h-8">
+                                  <td className="border p-1 text-center">{i + 1}</td>
+                                  <td className="border p-1"></td>
+                                  {[...Array(10)].map((_, j) => (
+                                    <td key={j} className="border p-1 text-center"></td>
+                                  ))}
+                                  <td className="border p-1 text-center"></td>
+                                  <td className="border p-1 text-center"></td>
+                                  <td className="border p-1 text-center font-bold text-gray-300 italic text-[8px]">TUNTAS / TIDAK</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+
+                          <div className="grid grid-cols-2 gap-8 text-[10px]">
+                            <div className="p-3 border rounded">
+                              <p className="font-bold border-b mb-2">Statistik Hasil:</p>
+                              <div className="space-y-1">
+                                <div className="flex justify-between"><span>Jumlah Peserta:</span> <span>........ Orang</span></div>
+                                <div className="flex justify-between"><span>Rata-rata Nilai:</span> <span>........</span></div>
+                                <div className="flex justify-between"><span>Nilai Tertinggi:</span> <span>........</span></div>
+                                <div className="flex justify-between"><span>Nilai Terendah:</span> <span>........</span></div>
+                              </div>
+                            </div>
+                            <div className="p-3 border rounded">
+                              <p className="font-bold border-b mb-2">Rencana Tindak Lanjut:</p>
+                              <div className="space-y-1 italic text-gray-500">
+                                <p>1. Remedial bagi yang tidak tuntas</p>
+                                <p>2. Pengayaan bagi yang melampaui KKTP</p>
+                                <p>3. Evaluasi butir soal sulit</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </PageContainer>
+                    ))}
+                  </>
                 )}
               </>
             )}
