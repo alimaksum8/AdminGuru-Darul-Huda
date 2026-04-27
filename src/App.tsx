@@ -23,9 +23,14 @@ import {
   Trash2,
   Wand2,
   X,
-  Zap
+  Zap,
+  Upload,
+  Loader2,
+  Search
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { GoogleGenAI, Type } from "@google/genai";
+import * as XLSX from 'xlsx';
 
 interface SubMateri {
   judul: string;
@@ -91,6 +96,160 @@ const App = () => {
   ]);
 
   const [showPekanModal, setShowPekanModal] = useState(false);
+  const [isScanningKaldik, setIsScanningKaldik] = useState(false);
+  const [kaldikFile, setKaldikFile] = useState<File | null>(null);
+  const [kaldikPreview, setKaldikPreview] = useState<string | null>(null);
+  const [kaldikContent, setKaldikContent] = useState<string | null>(null);
+
+  const handleKaldikUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setKaldikFile(file);
+      const isImage = file.type.startsWith('image/');
+      const isSpreadsheet = file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
+      
+      const reader = new FileReader();
+      if (isImage) {
+        reader.onloadend = () => {
+          setKaldikPreview(reader.result as string);
+          setKaldikContent(null);
+        };
+        reader.readAsDataURL(file);
+      } else if (isSpreadsheet) {
+        setKaldikPreview(null);
+        reader.onload = (event) => {
+          try {
+            const data = new Uint8Array(event.target?.result as ArrayBuffer);
+            const workbook = XLSX.read(data, { type: 'array' });
+            let fullText = "";
+            workbook.SheetNames.forEach(sheetName => {
+              const worksheet = workbook.Sheets[sheetName];
+              fullText += `Sheet: ${sheetName}\n${XLSX.utils.sheet_to_csv(worksheet)}\n\n`;
+            });
+            setKaldikContent(fullText);
+          } catch (err) {
+            console.error("Error parsing spreadsheet:", err);
+            alert("Gagal membaca file Excel. Coba simpan sebagai PDF.");
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        // For other documents
+        setKaldikPreview(null);
+        if (file.type === 'text/csv' || file.type === 'text/xml' || file.name.endsWith('.csv') || file.name.endsWith('.xml')) {
+          reader.onloadend = () => {
+            setKaldikContent(reader.result as string);
+          };
+          reader.readAsText(file);
+        } else {
+          // For PDF etc, prepare for base64 scan
+          reader.onloadend = () => {
+             setKaldikContent(reader.result as string);
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+    }
+  };
+
+  const handleKaldikScan = async () => {
+    if (!kaldikFile) return;
+    
+    setIsScanningKaldik(true);
+    try {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) throw new Error("API Key tidak ditemukan. Pastikan Anda menjalankan aplikasi di lingkungan yang mendukung.");
+      
+      const genAI = new GoogleGenAI({ apiKey });
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-1.5-flash",
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              ganjil: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    bulan: { type: Type.STRING },
+                    total: { type: Type.NUMBER },
+                    nonEfektif: { type: Type.NUMBER },
+                    keterangan: { type: Type.STRING }
+                  },
+                  required: ["bulan", "total", "nonEfektif"]
+                }
+              },
+              genap: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    bulan: { type: Type.STRING },
+                    total: { type: Type.NUMBER },
+                    nonEfektif: { type: Type.NUMBER },
+                    keterangan: { type: Type.STRING }
+                  },
+                  required: ["bulan", "total", "nonEfektif"]
+                }
+              }
+            },
+            required: ["ganjil", "genap"]
+          }
+        }
+      });
+      
+      let part;
+      if (kaldikFile.type.startsWith('image/') || kaldikFile.type === 'application/pdf') {
+        const base64Data = (kaldikPreview || kaldikContent)?.split(',')[1];
+        if (!base64Data) throw new Error("Gagal membaca data file");
+        part = {
+          inlineData: {
+            mimeType: kaldikFile.type || "application/octet-stream",
+            data: base64Data
+          }
+        };
+      } else if (kaldikContent && !kaldikContent.startsWith('data:')) {
+        // Text based (Spreadsheet converted to CSV, or direct CSV/XML)
+        part = { text: `Konten file ${kaldikFile.name}:\n\n${kaldikContent}` };
+      } else {
+        // Fallback
+        const base64Data = kaldikContent?.split(',')[1];
+        if (!base64Data) throw new Error("Gagal membaca data file");
+        part = {
+          inlineData: {
+            mimeType: kaldikFile.type || "application/octet-stream",
+            data: base64Data
+          }
+        };
+      }
+
+      const prompt = `
+        Analisis data dari file Kalender Pendidikan (Kaldik) ini. 
+        Ekstrak data jumlah minggu total dan jumlah minggu tidak efektif untuk setiap bulan dari Juli hingga Juni (Tahun Pelajaran).
+        Kembalikan data dalam format JSON yang sangat ketat dengan struktur ganjil (Juli-Desember) dan genap (Januari-Juni).
+        Jika data tidak ditemukan, gunakan estimasi standar hari efektif pendidikan di Indonesia (rata-rata 4-5 minggu total per bulan).
+      `;
+
+      const resultValue = await model.generateContent([prompt, part]);
+      const response = await resultValue.response;
+      const text = response.text();
+      
+      if (!text) throw new Error("Tidak ada respon dari model");
+      
+      const result = JSON.parse(text);
+      if (result.ganjil) setPekanDataGanjil(result.ganjil);
+      if (result.genap) setPekanDataGenap(result.genap);
+      
+      alert("Pemindaian berhasil! Data telah diterapkan.");
+    } catch (error) {
+      console.error("Scan error:", error);
+      alert("Gagal memindai Kaldik: " + (error instanceof Error ? error.message : "Terjadi kesalahan tidak dikenal"));
+    } finally {
+      setIsScanningKaldik(false);
+    }
+  };
 
   // Derived combined list for backward compatibility where needed
   const materiList = [
@@ -1851,6 +2010,37 @@ const App = () => {
               </div>
               
               <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                  {/* Kaldik Upload & Scan Section */}
+                  <div className="p-4 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200 space-y-4">
+                    <div className="flex flex-col md:flex-row items-center gap-4">
+                      <div className="flex-1 w-full">
+                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Upload Kalender Pendidikan (Kaldik)</label>
+                        <div className="flex gap-2">
+                          <label className="flex-1 flex items-center justify-center gap-2 p-3 bg-white border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-all group">
+                            <Upload size={18} className="text-gray-400 group-hover:text-indigo-600" />
+                            <span className="text-xs font-bold text-gray-500">{kaldikFile ? kaldikFile.name : 'Pilih File Kaldik'}</span>
+                            <input type="file" className="hidden" accept="image/*,application/pdf,.csv,.xml,.xlsx,.xls" onChange={handleKaldikUpload} />
+                          </label>
+                          {kaldikFile && (
+                            <button 
+                              onClick={handleKaldikScan}
+                              disabled={isScanningKaldik}
+                              className={`flex items-center gap-2 px-6 py-2 rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg transition-all ${isScanningKaldik ? 'bg-slate-300 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
+                            >
+                              {isScanningKaldik ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
+                              {isScanningKaldik ? 'Memindai...' : 'Pindai'}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      {kaldikPreview && (
+                        <div className="w-32 h-20 bg-white border rounded-lg overflow-hidden flex-shrink-0">
+                          <img src={kaldikPreview} alt="Kaldik Preview" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                  <div className="grid md:grid-cols-2 gap-8">
                    {/* Semester Ganjil */}
                    <div className="space-y-4">
