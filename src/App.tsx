@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Heart, 
   BookOpen, 
@@ -307,9 +307,20 @@ const App = () => {
   const hasilJpTidakEfektifGenap = totalNonGenap * jpSessi;
   const hasilJpNettoGenap = hasilJpEfektifGenap - hasilJpTidakEfektifGenap;
 
+  const hasilAkhirJpGanjil = hasilJpNettoGanjil - jpExtraGanjil;
+  const hasilAkhirJpGenap = hasilJpNettoGenap - jpExtraGenap;
+
   const totalPekanTahun = (formData.semester.includes('Ganjil') ? totalPekanGanjil : 0) + (formData.semester.includes('Genap') ? totalPekanGenap : 0);
   const totalNonTahun = (formData.semester.includes('Ganjil') ? totalNonGanjil : 0) + (formData.semester.includes('Genap') ? totalNonGenap : 0);
   const totalEfektifTahun = totalPekanTahun - totalNonTahun;
+  
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      totalJpGanjil: hasilJpNettoGanjil.toString(),
+      totalJpGenap: hasilJpNettoGenap.toString()
+    }));
+  }, [hasilJpNettoGanjil, hasilJpNettoGenap]);
 
   // State for Selected Documents (Multi-select)
   const [selectedDocs, setSelectedDocs] = useState<string[]>([]);
@@ -488,6 +499,29 @@ const App = () => {
       return;
     }
     
+    // Validation for JP Materi Pokok
+    if (formData.semester.includes('Ganjil')) {
+      const target = hasilAkhirJpGanjil;
+      if (jpMateriGanjil > target) {
+        alert(`Kelebihan JP Semester Ganjil!\nAlokasi Materi: ${jpMateriGanjil} JP\nTersedia: ${target} JP\n(Total Kaldik: ${hasilJpNettoGanjil} JP, UH+Cadangan: ${jpExtraGanjil} JP)`);
+        return;
+      } else if (jpMateriGanjil < target) {
+        alert(`Kekurangan JP Semester Ganjil!\nAlokasi Materi: ${jpMateriGanjil} JP\nTersedia: ${target} JP\n(Total Kaldik: ${hasilJpNettoGanjil} JP, UH+Cadangan: ${jpExtraGanjil} JP)`);
+        return;
+      }
+    }
+    
+    if (formData.semester.includes('Genap')) {
+      const target = hasilAkhirJpGenap;
+      if (jpMateriGenap > target) {
+        alert(`Kelebihan JP Semester Genap!\nAlokasi Materi: ${jpMateriGenap} JP\nTersedia: ${target} JP\n(Total Kaldik: ${hasilJpNettoGenap} JP, UH+Cadangan: ${jpExtraGenap} JP)`);
+        return;
+      } else if (jpMateriGenap < target) {
+        alert(`Kekurangan JP Semester Genap!\nAlokasi Materi: ${jpMateriGenap} JP\nTersedia: ${target} JP\n(Total Kaldik: ${hasilJpNettoGenap} JP, UH+Cadangan: ${jpExtraGenap} JP)`);
+        return;
+      }
+    }
+    
     setIsGenerating(true);
     // Simulate generation delay for feedback
     setTimeout(() => {
@@ -609,13 +643,21 @@ const App = () => {
               {formData.semester.includes('Ganjil') && (
                 <div className="space-y-1">
                   <label className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Total JP Ganjil</label>
-                  <input type="number" name="totalJpGanjil" value={formData.totalJpGanjil} onChange={handleInputChange} placeholder="JP" className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+                  <input type="number" name="totalJpGanjil" value={formData.totalJpGanjil} readOnly placeholder="JP" className="w-full p-2 bg-gray-100 border border-gray-200 rounded text-sm outline-none cursor-not-allowed font-bold text-indigo-600" />
+                  <div className="p-1.5 bg-amber-50 border border-amber-200 rounded flex justify-between items-center">
+                    <span className="text-[8px] font-bold text-amber-700 uppercase">Materi Pokok:</span>
+                    <span className="text-[10px] font-black text-amber-900">{hasilAkhirJpGanjil} JP</span>
+                  </div>
                 </div>
               )}
               {formData.semester.includes('Genap') && (
                 <div className="space-y-1">
                   <label className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Total JP Genap</label>
-                  <input type="number" name="totalJpGenap" value={formData.totalJpGenap} onChange={handleInputChange} placeholder="JP" className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+                  <input type="number" name="totalJpGenap" value={formData.totalJpGenap} readOnly placeholder="JP" className="w-full p-2 bg-gray-100 border border-gray-200 rounded text-sm outline-none cursor-not-allowed font-bold text-indigo-600" />
+                  <div className="p-1.5 bg-orange-50 border border-orange-200 rounded flex justify-between items-center">
+                    <span className="text-[8px] font-bold text-orange-700 uppercase">Materi Pokok:</span>
+                    <span className="text-[10px] font-black text-orange-900">{hasilAkhirJpGenap} JP</span>
+                  </div>
                 </div>
               )}
             </div>
@@ -984,9 +1026,15 @@ const App = () => {
                   <span className="opacity-70">JP Tidak Efektif:</span>
                   <span className="font-bold">-{hasilJpTidakEfektifGanjil} JP</span>
                 </div>
+                {(Number(formData.jpUlanganHarianGanjil) > 0 || Number(formData.jpCadanganGanjil) > 0) && (
+                  <div className="flex justify-between border-b border-amber-100 pb-1 text-orange-600">
+                    <span className="opacity-70">UH + Cadangan:</span>
+                    <span className="font-bold">-{jpExtraGanjil} JP</span>
+                  </div>
+                )}
                 <div className="flex justify-between border-b border-amber-300 pb-1 pt-1 bg-amber-100/50 px-1 rounded">
-                  <span className="text-amber-800 font-black uppercase tracking-tighter">Hasil Akhir JP:</span>
-                  <span className="font-black text-amber-900">{hasilJpNettoGanjil} JP</span>
+                  <span className="text-amber-800 font-black uppercase tracking-tighter">Hasil Akhir JP (Materi):</span>
+                  <span className="font-black text-amber-900">{hasilAkhirJpGanjil} JP</span>
                 </div>
               </div>
             </section>
@@ -1030,9 +1078,15 @@ const App = () => {
                   <span className="opacity-70">JP Tidak Efektif:</span>
                   <span className="font-bold">-{hasilJpTidakEfektifGenap} JP</span>
                 </div>
+                {(Number(formData.jpUlanganHarianGenap) > 0 || Number(formData.jpCadanganGenap) > 0) && (
+                  <div className="flex justify-between border-b border-amber-100 pb-1 text-orange-600">
+                    <span className="opacity-70">UH + Cadangan:</span>
+                    <span className="font-bold">-{jpExtraGenap} JP</span>
+                  </div>
+                )}
                 <div className="flex justify-between border-b border-amber-300 pb-1 pt-1 bg-amber-100/50 px-1 rounded">
-                  <span className="text-amber-800 font-black uppercase tracking-tighter">Hasil Akhir JP:</span>
-                  <span className="font-black text-amber-900">{hasilJpNettoGenap} JP</span>
+                  <span className="text-amber-800 font-black uppercase tracking-tighter">Hasil Akhir JP (Materi):</span>
+                  <span className="font-black text-amber-900">{hasilAkhirJpGenap} JP</span>
                 </div>
               </div>
             </section>
