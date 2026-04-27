@@ -160,10 +160,44 @@ const App = () => {
       const apiKey = process.env.GEMINI_API_KEY;
       if (!apiKey) throw new Error("API Key tidak ditemukan. Pastikan Anda menjalankan aplikasi di lingkungan yang mendukung.");
       
-      const genAI = new GoogleGenAI({ apiKey });
-      const model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash",
-        generationConfig: {
+      const ai = new GoogleGenAI({ apiKey });
+      
+      let part;
+      if (kaldikFile.type.startsWith('image/') || kaldikFile.type === 'application/pdf') {
+        const base64Data = (kaldikPreview || kaldikContent)?.split(',')[1];
+        if (!base64Data) throw new Error("Gagal membaca data file");
+        part = {
+          inlineData: {
+            mimeType: kaldikFile.type || "application/octet-stream",
+            data: base64Data
+          }
+        };
+      } else if (kaldikContent && !kaldikContent.startsWith('data:')) {
+        // Text based (Spreadsheet converted to CSV, or direct CSV/XML)
+        part = { text: `Konten file ${kaldikFile.name}:\n\n${kaldikContent}` };
+      } else {
+        // Fallback
+        const base64Data = kaldikContent?.split(',')[1];
+        if (!base64Data) throw new Error("Gagal membaca data file");
+        part = {
+          inlineData: {
+            mimeType: kaldikFile.type || "application/octet-stream",
+            data: base64Data
+          }
+        };
+      }
+
+      const prompt = `
+        Analisis data dari file Kalender Pendidikan (Kaldik) ini. 
+        Ekstrak data jumlah minggu total dan jumlah minggu tidak efektif untuk setiap bulan dari Juli hingga Juni (Tahun Pelajaran).
+        Kembalikan data dalam format JSON yang sangat ketat dengan struktur ganjil (Juli-Desember) dan genap (Januari-Juni).
+        Jika data tidak ditemukan, gunakan estimasi standar hari efektif pendidikan di Indonesia (rata-rata 4-5 minggu total per bulan).
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: [{ parts: [{ text: prompt }, part] }],
+        config: {
           responseMimeType: "application/json",
           responseSchema: {
             type: Type.OBJECT,
@@ -199,43 +233,8 @@ const App = () => {
           }
         }
       });
-      
-      let part;
-      if (kaldikFile.type.startsWith('image/') || kaldikFile.type === 'application/pdf') {
-        const base64Data = (kaldikPreview || kaldikContent)?.split(',')[1];
-        if (!base64Data) throw new Error("Gagal membaca data file");
-        part = {
-          inlineData: {
-            mimeType: kaldikFile.type || "application/octet-stream",
-            data: base64Data
-          }
-        };
-      } else if (kaldikContent && !kaldikContent.startsWith('data:')) {
-        // Text based (Spreadsheet converted to CSV, or direct CSV/XML)
-        part = { text: `Konten file ${kaldikFile.name}:\n\n${kaldikContent}` };
-      } else {
-        // Fallback
-        const base64Data = kaldikContent?.split(',')[1];
-        if (!base64Data) throw new Error("Gagal membaca data file");
-        part = {
-          inlineData: {
-            mimeType: kaldikFile.type || "application/octet-stream",
-            data: base64Data
-          }
-        };
-      }
 
-      const prompt = `
-        Analisis data dari file Kalender Pendidikan (Kaldik) ini. 
-        Ekstrak data jumlah minggu total dan jumlah minggu tidak efektif untuk setiap bulan dari Juli hingga Juni (Tahun Pelajaran).
-        Kembalikan data dalam format JSON yang sangat ketat dengan struktur ganjil (Juli-Desember) dan genap (Januari-Juni).
-        Jika data tidak ditemukan, gunakan estimasi standar hari efektif pendidikan di Indonesia (rata-rata 4-5 minggu total per bulan).
-      `;
-
-      const resultValue = await model.generateContent([prompt, part]);
-      const response = await resultValue.response;
-      const text = response.text();
-      
+      const text = response.text;
       if (!text) throw new Error("Tidak ada respon dari model");
       
       const result = JSON.parse(text);
