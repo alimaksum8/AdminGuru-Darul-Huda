@@ -1496,7 +1496,7 @@ const App = () => {
 
                 {selectedDocs.includes('PROSEM') && (
                   <PageContainer key="PROSEM" id="PROSEM" title="PROGRAM SEMESTER (PROSEM/PROMIS)">
-                    <div className="space-y-6 overflow-x-auto">
+                    <div className="space-y-12">
                       <div className="p-4 bg-slate-50 border rounded-lg text-xs space-y-1">
                         <p>Semester: {formData.semester.join(' / ')}</p>
                         <p>Mata Pelajaran: {formData.mapel}</p>
@@ -1505,123 +1505,151 @@ const App = () => {
                         {(formData.totalJpGenap && formData.semester.includes('Genap')) && <p>Total JP Semester Genap: {formData.totalJpGenap} JP</p>}
                       </div>
 
-                      <table className="w-full border-collapse border-2 border-slate-800 text-[9px]">
-                        <thead className="bg-slate-800 text-white uppercase text-center">
-                          <tr>
-                            <th rowSpan={2} className="border p-1 w-8">No</th>
-                            <th rowSpan={2} className="border p-1">Materi Pokok / Tujuan Pembelajaran</th>
-                            <th rowSpan={2} className="border p-1 w-10">JML JP</th>
-                            <th colSpan={5} className="border p-1">Juli</th>
-                            <th colSpan={5} className="border p-1">Agustus</th>
-                            <th colSpan={5} className="border p-1">September</th>
-                            <th colSpan={5} className="border p-1">Oktober</th>
-                            <th colSpan={5} className="border p-1">November</th>
-                            <th colSpan={5} className="border p-1">Desember</th>
-                          </tr>
-                          <tr>
-                            {[...Array(30)].map((_, i) => (
-                              <th key={i} className="border p-1 w-4 text-[7px]">{ (i % 5) + 1 }</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {/* SEMESTER GANJIL SECTION */}
-                          {formData.semester.includes('Ganjil') && (
-                            <>
-                              {materiGanjil.map((m, i) => (
-                                <React.Fragment key={`prosem-ganjil-${i}`}>
-                                  <tr className="bg-slate-50/50 font-bold">
-                                    <td className="border p-1 text-center">{i + 1}</td>
-                                    <td className="border p-1">{m.judul || '...'}</td>
-                                    <td className="border p-1 text-center">{m.jp || '...'} JP</td>
-                                    {[...Array(30)].map((_, j) => (
-                                      <td key={j} className="border p-1 text-center h-6"></td>
-                                    ))}
-                                  </tr>
-                                  {m.subMateri.map((sub, sIdx) => (
-                                    <tr key={`prosem-ganjil-sub-${i}-${sIdx}`}>
-                                      <td className="border p-1 text-center text-[10px] text-gray-400 opacity-50">•</td>
-                                      <td className="border p-1 pl-4 italic text-gray-600 font-medium">{sub.judul || '...'}</td>
-                                      <td className="border p-1 text-center text-gray-500 font-bold">{sub.jp || '...'} JP</td>
+                      {/* SEMESTER GANJIL TABLE */}
+                      {formData.semester.includes('Ganjil') && (
+                        <div className="space-y-4">
+                          <h4 className="font-bold text-sm bg-indigo-50 p-2 border-l-4 border-indigo-500 uppercase tracking-widest">Semester Ganjil (Juli - Desember)</h4>
+                          <div className="overflow-x-auto">
+                            <table className="w-full border-collapse border-2 border-slate-800 text-[9px]">
+                              <thead className="bg-slate-800 text-white uppercase text-center">
+                                <tr>
+                                  <th rowSpan={2} className="border p-1 w-8">No</th>
+                                  <th rowSpan={2} className="border p-1">Materi Pokok / Tujuan Pembelajaran</th>
+                                  <th rowSpan={2} className="border p-1 w-10">JML JP</th>
+                                  <th colSpan={5} className="border p-1">Juli</th>
+                                  <th colSpan={5} className="border p-1">Agustus</th>
+                                  <th colSpan={5} className="border p-1">September</th>
+                                  <th colSpan={5} className="border p-1">Oktober</th>
+                                  <th colSpan={5} className="border p-1">November</th>
+                                  <th colSpan={5} className="border p-1">Desember</th>
+                                </tr>
+                                <tr>
+                                  {[...Array(30)].map((_, i) => (
+                                    <th key={i} className="border p-1 w-4 text-[7px]">{ (i % 5) + 1 }</th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {materiGanjil.map((m, i) => (
+                                  <React.Fragment key={`prosem-ganjil-${i}`}>
+                                    <tr className="bg-slate-50/50 font-bold">
+                                      <td className="border p-1 text-center">{i + 1}</td>
+                                      <td className="border p-1">{m.judul || '...'}</td>
+                                      <td className="border p-1 text-center">{m.jp || '...'} JP</td>
                                       {[...Array(30)].map((_, j) => (
                                         <td key={j} className="border p-1 text-center h-6"></td>
                                       ))}
                                     </tr>
-                                  ))}
-                                </React.Fragment>
-                              ))}
-                              {formData.jpUlanganHarianGanjil && (
-                                <tr className="bg-slate-50 italic">
-                                   <td className="border p-1 text-center font-bold">-</td>
-                                   <td className="border p-1 font-medium text-indigo-700">Ulangan Harian (Ganjil)</td>
-                                   <td className="border p-1 text-center font-bold">{formData.jpUlanganHarianGanjil} JP</td>
-                                   {[...Array(30)].map((_, j) => (
-                                    <td key={j} className="border p-1 text-center font-bold"></td>
-                                  ))}
-                                </tr>
-                              )}
-                              {formData.jpCadanganGanjil && (
-                                <tr className="bg-slate-50 italic">
-                                   <td className="border p-1 text-center font-bold">-</td>
-                                   <td className="border p-1 font-medium text-indigo-700">Materi Cadangan (Ganjil)</td>
-                                   <td className="border p-1 text-center font-bold">{formData.jpCadanganGanjil} JP</td>
-                                   {[...Array(30)].map((_, j) => (
-                                    <td key={j} className="border p-1 text-center font-bold"></td>
-                                  ))}
-                                </tr>
-                              )}
-                            </>
-                          )}
+                                    {m.subMateri.map((sub, sIdx) => (
+                                      <tr key={`prosem-ganjil-sub-${i}-${sIdx}`}>
+                                        <td className="border p-1 text-center text-[10px] text-gray-400 opacity-50">•</td>
+                                        <td className="border p-1 pl-4 italic text-gray-600 font-medium">{sub.judul || '...'}</td>
+                                        <td className="border p-1 text-center text-gray-500 font-bold">{sub.jp || '...'} JP</td>
+                                        {[...Array(30)].map((_, j) => (
+                                          <td key={j} className="border p-1 text-center h-6"></td>
+                                        ))}
+                                      </tr>
+                                    ))}
+                                  </React.Fragment>
+                                ))}
+                                {formData.jpUlanganHarianGanjil && (
+                                  <tr className="bg-slate-50 italic">
+                                    <td className="border p-1 text-center font-bold">-</td>
+                                    <td className="border p-1 font-medium text-indigo-700">Ulangan Harian (Ganjil)</td>
+                                    <td className="border p-1 text-center font-bold">{formData.jpUlanganHarianGanjil} JP</td>
+                                    {[...Array(30)].map((_, j) => (
+                                      <td key={j} className="border p-1 text-center font-bold"></td>
+                                    ))}
+                                  </tr>
+                                )}
+                                {formData.jpCadanganGanjil && (
+                                  <tr className="bg-slate-50 italic">
+                                    <td className="border p-1 text-center font-bold">-</td>
+                                    <td className="border p-1 font-medium text-indigo-700">Materi Cadangan (Ganjil)</td>
+                                    <td className="border p-1 text-center font-bold">{formData.jpCadanganGanjil} JP</td>
+                                    {[...Array(30)].map((_, j) => (
+                                      <td key={j} className="border p-1 text-center font-bold"></td>
+                                    ))}
+                                  </tr>
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
 
-                          {/* SEMESTER GENAP SECTION */}
-                          {formData.semester.includes('Genap') && (
-                            <>
-                              {materiGenap.map((m, i) => (
-                                <React.Fragment key={`prosem-genap-${i}`}>
-                                  <tr className="bg-slate-50/50 font-bold">
-                                    <td className="border p-1 text-center font-bold">{(formData.semester.includes('Ganjil') ? materiGanjil.length : 0) + i + 1}</td>
-                                    <td className="border p-1">{m.judul || '...'}</td>
-                                    <td className="border p-1 text-center font-bold">{m.jp || '...'} JP</td>
-                                    {[...Array(30)].map((_, j) => (
-                                      <td key={j} className="border p-1 text-center h-6"></td>
-                                    ))}
-                                  </tr>
-                                  {m.subMateri.map((sub, sIdx) => (
-                                    <tr key={`prosem-genap-sub-${i}-${sIdx}`}>
-                                      <td className="border p-1 text-center text-[10px] text-gray-400 opacity-50">•</td>
-                                      <td className="border p-1 pl-4 italic text-gray-600 font-medium">{sub.judul || '...'}</td>
-                                      <td className="border p-1 text-center text-gray-500 font-bold">{sub.jp || '...'} JP</td>
+                      {/* SEMESTER GENAP TABLE */}
+                      {formData.semester.includes('Genap') && (
+                        <div className="space-y-4">
+                          <h4 className="font-bold text-sm bg-orange-50 p-2 border-l-4 border-orange-500 uppercase tracking-widest">Semester Genap (Januari - Juni)</h4>
+                          <div className="overflow-x-auto">
+                            <table className="w-full border-collapse border-2 border-slate-800 text-[9px]">
+                              <thead className="bg-slate-800 text-white uppercase text-center">
+                                <tr>
+                                  <th rowSpan={2} className="border p-1 w-8">No</th>
+                                  <th rowSpan={2} className="border p-1">Materi Pokok / Tujuan Pembelajaran</th>
+                                  <th rowSpan={2} className="border p-1 w-10">JML JP</th>
+                                  <th colSpan={5} className="border p-1">Januari</th>
+                                  <th colSpan={5} className="border p-1">Februari</th>
+                                  <th colSpan={5} className="border p-1">Maret</th>
+                                  <th colSpan={5} className="border p-1">April</th>
+                                  <th colSpan={5} className="border p-1">Mei</th>
+                                  <th colSpan={5} className="border p-1">Juni</th>
+                                </tr>
+                                <tr>
+                                  {[...Array(30)].map((_, i) => (
+                                    <th key={i} className="border p-1 w-4 text-[7px]">{ (i % 5) + 1 }</th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {materiGenap.map((m, i) => (
+                                  <React.Fragment key={`prosem-genap-${i}`}>
+                                    <tr className="bg-slate-50/50 font-bold">
+                                      <td className="border p-1 text-center font-bold">{(formData.semester.includes('Ganjil') ? materiGanjil.length : 0) + i + 1}</td>
+                                      <td className="border p-1">{m.judul || '...'}</td>
+                                      <td className="border p-1 text-center font-bold">{m.jp || '...'} JP</td>
                                       {[...Array(30)].map((_, j) => (
                                         <td key={j} className="border p-1 text-center h-6"></td>
                                       ))}
                                     </tr>
-                                  ))}
-                                </React.Fragment>
-                              ))}
-                              {formData.jpUlanganHarianGenap && (
-                                <tr className="bg-slate-50 italic border-t-2 border-orange-100">
-                                   <td className="border p-1 text-center font-bold">-</td>
-                                   <td className="border p-1 font-medium text-orange-700">Ulangan Harian (Genap)</td>
-                                   <td className="border p-1 text-center font-bold">{formData.jpUlanganHarianGenap} JP</td>
-                                   {[...Array(30)].map((_, j) => (
-                                    <td key={j} className="border p-1 text-center font-bold"></td>
-                                  ))}
-                                </tr>
-                              )}
-                              {formData.jpCadanganGenap && (
-                                <tr className="bg-slate-50 italic">
-                                   <td className="border p-1 text-center font-bold">-</td>
-                                   <td className="border p-1 font-medium text-orange-700">Materi Cadangan (Genap)</td>
-                                   <td className="border p-1 text-center font-bold">{formData.jpCadanganGenap} JP</td>
-                                   {[...Array(30)].map((_, j) => (
-                                    <td key={j} className="border p-1 text-center font-bold"></td>
-                                  ))}
-                                </tr>
-                              )}
-                            </>
-                          )}
-                        </tbody>
-                      </table>
+                                    {m.subMateri.map((sub, sIdx) => (
+                                      <tr key={`prosem-genap-sub-${i}-${sIdx}`}>
+                                        <td className="border p-1 text-center text-[10px] text-gray-400 opacity-50">•</td>
+                                        <td className="border p-1 pl-4 italic text-gray-600 font-medium">{sub.judul || '...'}</td>
+                                        <td className="border p-1 text-center text-gray-500 font-bold">{sub.jp || '...'} JP</td>
+                                        {[...Array(30)].map((_, j) => (
+                                          <td key={j} className="border p-1 text-center h-6"></td>
+                                        ))}
+                                      </tr>
+                                    ))}
+                                  </React.Fragment>
+                                ))}
+                                {formData.jpUlanganHarianGenap && (
+                                  <tr className="bg-slate-50 italic border-t-2 border-orange-100">
+                                    <td className="border p-1 text-center font-bold">-</td>
+                                    <td className="border p-1 font-medium text-orange-700">Ulangan Harian (Genap)</td>
+                                    <td className="border p-1 text-center font-bold">{formData.jpUlanganHarianGenap} JP</td>
+                                    {[...Array(30)].map((_, j) => (
+                                      <td key={j} className="border p-1 text-center font-bold"></td>
+                                    ))}
+                                  </tr>
+                                )}
+                                {formData.jpCadanganGenap && (
+                                  <tr className="bg-slate-50 italic">
+                                    <td className="border p-1 text-center font-bold">-</td>
+                                    <td className="border p-1 font-medium text-orange-700">Materi Cadangan (Genap)</td>
+                                    <td className="border p-1 text-center font-bold">{formData.jpCadanganGenap} JP</td>
+                                    {[...Array(30)].map((_, j) => (
+                                      <td key={j} className="border p-1 text-center font-bold"></td>
+                                    ))}
+                                  </tr>
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
                       
                       <div className="flex gap-4 text-[8px] font-bold">
                         <div className="flex items-center gap-1"><div className="w-3 h-3 bg-indigo-400"></div> KBM Terjadwal</div>
