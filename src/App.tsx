@@ -26,7 +26,8 @@ import {
   Zap,
   Upload,
   Loader2,
-  Search
+  Search,
+  Table
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI, Type } from "@google/genai";
@@ -38,6 +39,7 @@ interface SubMateri {
 }
 
 interface Materi {
+  elemenCp: string[];
   judul: string;
   jp: string;
   subMateri: SubMateri[];
@@ -74,8 +76,8 @@ const App = () => {
   };
 
   // State for Dynamic Materials - Split by Semester
-  const [materiGanjil, setMateriGanjil] = useState<Materi[]>([{ judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
-  const [materiGenap, setMateriGenap] = useState<Materi[]>([{ judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
+  const [materiGanjil, setMateriGanjil] = useState<Materi[]>([{ elemenCp: [''], judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
+  const [materiGenap, setMateriGenap] = useState<Materi[]>([{ elemenCp: [''], judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
 
   const [pekanDataGanjil, setPekanDataGanjil] = useState([
     { bulan: 'Juli', total: 4, nonEfektif: 2, keterangan: 'Libur Semester' },
@@ -331,9 +333,11 @@ const App = () => {
     { id: 'CP', name: 'CP', icon: <BookOpen size={18} /> },
     { id: 'TP', name: 'TP', icon: <Sparkles size={18} /> },
     { id: 'ATP', name: 'ATP', icon: <PenTool size={18} /> },
+    { id: 'MATRIX', name: 'Matrix CP/TP', icon: <Table size={18} /> },
     { id: 'MODUL', name: 'Modul Ajar', icon: <FileText size={18} /> },
     { id: 'LKPD', name: 'LKPD', icon: <ClipboardList size={18} /> },
-    { id: 'ASESMEN', name: 'Asesmen', icon: <UserCheck size={18} /> },
+    { id: 'ASESMEN_FORMATIF', name: 'Asesmen Formatif', icon: <UserCheck size={18} /> },
+    { id: 'ASESMEN_SUMATIF', name: 'Asesmen Sumatif', icon: <CheckSquare size={18} /> },
     { id: 'KKTP', name: 'KKTP', icon: <GraduationCap size={18} /> },
     { id: 'PEKAN', name: 'Pekan Efektif', icon: <Calendar size={18} /> },
     { id: 'PROTA', name: 'Prota', icon: <FileText size={18} /> },
@@ -359,7 +363,7 @@ const App = () => {
   };
 
   const addMateri = (sem: 'Ganjil' | 'Genap') => {
-    const defaultMateri = { judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] };
+    const defaultMateri: Materi = { elemenCp: [''], judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] };
     if (sem === 'Ganjil') setMateriGanjil([...materiGanjil, defaultMateri]);
     else setMateriGenap([...materiGenap, defaultMateri]);
   };
@@ -367,10 +371,48 @@ const App = () => {
   const removeMateri = (sem: 'Ganjil' | 'Genap', index: number) => {
     if (sem === 'Ganjil') {
       const newList = materiGanjil.filter((_, i) => i !== index);
-      setMateriGanjil(newList.length ? newList : [{ judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
+      setMateriGanjil(newList.length ? newList : [{ elemenCp: [''], judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
     } else {
       const newList = materiGenap.filter((_, i) => i !== index);
-      setMateriGenap(newList.length ? newList : [{ judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
+      setMateriGenap(newList.length ? newList : [{ elemenCp: [''], judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
+    }
+  };
+
+  const addElemenCp = (sem: 'Ganjil' | 'Genap', materiIdx: number) => {
+    if (sem === 'Ganjil') {
+      const newList = [...materiGanjil];
+      newList[materiIdx].elemenCp.push('');
+      setMateriGanjil(newList);
+    } else {
+      const newList = [...materiGenap];
+      newList[materiIdx].elemenCp.push('');
+      setMateriGenap(newList);
+    }
+  };
+
+  const removeElemenCp = (sem: 'Ganjil' | 'Genap', materiIdx: number, elemenIdx: number) => {
+    if (sem === 'Ganjil') {
+      const newList = [...materiGanjil];
+      newList[materiIdx].elemenCp = newList[materiIdx].elemenCp.filter((_, i) => i !== elemenIdx);
+      if (newList[materiIdx].elemenCp.length === 0) newList[materiIdx].elemenCp = [''];
+      setMateriGanjil(newList);
+    } else {
+      const newList = [...materiGenap];
+      newList[materiIdx].elemenCp = newList[materiIdx].elemenCp.filter((_, i) => i !== elemenIdx);
+      if (newList[materiIdx].elemenCp.length === 0) newList[materiIdx].elemenCp = [''];
+      setMateriGenap(newList);
+    }
+  };
+
+  const handleElemenCpChange = (sem: 'Ganjil' | 'Genap', materiIdx: number, elemenIdx: number, value: string) => {
+    if (sem === 'Ganjil') {
+      const newList = [...materiGanjil];
+      newList[materiIdx].elemenCp[elemenIdx] = value;
+      setMateriGanjil(newList);
+    } else {
+      const newList = [...materiGenap];
+      newList[materiIdx].elemenCp[elemenIdx] = value;
+      setMateriGenap(newList);
     }
   };
 
@@ -760,6 +802,36 @@ const App = () => {
                   key={`ganjil-${idx}`} 
                   className="space-y-2 p-3 bg-slate-50/50 rounded-xl border border-slate-200"
                 >
+                  {/* Elemen CP Section */}
+                  <div className="space-y-1 mb-2">
+                    <div className="flex justify-between items-center px-1">
+                      <label className="text-[9px] font-black text-slate-400 uppercase">Elemen CP</label>
+                      <button 
+                        onClick={() => addElemenCp('Ganjil', idx)}
+                        className="p-1 text-indigo-600 hover:bg-white rounded border border-transparent hover:border-indigo-100 transition-all"
+                      >
+                        <Plus size={10} />
+                      </button>
+                    </div>
+                    <div className="space-y-1">
+                      {materi.elemenCp.map((elemen, eIdx) => (
+                        <div key={eIdx} className="flex gap-1 items-center">
+                          <input 
+                            value={elemen}
+                            onChange={(e) => handleElemenCpChange('Ganjil', idx, eIdx, e.target.value)}
+                            placeholder="Contoh: Pemahaman Konsep"
+                            className="flex-1 p-1.5 bg-white border border-gray-100 rounded text-[10px] focus:ring-1 focus:ring-indigo-500 outline-none italic"
+                          />
+                          {materi.elemenCp.length > 1 && (
+                            <button onClick={() => removeElemenCp('Ganjil', idx, eIdx)} className="text-gray-300 hover:text-red-400">
+                              <X size={10} />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="flex gap-1 group items-center">
                     <input 
                       value={materi.judul} 
@@ -859,6 +931,36 @@ const App = () => {
                   key={`genap-${idx}`} 
                   className="space-y-2 p-3 bg-slate-50/50 rounded-xl border border-slate-200"
                 >
+                  {/* Elemen CP Section */}
+                  <div className="space-y-1 mb-2">
+                    <div className="flex justify-between items-center px-1">
+                      <label className="text-[9px] font-black text-slate-400 uppercase">Elemen CP</label>
+                      <button 
+                        onClick={() => addElemenCp('Genap', idx)}
+                        className="p-1 text-orange-600 hover:bg-white rounded border border-transparent hover:border-orange-100 transition-all"
+                      >
+                        <Plus size={10} />
+                      </button>
+                    </div>
+                    <div className="space-y-1">
+                      {materi.elemenCp.map((elemen, eIdx) => (
+                        <div key={eIdx} className="flex gap-1 items-center">
+                          <input 
+                            value={elemen}
+                            onChange={(e) => handleElemenCpChange('Genap', idx, eIdx, e.target.value)}
+                            placeholder="Contoh: Pemahaman Konsep"
+                            className="flex-1 p-1.5 bg-white border border-gray-100 rounded text-[10px] focus:ring-1 focus:ring-orange-500 outline-none italic"
+                          />
+                          {materi.elemenCp.length > 1 && (
+                            <button onClick={() => removeElemenCp('Genap', idx, eIdx)} className="text-gray-300 hover:text-red-400">
+                              <X size={10} />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="flex gap-1 group items-center">
                     <input 
                       value={materi.judul} 
@@ -976,7 +1078,9 @@ const App = () => {
           <div className="grid grid-cols-2 gap-2 text-[10px]">
             <div className="flex justify-between border-b border-indigo-100 pb-1">
               <span className="text-gray-500">Materi Pokok:</span>
-              <span className="font-bold text-indigo-700">{totalJpMateri} JP</span>
+              <span className="font-bold text-indigo-700">
+                {(formData.semester.includes('Ganjil') ? hasilAkhirJpGanjil : 0) + (formData.semester.includes('Genap') ? hasilAkhirJpGenap : 0)} JP
+              </span>
             </div>
             <div className="flex justify-between border-b border-indigo-100 pb-1">
               <span className="text-gray-500">Extra (UH/Cad):</span>
@@ -984,7 +1088,9 @@ const App = () => {
             </div>
             <div className="flex justify-between border-b border-indigo-100 pb-1">
               <span className="text-gray-500">Total Akhir:</span>
-              <span className="font-bold text-indigo-900">{totalJpKeseluruhan} JP</span>
+              <span className="font-bold text-indigo-900">
+                {(formData.semester.includes('Ganjil') ? hasilJpNettoGanjil : 0) + (formData.semester.includes('Genap') ? hasilJpNettoGenap : 0)} JP
+              </span>
             </div>
           </div>
         </section>
@@ -1180,7 +1286,18 @@ const App = () => {
                         <div className="space-y-4">
                           {materiList.map((m, i) => (
                             <div key={i} className="p-4 border rounded-lg bg-gray-50">
-                              <p className="font-bold text-indigo-700 underline mb-1">Elemen: {m.judul || 'Materi Pokok'}</p>
+                              <div className="mb-2">
+                                <span className="font-bold text-indigo-700 underline">Elemen:</span>
+                                {m.elemenCp && m.elemenCp.length > 0 ? (
+                                  <div className="flex flex-col ml-1">
+                                    {m.elemenCp.map((e, ei) => (
+                                      <span key={ei} className="font-bold text-indigo-700 uppercase leading-tight">- {e}</span>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <span className="font-bold text-indigo-700 uppercase ml-1">{m.judul || 'Materi Pokok'}</span>
+                                )}
+                              </div>
                               <p className="text-sm">Pada akhir {formData.fase}, peserta didik mampu mendeskripsikan, menganalisis, serta mengevaluasi konsep-konsep yang berkaitan dengan <strong>{m.judul}</strong>. Peserta didik dapat mengintegrasikan pengetahuan tersebut untuk memecahkan masalah kontekstual dalam kehidupan masyarakat serta mampu mengomunikasikan ide secara terstruktur dan ilmiah.</p>
                             </div>
                           ))}
@@ -1259,91 +1376,145 @@ const App = () => {
                   </PageContainer>
                 )}
 
-                {selectedDocs.includes('MODUL') && (
-                  <PageContainer key="MODUL" id="MODUL" title="MODUL AJAR / RPP LENGKAP">
+                {selectedDocs.includes('MATRIX') && (
+                  <PageContainer key="MATRIX" id="MATRIX" title="MATRIX PEMETAAN CP & TP">
                     <div className="space-y-6">
-                      {/* Informasi Umum */}
-                      <div className="grid grid-cols-2 gap-4 text-xs font-bold border-b-2 border-indigo-600 pb-4">
-                        <div className="space-y-1">
-                          <p>PENYUSUN: {formData.namaGuru}</p>
-                          <p>SEKOLAH: {formData.namaSekolah}</p>
-                          <p>JENJANG: {formData.kelas}</p>
-                        </div>
-                        <div className="space-y-1 text-right">
-                          <p>MAPEL: {formData.mapel}</p>
-                          <p>TAHUN: {formData.tahunAjaran}</p>
-                          <p>METODE: {formData.kurikulum === 'Deep Learning' ? 'Exploration & Deep Thinking' : 'Problem Based Learning'}</p>
-                        </div>
-                      </div>
-
-                      {/* Komponen Inti per Materi */}
-                      <div className="space-y-10 mt-6">
-                        {flatSubMateriList.slice(0, 5).map((sm, i) => {
-                          const jpPerSessi = Number(formData.jpPerPertemuan) || 2;
-                          const totalJp = Number(sm.jp) || 0;
-                          const jmlPertemuan = Math.ceil(totalJp / jpPerSessi);
-
-                          return (
-                            <div key={i} className="border-l-4 border-indigo-600 pl-6 space-y-4 break-inside-avoid">
-                              <div className="flex justify-between items-start">
-                                <div className="space-y-1">
-                                  <h4 className="bg-indigo-600 text-white px-3 py-1 inline-block font-black uppercase text-[10px]">
-                                    Modul {i+1}: {sm.materiJudul}
-                                  </h4>
-                                  <p className="text-[11px] font-bold text-slate-700">SUB MATERI: <span className="text-indigo-600 uppercase">{sm.judul || '...'}</span></p>
-                                </div>
-                                <div className="text-right">
-                                  <p className="text-[9px] font-black text-slate-400 uppercase">Alokasi Waktu</p>
-                                  <p className="text-xs font-bold">{sm.jp} JP ({jmlPertemuan} Pertemuan)</p>
-                                </div>
-                              </div>
-
-                              {/* Checklist Pertemuan */}
-                              <div className="flex gap-4 p-2 bg-indigo-50/50 rounded-lg border border-indigo-100 mb-4">
-                                <span className="text-[9px] font-black text-indigo-400 uppercase self-center">Pertemuan Ke:</span>
-                                <div className="flex gap-3 flex-wrap">
-                                  {[...Array(jmlPertemuan || 1)].map((_, pIdx) => (
-                                    <div key={pIdx} className="flex items-center gap-1.5">
-                                      <div className="w-4 h-4 border-2 border-indigo-300 rounded flex items-center justify-center">
-                                        <div className="w-2 h-2 bg-indigo-500 rounded-sm opacity-20"></div>
-                                      </div>
-                                      <span className="text-[10px] font-bold text-slate-600">{pIdx + 1}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                              
-                              <div className="space-y-2">
-                                <p className="font-bold underline text-xs">1. Pertanyaan Pemantik:</p>
-                                <p className="italic text-slate-600">"Pernahkah Anda terpikir bagaimana konsep {sm.judul} mempengaruhi kenyamanan hidup kita setiap harinya? Apa yang terjadi jika {sm.judul} tidak ada?"</p>
-                              </div>
-
-                              <div className="space-y-3">
-                                <p className="font-bold underline text-xs uppercase">2. Rincian Kegiatan Pembelajaran:</p>
-                                <ul className="list-decimal ml-5 space-y-3 text-xs leading-relaxed">
-                                  <li>
-                                    <span className="font-bold">Kegiatan Awal (15 Menit):</span> Melakukan teknik K-W-L (Know, Want, Learn) dan memberikan stimulasi berupa video atau demonstrasi fisik terkait {sm.judul}.
-                                  </li>
-                                  <li>
-                                    <span className="font-bold">Kegiatan Inti (50 Menit):</span> Peserta didik dibagi menjadi kelompok kecil untuk melakukan investigasi literasi and eksperimen terbimbing mengenai struktur {sm.judul}. Guru bertindak sebagai fasilitator yang memberikan pertanyaan pelacak.
-                                  </li>
-                                  <li>
-                                    <span className="font-bold">Kegiatan Penutup (15 Menit):</span> Melakukan konfirmasi pemahaman melalui kuis interaktif dan penarikan kesimpulan secara kolaboratif.
-                                  </li>
+                      <table className="w-full border-collapse border-2 border-slate-800 text-[10px]">
+                        <thead className="bg-slate-800 text-white uppercase font-black">
+                          <tr>
+                            <th className="border border-slate-600 p-2 w-32 text-left">Elemen CP</th>
+                            <th className="border border-slate-600 p-2 text-left">Capaian Pembelajaran (CP)</th>
+                            <th className="border border-slate-600 p-2 text-left">Tujuan Pembelajaran (TP)</th>
+                            <th className="border border-slate-600 p-2 w-16 text-center">Kelas / Smt</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {materiList.map((m, i) => (
+                            <tr key={i}>
+                              <td className="border border-slate-300 p-3 font-bold bg-slate-50 uppercase">
+                                {m.elemenCp && m.elemenCp.length > 0 ? (
+                                  <div className="flex flex-col">
+                                    {m.elemenCp.map((e, ei) => (
+                                      <div key={ei}>{e}</div>
+                                    ))}
+                                  </div>
+                                ) : '...'}
+                              </td>
+                              <td className="border border-slate-300 p-3 italic leading-relaxed">
+                                Peserta didik mampu menganalisis secara kritis, melakukan observasi, serta menjelaskan prinsip-prinsip dasar yang berkaitan dengan {m.judul} dalam konteks kehidupan sehari-hari.
+                              </td>
+                              <td className="border border-slate-300 p-3 font-medium">
+                                <ul className="list-disc pl-4 space-y-1">
+                                  <li>Mendeskripsikan definisi dan ruang lingkup {m.judul}.</li>
+                                  <li>Mengidentifikasi karakteristik utama dari {m.judul}.</li>
+                                  <li>Menganalisis dampak {m.judul} terhadap masyarakat.</li>
                                 </ul>
-                              </div>
-
-                              <div className="bg-slate-50 p-3 rounded text-[10px] border border-slate-200">
-                                <p className="font-bold mb-1">Media & Sumber Belajar:</p>
-                                <p>Buku Teks, Platform Merdeka Mengajar (PMM), Objek fisik sekitar, dan Lembar Kerja.</p>
-                              </div>
-                            </div>
-                          );
-                        })}
+                              </td>
+                              <td className="border border-slate-300 p-3 text-center font-bold">{formData.kelas} / {formData.semester.join('-')}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <div className="bg-amber-50 p-4 border border-amber-200 text-amber-900 italic text-[9px] leading-relaxed">
+                        <strong>Keterangan:</strong> Matrix ini berfungsi untuk memastikan keselarasan (alignment) antara Capaian Pembelajaran yang ditetapkan Pemerintah dengan Tujuan Pembelajaran yang diturunkan secara mandiri oleh satuan pendidikan.
                       </div>
                     </div>
                   </PageContainer>
                 )}
+
+                {selectedDocs.includes('MODUL') && flatSubMateriList.map((sm, i) => {
+                  const jpPerSessi = Number(formData.jpPerPertemuan) || 2;
+                  const totalJp = Number(sm.jp) || 0;
+                  const jmlPertemuan = Math.ceil(totalJp / jpPerSessi);
+
+                  return (
+                    <PageContainer key={`MODUL-${i}`} id={`MODUL-${i}`} title={`MODUL AJAR: ${sm.judul}`}>
+                      <div className="space-y-6">
+                        {/* Informasi Umum */}
+                        <div className="grid grid-cols-2 gap-4 text-[10px] font-bold border-b border-indigo-600 pb-2 mb-4">
+                          <div className="space-y-1">
+                            <p>PENYUSUN: {formData.namaGuru}</p>
+                            <p>SEKOLAH: {formData.namaSekolah}</p>
+                            <p>JENJANG: {formData.kelas}</p>
+                            <p>MATERI: {sm.materiJudul}</p>
+                          </div>
+                          <div className="space-y-1 text-right">
+                            <p>MAPEL: {formData.mapel}</p>
+                            <p>TAHUN: {formData.tahunAjaran}</p>
+                            <p>ALOKASI: {sm.jp} JP ({jmlPertemuan} Pertemuan)</p>
+                            <p>METODE: {formData.kurikulum === 'Deep Learning' ? 'Exploration & Deep Thinking' : 'Problem Based Learning'}</p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-6">
+                          {/* Panca Cinta - Kemenag Cinta */}
+                          {formData.kurikulum === 'Kurikulum Berbasis Cinta' && (
+                            <div className="p-3 bg-rose-50 border-2 border-rose-200 rounded-lg space-y-2">
+                              <p className="text-[10px] font-black text-rose-700 uppercase flex items-center gap-2">
+                                <Heart size={14} className="fill-rose-700" /> Integrasi Panca Cinta (Cinta):
+                              </p>
+                              <div className="grid grid-cols-5 gap-1">
+                                {[
+                                  { t: 'Cinta Allah & Rasul', c: 'Religiusitas' },
+                                  { t: 'Cinta Orang Tua & Guru', c: 'Adab' },
+                                  { t: 'Cinta Sesama', c: 'Empati' },
+                                  { t: 'Cinta Tanah Air', c: 'Nasionalisme' },
+                                  { t: 'Cinta Ilmu & Tekno', c: 'Literasi' }
+                                ].map((love, lIdx) => (
+                                  <div key={lIdx} className="bg-white p-1.5 rounded border border-rose-100 text-center space-y-1">
+                                    <p className="text-[7px] font-black text-rose-800 leading-tight uppercase">{love.t}</p>
+                                    <div className="h-0.5 bg-rose-200 w-full rounded-full"></div>
+                                    <p className="text-[6px] font-bold text-rose-400 uppercase tracking-tighter">{love.c}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Checklist Pertemuan */}
+                          <div className="flex gap-4 p-2 bg-indigo-50/50 rounded-lg border border-indigo-100">
+                            <span className="text-[9px] font-black text-indigo-400 uppercase self-center">Pertemuan Ke:</span>
+                            <div className="flex gap-3 flex-wrap">
+                              {[...Array(jmlPertemuan || 1)].map((_, pIdx) => (
+                                <div key={pIdx} className="flex items-center gap-1.5">
+                                  <div className="w-4 h-4 border-2 border-indigo-300 rounded flex items-center justify-center">
+                                    <div className="w-2 h-2 bg-indigo-500 rounded-sm opacity-20"></div>
+                                  </div>
+                                  <span className="text-[10px] font-bold text-slate-600">{pIdx + 1}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2 border-l-2 border-indigo-200 pl-4">
+                            <p className="font-bold underline text-xs">1. Pertanyaan Pemantik:</p>
+                            <p className="italic text-slate-600 text-xs">"Pernahkah Anda terpikir bagaimana konsep {sm.judul} mempengaruhi kenyamanan hidup kita setiap harinya? Apa yang terjadi jika {sm.judul} tidak ada?"</p>
+                          </div>
+
+                          <div className="space-y-3 border-l-2 border-indigo-200 pl-4">
+                            <p className="font-bold underline text-xs uppercase">2. Rincian Kegiatan Pembelajaran:</p>
+                            <ul className="list-decimal ml-5 space-y-3 text-xs leading-relaxed">
+                              <li>
+                                <span className="font-bold text-indigo-700">Kegiatan Awal (15 Menit):</span> Motivasi, Apersepsi, dan penyampaian tujuan pembelajaran menggunakan teknik pemetaan pikiran.
+                              </li>
+                              <li>
+                                <span className="font-bold text-indigo-700">Kegiatan Inti (50 Menit):</span> Peserta didik mengeksplorasi materi melalui diskusi terprogram, demonstrasi, atau eksperimen langsung sesuai karakteristik materi.
+                              </li>
+                              <li>
+                                <span className="font-bold text-indigo-700">Kegiatan Penutup (15 Menit):</span> Refleksi bersama, penarikan kesimpulan kunci, dan pemberian tugas penguatan mandiri.
+                              </li>
+                            </ul>
+                          </div>
+
+                          <div className="bg-slate-50 p-3 rounded text-[10px] border border-slate-200 italic font-medium">
+                            <p className="font-bold mb-1 not-italic">Media & Sumber Belajar:</p>
+                            <p>Buku Paket Siswa, Lingkungan Sekitar, Media Digital (LMS/PMM), dan Instrumen Pengamatan.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </PageContainer>
+                  );
+                })}
 
                 {selectedDocs.includes('LKPD') && (
                   <PageContainer key="LKPD" id="LKPD" title="LEMBAR KERJA PESERTA DIDIK (LKPD)">
@@ -1386,32 +1557,48 @@ const App = () => {
                   </PageContainer>
                 )}
 
-                {selectedDocs.includes('ASESMEN') && (
-                  <PageContainer key="ASESMEN" id="ASESMEN" title="ASESMEN & PENILAIAN">
+                {selectedDocs.includes('ASESMEN_FORMATIF') && (
+                  <PageContainer key="ASESMEN_FORMATIF" id="ASESMEN_FORMATIF" title="ASESMEN FORMATIF (SIKAP & PROFIL)">
                     <div className="space-y-10">
                       <section>
-                        <h4 className="font-bold text-indigo-900 border-b pb-1 mb-4">A. ASESMEN KOGNITIF (SUMATIF)</h4>
-                        <div className="space-y-6">
-                          {materiList.slice(0, 3).map((m, i) => (
-                            <div key={i} className="pl-4">
-                              <p className="font-bold mb-2">{i+1}. Analisislah peran materi <strong>{m.judul}</strong> dalam konteks {formData.kurikulum}. Mengapa pemahaman ini menjadi prasyarat penting dalam penguasaan {formData.mapel}?</p>
-                              <div className="grid grid-cols-1 gap-1 text-xs opacity-80">
-                                <p>A. Jawaban pengecoh yang logis</p>
-                                <p>B. Jawaban yang menunjukkan pemahaman dangkal</p>
-                                <p>C. Jawaban yang paling tepat dan analitis</p>
-                                <p>D. Jawaban yang tidak relevan dengan konteks</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                        <h4 className="font-bold text-indigo-900 border-b pb-1 mb-4">A. INSTRUMEN OBSERVASI SIKAP (FORMATIF)</h4>
+                        <p className="text-xs italic mb-4">Dilakukan selama proses pembelajaran berlangsung untuk memantau perkembangan karakter dan adab peserta didik.</p>
+                        <table className="w-full border-collapse border border-slate-300 text-[10px]">
+                          <thead>
+                            <tr className="bg-slate-100">
+                              <th className="border p-2 w-8">No</th>
+                              <th className="border p-2">Aspek yang Diamati</th>
+                              <th className="border p-2 w-16">Ya</th>
+                              <th className="border p-2 w-16">Tidak</th>
+                              <th className="border p-2">Catatan Anekdot</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {[
+                              'Menunjukkan rasa ingin tahu terhadap materi',
+                              'Bekerja sama dalam diskusi kelompok',
+                              'Menghargai pendapat teman yang berbeda',
+                              'Menyelesaikan tugas tepat waktu',
+                              'Menggunakan bahasa yang santun'
+                            ].map((item, idx) => (
+                              <tr key={idx}>
+                                <td className="border p-2 text-center">{idx + 1}</td>
+                                <td className="border p-2">{item}</td>
+                                <td className="border p-2"></td>
+                                <td className="border p-2"></td>
+                                <td className="border p-2"></td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </section>
 
                       <section>
-                        <h4 className="font-bold text-indigo-900 border-b pb-1 mb-4">B. RUBRIK PENILAIAN SIKAP</h4>
+                        <h4 className="font-bold text-indigo-900 border-b pb-1 mb-4">B. RUBRIK PENILAIAN PROFIL PELAJAR</h4>
                         <table className="w-full border-collapse border border-slate-300 text-xs">
                           <thead>
                             <tr className="bg-slate-100">
-                              <th className="border p-2">Aspek</th>
+                              <th className="border p-2">Dimensi</th>
                               <th className="border p-2">Mulai Berkembang (1)</th>
                               <th className="border p-2">Berkembang (2)</th>
                               <th className="border p-2">Sangat Berkembang (3)</th>
@@ -1419,14 +1606,47 @@ const App = () => {
                           </thead>
                           <tbody>
                             <tr>
-                              <td className="border p-2 font-bold uppercase">Kritikalitas</td>
-                              <td className="border p-2 italic text-[10px]">Pasif dalam diskusi.</td>
-                              <td className="border p-2 italic text-[10px]">Memberikan pendapat sederhana.</td>
-                              <td className="border p-2 italic text-[10px]">Mampu membedah masalah secara tajam.</td>
+                              <td className="border p-2 font-bold uppercase">Bernalar Kritis</td>
+                              <td className="border p-2 italic text-[10px]">Memerlukan bantuan untuk bertanya.</td>
+                              <td className="border p-2 italic text-[10px]">Mampu mengajukan pertanyaan dasar.</td>
+                              <td className="border p-2 italic text-[10px]">Mampu menganalisis argumen secara logis.</td>
+                            </tr>
+                            <tr>
+                              <td className="border p-2 font-bold uppercase">Gotong Royong</td>
+                              <td className="border p-2 italic text-[10px]">Cenderung bekerja sendiri.</td>
+                              <td className="border p-2 italic text-[10px]">Aktif membantu jika diminta.</td>
+                              <td className="border p-2 italic text-[10px]">Inisiatif membantu tim tanpa diminta.</td>
                             </tr>
                           </tbody>
                         </table>
                       </section>
+                    </div>
+                  </PageContainer>
+                )}
+
+                {selectedDocs.includes('ASESMEN_SUMATIF') && (
+                  <PageContainer key="ASESMEN_SUMATIF" id="ASESMEN_SUMATIF" title="ASESMEN SUMATIF (KOGNITIF)">
+                    <div className="space-y-10">
+                      <section>
+                        <h4 className="font-bold text-indigo-900 border-b pb-1 mb-4">INSTRUMEN TES TERTULIS (SUMATIF MATERI)</h4>
+                        <div className="space-y-6">
+                          {materiList.map((m, i) => (
+                            <div key={i} className="pl-4">
+                              <p className="font-bold mb-2">{i+1}. Analisislah peran materi <strong>{m.judul}</strong> dalam konteks {formData.kurikulum}. Mengapa pemahaman ini menjadi prasyarat penting dalam penguasaan {formData.mapel}?</p>
+                              <div className="grid grid-cols-1 gap-1 text-xs opacity-80">
+                                <p>A. Jawaban pengecoh yang logis dan berhubungan</p>
+                                <p>B. Jawaban yang menunjukkan pemahaman parsial</p>
+                                <p>C. Jawaban yang paling komprehensif dan tepat</p>
+                                <p>D. Jawaban yang kurang relevan dengan materi</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </section>
+
+                      <div className="bg-slate-50 p-4 border-2 border-dashed border-slate-300 rounded-lg">
+                        <p className="text-center font-bold text-slate-400 uppercase tracking-widest text-[10px]">Lembar Kunci Jawaban & Bobot Nilai</p>
+                      </div>
                     </div>
                   </PageContainer>
                 )}
