@@ -1447,7 +1447,7 @@ const App = () => {
                             <p>JENJANG: {formData.kelas}</p>
                             <p>MATERI: {sm.materiJudul}</p>
                           </div>
-                          <div className="space-y-1 text-right">
+                          <div className="space-y-1 text-left">
                             <p>MAPEL: {formData.mapel}</p>
                             <p>KELAS: {formData.kelas}</p>
                             <p>TAHUN: {formData.tahunAjaran}</p>
