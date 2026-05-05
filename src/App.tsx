@@ -597,9 +597,11 @@ const App = () => {
         <div className="text-center border-b-4 border-double border-gray-800 pb-4 mb-8">
           <h2 className="text-sm font-bold uppercase tracking-widest text-gray-700">YAYASAN PON-PES DARUL HUDA</h2>
           <h1 className="text-xl font-bold uppercase tracking-wider leading-tight">{formData.namaSekolah || 'NAMA SEKOLAH ANDA'}</h1>
+          <p className="text-[10px] font-bold text-gray-700">TAHUN PELAJARAN {formData.tahunAjaran}</p>
           <p className="text-[10px] italic text-gray-600">Jl. KH. Moch. Chozin Toyib No.2 Rt 01/ Rw 01 Desa pengarang Kec. Jambesari Darus Sholah Kab. Bondowoso</p>
           <div className="mt-4 flex justify-between text-[10px] font-bold text-gray-500 uppercase">
             <span>Mapel: {formData.mapel || '...'}</span>
+            <span>Kelas: {formData.kelas || '...'}</span>
             <span>Semester: {formData.semester.join(' / ')}</span>
             <span>{formData.kurikulum}</span>
             <span>{formData.fase}</span>
@@ -616,12 +618,19 @@ const App = () => {
 
         <div className="mt-16 grid grid-cols-2 gap-20 text-center print:break-inside-avoid">
           <div className="print:break-inside-avoid">
-            <p className="mb-20">Mengetahui,<br/>Kepala Sekolah</p>
+            <p className="mb-20">Mengetahui,<br/>
+              {formData.kelas.includes('VII') || formData.kelas.includes('VIII') || formData.kelas.includes('IX') ? 'Kepala MTs Darul Huda' : 
+               formData.kelas.includes('X') || formData.kelas.includes('XI') || formData.kelas.includes('XII') ? 'Kepala MA Darul Huda' : 'Kepala Sekolah'}
+            </p>
             <p className="font-bold underline uppercase">{formData.namaKepalaSekolah || '..........................'}</p>
             <p className="text-xs text-gray-500 italic">NIP. ..........................</p>
           </div>
           <div className="print:break-inside-avoid">
-            <p className="mb-20 uppercase">{formData.kabupaten || 'Kabupaten'}, {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(formData.tanggalTtd))}<br/>Guru Mata Pelajaran</p>
+            <p className="mb-20">
+              {formData.kabupaten || 'Bondowoso'}, {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(formData.tanggalTtd))}
+              <br/>
+              Guru Mata Pelajaran
+            </p>
             <p className="font-bold underline uppercase">{formData.namaGuru || '..........................'}</p>
             <p className="text-xs text-gray-500 italic">NIP. ..........................</p>
           </div>
@@ -1440,6 +1449,7 @@ const App = () => {
                           </div>
                           <div className="space-y-1 text-right">
                             <p>MAPEL: {formData.mapel}</p>
+                            <p>KELAS: {formData.kelas}</p>
                             <p>TAHUN: {formData.tahunAjaran}</p>
                             <p>ALOKASI: {sm.jp} JP ({jmlPertemuan} Pertemuan)</p>
                             <p>METODE: {formData.kurikulum === 'Deep Learning' ? 'Exploration & Deep Thinking' : 'Problem Based Learning'}</p>
