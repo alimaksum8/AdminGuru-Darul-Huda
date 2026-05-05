@@ -40,6 +40,7 @@ interface SubMateri {
 
 interface Materi {
   elemenCp: string[];
+  mediaSumberBelajar: string;
   judul: string;
   jp: string;
   subMateri: SubMateri[];
@@ -76,8 +77,8 @@ const App = () => {
   };
 
   // State for Dynamic Materials - Split by Semester
-  const [materiGanjil, setMateriGanjil] = useState<Materi[]>([{ elemenCp: [''], judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
-  const [materiGenap, setMateriGenap] = useState<Materi[]>([{ elemenCp: [''], judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
+  const [materiGanjil, setMateriGanjil] = useState<Materi[]>([{ elemenCp: [''], mediaSumberBelajar: '', judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
+  const [materiGenap, setMateriGenap] = useState<Materi[]>([{ elemenCp: [''], mediaSumberBelajar: '', judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
 
   const [pekanDataGanjil, setPekanDataGanjil] = useState([
     { bulan: 'Juli', total: 4, nonEfektif: 2, keterangan: 'Libur Semester' },
@@ -262,7 +263,8 @@ const App = () => {
     m.subMateri.map(sub => ({
       materiJudul: m.judul,
       judul: sub.judul,
-      jp: sub.jp
+      jp: sub.jp,
+      mediaSumberBelajar: m.mediaSumberBelajar
     }))
   );
 
@@ -363,7 +365,7 @@ const App = () => {
   };
 
   const addMateri = (sem: 'Ganjil' | 'Genap') => {
-    const defaultMateri: Materi = { elemenCp: [''], judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] };
+    const defaultMateri: Materi = { elemenCp: [''], mediaSumberBelajar: '', judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] };
     if (sem === 'Ganjil') setMateriGanjil([...materiGanjil, defaultMateri]);
     else setMateriGenap([...materiGenap, defaultMateri]);
   };
@@ -371,10 +373,10 @@ const App = () => {
   const removeMateri = (sem: 'Ganjil' | 'Genap', index: number) => {
     if (sem === 'Ganjil') {
       const newList = materiGanjil.filter((_, i) => i !== index);
-      setMateriGanjil(newList.length ? newList : [{ elemenCp: [''], judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
+      setMateriGanjil(newList.length ? newList : [{ elemenCp: [''], mediaSumberBelajar: '', judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
     } else {
       const newList = materiGenap.filter((_, i) => i !== index);
-      setMateriGenap(newList.length ? newList : [{ elemenCp: [''], judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
+      setMateriGenap(newList.length ? newList : [{ elemenCp: [''], mediaSumberBelajar: '', judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
     }
   };
 
@@ -416,7 +418,7 @@ const App = () => {
     }
   };
 
-  const handleMateriChange = (sem: 'Ganjil' | 'Genap', index: number, field: 'judul' | 'jp', value: string) => {
+  const handleMateriChange = (sem: 'Ganjil' | 'Genap', index: number, field: 'judul' | 'jp' | 'mediaSumberBelajar', value: string) => {
     let finalValue = value;
     if (field === 'jp' && value !== '') {
       const num = Number(value);
@@ -693,7 +695,10 @@ const App = () => {
             <div className={`grid ${formData.semester.length === 2 ? 'grid-cols-2' : 'grid-cols-1'} gap-2`}>
               {formData.semester.includes('Ganjil') && (
                 <div className="space-y-1">
-                  <label className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Total JP Ganjil</label>
+                  <div className="flex justify-between items-center px-1">
+                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Total JP Ganjil</label>
+                    <span className="text-[8px] font-bold text-indigo-500 uppercase">{totalEfektifGanjil} Pekan Efektif</span>
+                  </div>
                   <input type="number" name="totalJpGanjil" value={formData.totalJpGanjil} readOnly placeholder="JP" className="w-full p-2 bg-gray-100 border border-gray-200 rounded text-sm outline-none cursor-not-allowed font-bold text-indigo-600" />
                   <div className="p-1.5 bg-amber-50 border border-amber-200 rounded flex justify-between items-center">
                     <span className="text-[8px] font-bold text-amber-700 uppercase">Materi Pokok:</span>
@@ -703,7 +708,10 @@ const App = () => {
               )}
               {formData.semester.includes('Genap') && (
                 <div className="space-y-1">
-                  <label className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Total JP Genap</label>
+                  <div className="flex justify-between items-center px-1">
+                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Total JP Genap</label>
+                    <span className="text-[8px] font-bold text-orange-500 uppercase">{totalEfektifGenap} Pekan Efektif</span>
+                  </div>
                   <input type="number" name="totalJpGenap" value={formData.totalJpGenap} readOnly placeholder="JP" className="w-full p-2 bg-gray-100 border border-gray-200 rounded text-sm outline-none cursor-not-allowed font-bold text-indigo-600" />
                   <div className="p-1.5 bg-orange-50 border border-orange-200 rounded flex justify-between items-center">
                     <span className="text-[8px] font-bold text-orange-700 uppercase">Materi Pokok:</span>
@@ -841,6 +849,17 @@ const App = () => {
                     </div>
                   </div>
 
+                  {/* Media & Sumber Belajar */}
+                  <div className="space-y-1 mb-2">
+                    <label className="text-[9px] font-black text-slate-400 uppercase px-1">Media & Sumber Belajar</label>
+                    <textarea 
+                      value={materi.mediaSumberBelajar}
+                      onChange={(e) => handleMateriChange('Ganjil', idx, 'mediaSumberBelajar', e.target.value)}
+                      placeholder="Buku Paket, Internet, LKPD, dll"
+                      className="w-full p-2 bg-white border border-gray-100 rounded text-[10px] focus:ring-1 focus:ring-indigo-500 outline-none min-h-[40px] resize-none"
+                    />
+                  </div>
+
                   <div className="flex gap-1 group items-center">
                     <input 
                       value={materi.judul} 
@@ -970,6 +989,17 @@ const App = () => {
                     </div>
                   </div>
 
+                  {/* Media & Sumber Belajar */}
+                  <div className="space-y-1 mb-2">
+                    <label className="text-[9px] font-black text-slate-400 uppercase px-1">Media & Sumber Belajar</label>
+                    <textarea 
+                      value={materi.mediaSumberBelajar}
+                      onChange={(e) => handleMateriChange('Genap', idx, 'mediaSumberBelajar', e.target.value)}
+                      placeholder="Buku Paket, Internet, LKPD, dll"
+                      className="w-full p-2 bg-white border border-gray-100 rounded text-[10px] focus:ring-1 focus:ring-orange-500 outline-none min-h-[40px] resize-none"
+                    />
+                  </div>
+
                   <div className="flex gap-1 group items-center">
                     <input 
                       value={materi.judul} 
@@ -1067,7 +1097,7 @@ const App = () => {
 
         <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
           <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
-             <Calendar size={12} /> JP Satu Kali Pertemuan (Promis)
+             <Calendar size={12} /> Parameter JP (JP per Minggu)
           </label>
           <input 
             type="number" 
@@ -1075,7 +1105,7 @@ const App = () => {
             value={formData.jpPerPertemuan} 
             onChange={handleInputChange} 
             min="1"
-            className="w-full p-2 bg-white border border-gray-200 rounded text-xs focus:ring-1 focus:ring-indigo-500 outline-none"
+            className="w-full p-2 bg-white border border-gray-200 rounded text-xs font-bold text-indigo-600 focus:ring-1 focus:ring-indigo-500 outline-none"
             placeholder="Contoh: 2"
           />
         </div>
@@ -1518,7 +1548,7 @@ const App = () => {
 
                           <div className="bg-slate-50 p-3 rounded text-[10px] border border-slate-200 italic font-medium">
                             <p className="font-bold mb-1 not-italic">Media & Sumber Belajar:</p>
-                            <p>Buku Paket Siswa, Lingkungan Sekitar, Media Digital (LMS/PMM), dan Instrumen Pengamatan.</p>
+                            <p>{sm.mediaSumberBelajar || 'Buku Paket Siswa, Lingkungan Sekitar, Media Digital (LMS/PMM), dan Instrumen Pengamatan.'}</p>
                           </div>
                         </div>
                       </div>
@@ -1712,6 +1742,9 @@ const App = () => {
                           <p className="font-bold text-indigo-900 mb-1 uppercase">Identitas Waktu</p>
                           <p>Semester: {formData.semester.join(' / ')}</p>
                           <p>Tahun Ajaran: {formData.tahunAjaran}</p>
+                          <p>Parameter JP: {formData.jpPerPertemuan} JP/Minggu</p>
+                          {formData.semester.includes('Ganjil') && <p>Pekan Efektif Ganjil: {totalEfektifGanjil} Minggu</p>}
+                          {formData.semester.includes('Genap') && <p>Pekan Efektif Genap: {totalEfektifGenap} Minggu</p>}
                           {(formData.totalJpGanjil && formData.semester.includes('Ganjil')) && <p>Total JP Ganjil: {formData.totalJpGanjil} JP</p>}
                           {(formData.totalJpGenap && formData.semester.includes('Genap')) && <p>Total JP Genap: {formData.totalJpGenap} JP</p>}
                         </div>
@@ -1943,6 +1976,9 @@ const App = () => {
                         <p>Semester: {formData.semester.join(' / ')}</p>
                         <p>Mata Pelajaran: {formData.mapel}</p>
                         <p>Tahun Pelajaran: {formData.tahunAjaran}</p>
+                        <p>Parameter JP: {formData.jpPerPertemuan} JP/Minggu</p>
+                        {formData.semester.includes('Ganjil') && <p>Pekan Efektif Ganjil: {totalEfektifGanjil} Minggu</p>}
+                        {formData.semester.includes('Genap') && <p>Pekan Efektif Genap: {totalEfektifGenap} Minggu</p>}
                         {(formData.totalJpGanjil && formData.semester.includes('Ganjil')) && <p>Total JP Semester Ganjil: {formData.totalJpGanjil} JP</p>}
                         {(formData.totalJpGenap && formData.semester.includes('Genap')) && <p>Total JP Semester Genap: {formData.totalJpGenap} JP</p>}
                       </div>
@@ -2293,6 +2329,26 @@ const App = () => {
               </div>
               
               <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                  {/* Parameter JP (JP per Minggu) */}
+                  <div className="p-4 bg-indigo-50 rounded-xl border border-indigo-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div className="flex-1">
+                      <h4 className="text-xs font-black text-indigo-700 uppercase tracking-widest mb-1 flex items-center gap-2">
+                        <Zap size={14} /> Parameter JP (Jam Pelajaran per Minggu)
+                      </h4>
+                      <p className="text-[10px] text-indigo-500 font-medium">Banyaknya Jam Pelajaran yang diajarkan dalam satu pekan efektif.</p>
+                    </div>
+                    <div className="w-full md:w-32">
+                      <input 
+                        type="number" 
+                        name="jpPerPertemuan" 
+                        value={formData.jpPerPertemuan} 
+                        onChange={handleInputChange}
+                        min="1"
+                        className="w-full p-3 bg-white border border-indigo-200 rounded-xl text-center font-black text-indigo-600 focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm"
+                      />
+                    </div>
+                  </div>
+
                   {/* Kaldik Upload & Scan Section */}
                   <div className="p-4 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200 space-y-4">
                     <div className="flex flex-col md:flex-row items-center gap-4">
@@ -2430,6 +2486,26 @@ const App = () => {
                        ))}
                      </div>
                    </div>
+                 </div>
+
+                 {/* Modal Summary Summary */}
+                 <div className="p-4 bg-slate-900 rounded-2xl text-white shadow-xl grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
+                    <div className="text-center md:border-r border-slate-700">
+                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Pekan Efektif (Ganjil)</p>
+                      <p className="text-lg font-black text-indigo-400">{totalEfektifGanjil} <span className="text-[10px]">Minggu</span></p>
+                    </div>
+                    <div className="text-center md:border-r border-slate-700">
+                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Total JP (Ganjil)</p>
+                      <p className="text-lg font-black text-indigo-300">{hasilJpNettoGanjil} <span className="text-[10px]">JP</span></p>
+                    </div>
+                    <div className="text-center md:border-r border-slate-700">
+                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Pekan Efektif (Genap)</p>
+                      <p className="text-lg font-black text-orange-400">{totalEfektifGenap} <span className="text-[10px]">Minggu</span></p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Total JP (Genap)</p>
+                      <p className="text-lg font-black text-orange-300">{hasilJpNettoGenap} <span className="text-[10px]">JP</span></p>
+                    </div>
                  </div>
               </div>
               
