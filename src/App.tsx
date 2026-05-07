@@ -301,11 +301,7 @@ const App = () => {
   const totalPekanGenap = pekanDataGenap.reduce((acc, curr) => acc + curr.total, 0);
   const totalNonGenap = pekanDataGenap.reduce((acc, curr) => acc + curr.nonEfektif, 0);
   const totalEfektifGenap = totalPekanGenap - totalNonGenap;
-
-  const jpSessi = Number(formData.jpPerPertemuan) || 0;
-  
-  const countAnalisisGanjil = (formData.semester.includes('Ganjil') && jpSessi > 0) ? Math.ceil(Number(formData.jpUlanganHarianGanjil) / jpSessi) : 0;
-  const countAnalisisGenap = (formData.semester.includes('Genap') && jpSessi > 0) ? Math.ceil(Number(formData.jpUlanganHarianGenap) / jpSessi) : 0;
+  const jpSessi = Math.max(1, Number(formData.jpPerPertemuan) || 0);
 
   const hasilJpEfektifGanjil = totalPekanGanjil * jpSessi;
   const hasilJpTidakEfektifGanjil = totalNonGanjil * jpSessi;
@@ -334,6 +330,9 @@ const App = () => {
   const [selectedDocs, setSelectedDocs] = useState<string[]>([]);
   const [isGenerated, setIsGenerated] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  const countAnalisisGanjil = (formData.semester.includes('Ganjil') && selectedDocs.includes('ANALISIS')) ? Math.max(1, Math.ceil((Number(formData.jpUlanganHarianGanjil) || 0) / (jpSessi || 2))) : 0;
+  const countAnalisisGenap = (formData.semester.includes('Genap') && selectedDocs.includes('ANALISIS')) ? Math.max(1, Math.ceil((Number(formData.jpUlanganHarianGenap) || 0) / (jpSessi || 2))) : 0;
 
   const documentTypes = [
     { id: 'PEKAN', name: 'PEKAN EFEKTIF', icon: <Calendar size={18} /> },
@@ -2431,7 +2430,7 @@ const App = () => {
                 {selectedDocs.includes('ANALISIS') && (
                   <>
                     {[...Array(countAnalisisGanjil)].map((_, idx) => (
-                      <PageContainer key={`ANALISIS-GANJIL-${idx}`} id={`ANALISIS-GANJIL-${idx}`} title={`ANALISIS HASIL ULANGAN ${idx + 1} (GANJIL)`}>
+                      <PageContainer key={`ANALISIS-GANJIL-${idx}`} id={`ANALISIS-GANJIL-${idx}`} title={`ANALISIS HASIL ULANGAN ${idx + 1} (GANJIL)`} hideSignature={true}>
                         <div className="space-y-6">
                           <div className="p-4 bg-slate-50 border rounded-lg text-xs space-y-1">
                             <p>Mata Pelajaran: {formData.mapel}</p>
@@ -2496,7 +2495,7 @@ const App = () => {
                     ))}
 
                     {[...Array(countAnalisisGenap)].map((_, idx) => (
-                      <PageContainer key={`ANALISIS-GENAP-${idx}`} id={`ANALISIS-GENAP-${idx}`} title={`ANALISIS HASIL ULANGAN ${idx + 1} (GENAP)`}>
+                      <PageContainer key={`ANALISIS-GENAP-${idx}`} id={`ANALISIS-GENAP-${idx}`} title={`ANALISIS HASIL ULANGAN ${idx + 1} (GENAP)`} hideSignature={true}>
                         <div className="space-y-6">
                           <div className="p-4 bg-slate-50 border rounded-lg text-xs space-y-1">
                             <p>Mata Pelajaran: {formData.mapel}</p>
