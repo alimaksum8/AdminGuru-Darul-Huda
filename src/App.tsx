@@ -36,6 +36,7 @@ import * as XLSX from 'xlsx';
 interface SubMateri {
   judul: string;
   jp: string;
+  praktik: boolean;
 }
 
 interface Materi {
@@ -67,7 +68,8 @@ const App = () => {
     jpCadanganGenap: '',
     jpPerPertemuan: '2',
     totalJpGanjil: '',
-    totalJpGenap: ''
+    totalJpGenap: '',
+    metode: 'Problem Based Learning'
   });
 
   const paperStyles = {
@@ -77,8 +79,8 @@ const App = () => {
   };
 
   // State for Dynamic Materials - Split by Semester
-  const [materiGanjil, setMateriGanjil] = useState<Materi[]>([{ elemenCp: [''], mediaSumberBelajar: '', judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
-  const [materiGenap, setMateriGenap] = useState<Materi[]>([{ elemenCp: [''], mediaSumberBelajar: '', judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
+  const [materiGanjil, setMateriGanjil] = useState<Materi[]>([{ elemenCp: [''], mediaSumberBelajar: '', judul: '', jp: '', subMateri: [{ judul: '', jp: '', praktik: false }] }]);
+  const [materiGenap, setMateriGenap] = useState<Materi[]>([{ elemenCp: [''], mediaSumberBelajar: '', judul: '', jp: '', subMateri: [{ judul: '', jp: '', praktik: false }] }]);
 
   const [pekanDataGanjil, setPekanDataGanjil] = useState([
     { bulan: 'Juli', total: 4, nonEfektif: 2, keterangan: 'Libur Semester' },
@@ -264,7 +266,8 @@ const App = () => {
       materiJudul: m.judul,
       judul: sub.judul,
       jp: sub.jp,
-      mediaSumberBelajar: m.mediaSumberBelajar
+      mediaSumberBelajar: m.mediaSumberBelajar,
+      praktik: sub.praktik
     }))
   );
 
@@ -365,7 +368,7 @@ const App = () => {
   };
 
   const addMateri = (sem: 'Ganjil' | 'Genap') => {
-    const defaultMateri: Materi = { elemenCp: [''], mediaSumberBelajar: '', judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] };
+    const defaultMateri: Materi = { elemenCp: [''], mediaSumberBelajar: '', judul: '', jp: '', subMateri: [{ judul: '', jp: '', praktik: false }] };
     if (sem === 'Ganjil') setMateriGanjil([...materiGanjil, defaultMateri]);
     else setMateriGenap([...materiGenap, defaultMateri]);
   };
@@ -373,10 +376,10 @@ const App = () => {
   const removeMateri = (sem: 'Ganjil' | 'Genap', index: number) => {
     if (sem === 'Ganjil') {
       const newList = materiGanjil.filter((_, i) => i !== index);
-      setMateriGanjil(newList.length ? newList : [{ elemenCp: [''], mediaSumberBelajar: '', judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
+      setMateriGanjil(newList.length ? newList : [{ elemenCp: [''], mediaSumberBelajar: '', judul: '', jp: '', subMateri: [{ judul: '', jp: '', praktik: false }] }]);
     } else {
       const newList = materiGenap.filter((_, i) => i !== index);
-      setMateriGenap(newList.length ? newList : [{ elemenCp: [''], mediaSumberBelajar: '', judul: '', jp: '', subMateri: [{ judul: '', jp: '' }] }]);
+      setMateriGenap(newList.length ? newList : [{ elemenCp: [''], mediaSumberBelajar: '', judul: '', jp: '', subMateri: [{ judul: '', jp: '', praktik: false }] }]);
     }
   };
 
@@ -440,11 +443,11 @@ const App = () => {
   const addSubMateri = (sem: 'Ganjil' | 'Genap', materiIdx: number) => {
     if (sem === 'Ganjil') {
       const newList = [...materiGanjil];
-      newList[materiIdx].subMateri.push({ judul: '', jp: '' });
+      newList[materiIdx].subMateri.push({ judul: '', jp: '', praktik: false });
       setMateriGanjil(newList);
     } else {
       const newList = [...materiGenap];
-      newList[materiIdx].subMateri.push({ judul: '', jp: '' });
+      newList[materiIdx].subMateri.push({ judul: '', jp: '', praktik: false });
       setMateriGenap(newList);
     }
   };
@@ -453,17 +456,17 @@ const App = () => {
     if (sem === 'Ganjil') {
       const newList = [...materiGanjil];
       newList[materiIdx].subMateri = newList[materiIdx].subMateri.filter((_, i) => i !== subIdx);
-      if (newList[materiIdx].subMateri.length === 0) newList[materiIdx].subMateri = [{ judul: '', jp: '' }];
+      if (newList[materiIdx].subMateri.length === 0) newList[materiIdx].subMateri = [{ judul: '', jp: '', praktik: false }];
       setMateriGanjil(newList);
     } else {
       const newList = [...materiGenap];
       newList[materiIdx].subMateri = newList[materiIdx].subMateri.filter((_, i) => i !== subIdx);
-      if (newList[materiIdx].subMateri.length === 0) newList[materiIdx].subMateri = [{ judul: '', jp: '' }];
+      if (newList[materiIdx].subMateri.length === 0) newList[materiIdx].subMateri = [{ judul: '', jp: '', praktik: false }];
       setMateriGenap(newList);
     }
   };
 
-  const handleSubMateriChange = (sem: 'Ganjil' | 'Genap', materiIdx: number, subIdx: number, field: 'judul' | 'jp', value: string) => {
+  const handleSubMateriChange = (sem: 'Ganjil' | 'Genap', materiIdx: number, subIdx: number, field: 'judul' | 'jp' | 'praktik', value: any) => {
     let finalValue = value;
     if (field === 'jp' && value !== '') {
       const num = Number(value);
@@ -725,6 +728,16 @@ const App = () => {
               <option value="Deep Learning">Deep Learning</option>
               <option value="Kurikulum Berbasis Cinta">Kurikulum Berbasis Cinta</option>
             </select>
+            <select name="metode" value={formData.metode} onChange={handleInputChange} className="w-full p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+              <option value="Problem Based Learning">Problem Based Learning</option>
+              <option value="Project Based Learning">Project Based Learning</option>
+              <option value="Discovery Learning">Discovery Learning</option>
+              <option value="Inquiry Learning">Inquiry Learning</option>
+              <option value="Exploration & Deep Thinking">Exploration & Deep Thinking</option>
+              <option value="Contextual Teaching and Learning">Contextual Teaching and Learning</option>
+              <option value="Direct Instruction">Direct Instruction</option>
+              <option value="Cooperative Learning">Cooperative Learning</option>
+            </select>
             <div className="grid grid-cols-2 gap-2">
               <select name="fase" value={formData.fase} onChange={handleInputChange} className="p-2 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                 <option value="Fase A">Fase A</option><option value="Fase B">Fase B</option><option value="Fase C">Fase C</option>
@@ -908,6 +921,16 @@ const App = () => {
                     <div className="space-y-1.5">
                       {materi.subMateri.map((sub, sIdx) => (
                         <div key={`sub-ganjil-${idx}-${sIdx}`} className="flex gap-1 items-center animate-in fade-in slide-in-from-left-2">
+                          <div className="flex flex-col items-center">
+                            <label className="text-[7px] font-bold text-gray-400 uppercase leading-none mb-0.5">Prktk</label>
+                            <input 
+                              type="checkbox"
+                              checked={sub.praktik}
+                              onChange={(e) => handleSubMateriChange('Ganjil', idx, sIdx, 'praktik', e.target.checked)}
+                              className="w-3 h-3 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                              title="Ada Praktik?"
+                            />
+                          </div>
                           <input 
                             value={sub.judul} 
                             onChange={(e) => handleSubMateriChange('Ganjil', idx, sIdx, 'judul', e.target.value)}
@@ -1048,6 +1071,16 @@ const App = () => {
                     <div className="space-y-1.5">
                       {materi.subMateri.map((sub, sIdx) => (
                         <div key={`sub-genap-${idx}-${sIdx}`} className="flex gap-1 items-center animate-in fade-in slide-in-from-left-2">
+                          <div className="flex flex-col items-center">
+                            <label className="text-[7px] font-bold text-gray-400 uppercase leading-none mb-0.5">Prktk</label>
+                            <input 
+                              type="checkbox"
+                              checked={sub.praktik}
+                              onChange={(e) => handleSubMateriChange('Genap', idx, sIdx, 'praktik', e.target.checked)}
+                              className="w-3 h-3 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                              title="Ada Praktik?"
+                            />
+                          </div>
                           <input 
                             value={sub.judul} 
                             onChange={(e) => handleSubMateriChange('Genap', idx, sIdx, 'judul', e.target.value)}
@@ -1482,7 +1515,7 @@ const App = () => {
                             <p>KELAS: {formData.kelas}</p>
                             <p>TAHUN: {formData.tahunAjaran}</p>
                             <p>ALOKASI: {sm.jp} JP ({jmlPertemuan} Pertemuan)</p>
-                            <p>METODE: {formData.kurikulum === 'Deep Learning' ? 'Exploration & Deep Thinking' : 'Problem Based Learning'}</p>
+                            <p>METODE: {formData.metode}</p>
                           </div>
                         </div>
 
@@ -1535,13 +1568,96 @@ const App = () => {
                             <p className="font-bold underline text-xs uppercase">2. Rincian Kegiatan Pembelajaran:</p>
                             <ul className="list-decimal ml-5 space-y-3 text-xs leading-relaxed">
                               <li>
-                                <span className="font-bold text-indigo-700">Kegiatan Awal (15 Menit):</span> Motivasi, Apersepsi, dan penyampaian tujuan pembelajaran menggunakan teknik pemetaan pikiran.
+                                <span className="font-bold text-indigo-700 block mb-1">Kegiatan Awal (15 Menit):</span>
+                                <div className="space-y-0.5 pl-2">
+                                  <p>• Salam</p>
+                                  <p>• Do'a sebelum belajar</p>
+                                  <p>• Absensi</p>
+                                  <p>• Motivasi</p>
+                                  <p>• Apersepsi</p>
+                                  <p>• Penyampaian tujuan pembelajaran menggunakan teknik pemetaan pikiran.</p>
+                                </div>
                               </li>
                               <li>
-                                <span className="font-bold text-indigo-700">Kegiatan Inti (50 Menit):</span> Peserta didik mengeksplorasi materi melalui diskusi terprogram, demonstrasi, atau eksperimen langsung sesuai karakteristik materi.
+                                <span className="font-bold text-indigo-700 block mb-1">Kegiatan Inti (50 Menit):</span>
+                                <div className="space-y-1 pl-2">
+                                  {formData.metode === 'Problem Based Learning' ? (
+                                    <>
+                                      <p>• Orientasi peserta didik pada masalah.</p>
+                                      <p>• Mengorganisasikan peserta didik untuk belajar.</p>
+                                      <p>• Membimbing penyelidikan individu maupun kelompok.</p>
+                                      <p>• Mengembangkan dan menyajikan hasil karya.</p>
+                                      <p>• Menganalisis dan mengevaluasi proses pemecahan masalah.</p>
+                                    </>
+                                  ) : formData.metode === 'Project Based Learning' ? (
+                                    <>
+                                      <p>• Pertanyaan mendasar.</p>
+                                      <p>• Mendesain perencanaan produk.</p>
+                                      <p>• Menyusun jadwal pembuatan.</p>
+                                      <p>• Memonitor keaktifan dan perkembangan proyek.</p>
+                                      <p>• Menguji hasil (Presentasi).</p>
+                                      <p>• Evaluasi pengalaman belajar.</p>
+                                    </>
+                                  ) : formData.metode === 'Discovery Learning' ? (
+                                    <>
+                                      <p>• Pemberian rangsangan (Stimulation).</p>
+                                      <p>• Pernyataan/Identifikasi masalah (Problem Statement).</p>
+                                      <p>• Pengumpulan data (Data Collection).</p>
+                                      <p>• Pengolahan data (Data Processing).</p>
+                                      <p>• Pembuktian (Verification).</p>
+                                      <p>• Menarik simpulan/generalisasi (Generalization).</p>
+                                    </>
+                                  ) : formData.metode === 'Inquiry Learning' ? (
+                                    <>
+                                      <p>• Orientasi masalah.</p>
+                                      <p>• Merumuskan masalah.</p>
+                                      <p>• Merumuskan hipotesis.</p>
+                                      <p>• Mengumpulkan data.</p>
+                                      <p>• Menguji hipotesis.</p>
+                                      <p>• Merumuskan kesimpulan.</p>
+                                    </>
+                                  ) : formData.metode === 'Exploration & Deep Thinking' ? (
+                                    <>
+                                      <p>• Mindful Learning: Kesadaran penuh dalam belajar.</p>
+                                      <p>• Mindful Teaching: Pendampingan guru yang bermakna.</p>
+                                      <p>• Joyful Learning: Menciptakan suasana belajar yang menyenangkan.</p>
+                                      <p>• Meaningful Learning: Menemukan makna dari materi yang dipelajari.</p>
+                                    </>
+                                  ) : formData.metode === 'Contextual Teaching and Learning' ? (
+                                    <>
+                                      <p>• Konstruktivisme: Membangun pemahaman.</p>
+                                      <p>• Inkuiri: Proses penemuan.</p>
+                                      <p>• Bertanya: Merangsang rasa ingin tahu.</p>
+                                      <p>• Masyarakat Belajar: Belajar berkelompok.</p>
+                                      <p>• Pemodelan: Contoh nyata.</p>
+                                      <p>• Refleksi & Penilaian Nyata.</p>
+                                    </>
+                                  ) : formData.metode === 'Direct Instruction' ? (
+                                    <>
+                                      <p>• Menyampaikan tujuan dan mempersiapkan siswa.</p>
+                                      <p>• Mendemonstrasikan pengetahuan atau keterampilan.</p>
+                                      <p>• Membimbing pelatihan.</p>
+                                      <p>• Mengecek pemahaman dan memberikan umpan balik.</p>
+                                      <p>• Memberikan kesempatan untuk pelatihan mandiri.</p>
+                                    </>
+                                  ) : (
+                                    <p>• Peserta didik mengeksplorasi materi melalui diskusi terprogram, demonstrasi, atau eksperimen langsung sesuai karakteristik metode {formData.metode}.</p>
+                                  )}
+                                </div>
                               </li>
+                              {sm.praktik && (
+                                <li className="bg-emerald-50 p-2 rounded border border-emerald-100">
+                                  <span className="font-bold text-emerald-700 block mb-1">Sesi Praktik (Ekstensi):</span>
+                                  <p className="pl-2">• Mengadakan sesi praktik langsung terkait {sm.judul} untuk menguji pemahaman dan keterampilan teknis peserta didik di akhir pertemuan.</p>
+                                </li>
+                              )}
                               <li>
-                                <span className="font-bold text-indigo-700">Kegiatan Penutup (15 Menit):</span> Refleksi bersama, penarikan kesimpulan kunci, dan pemberian tugas penguatan mandiri.
+                                <span className="font-bold text-indigo-700 block mb-1">Kegiatan Penutup (15 Menit):</span>
+                                <div className="space-y-0.5 pl-2">
+                                  <p>• Refleksi bersama antara guru dan peserta didik.</p>
+                                  <p>• Penarikan kesimpulan kunci dari materi yang dipelajari.</p>
+                                  <p>• Pemberian tugas penguatan mandiri atau tindak lanjut.</p>
+                                </div>
                               </li>
                             </ul>
                           </div>
@@ -1895,7 +2011,10 @@ const App = () => {
                                   {m.subMateri.map((sub, sIdx) => (
                                     <tr key={`prota-ganjil-sub-${i}-${sIdx}`}>
                                       <td className="border p-2 text-center text-[10px] text-gray-400 opacity-50">•</td>
-                                      <td className="border p-2 pl-6 italic text-gray-600">{sub.judul || '...'}</td>
+                                      <td className="border p-2 pl-6 italic text-gray-600">
+                                        {sub.judul || '...'} 
+                                        {sub.praktik && <span className="ml-2 text-[8px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase">Praktik</span>}
+                                      </td>
                                       <td className="border p-2 text-center text-gray-500 font-medium">{sub.jp || '...'} JP</td>
                                     </tr>
                                   ))}
@@ -1935,7 +2054,10 @@ const App = () => {
                                   {m.subMateri.map((sub, sIdx) => (
                                     <tr key={`prota-genap-sub-${i}-${sIdx}`}>
                                       <td className="border p-2 text-center text-[10px] text-gray-400 opacity-50">•</td>
-                                      <td className="border p-2 pl-6 italic text-gray-600">{sub.judul || '...'}</td>
+                                      <td className="border p-2 pl-6 italic text-gray-600">
+                                        {sub.judul || '...'}
+                                        {sub.praktik && <span className="ml-2 text-[8px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase">Praktik</span>}
+                                      </td>
                                       <td className="border p-2 text-center text-gray-500 font-medium">{sub.jp || '...'} JP</td>
                                     </tr>
                                   ))}
@@ -2021,7 +2143,10 @@ const App = () => {
                                     {m.subMateri.map((sub, sIdx) => (
                                       <tr key={`prosem-ganjil-sub-${i}-${sIdx}`}>
                                         <td className="border p-1 text-center text-[10px] text-gray-400 opacity-50">•</td>
-                                        <td className="border p-1 pl-4 italic text-gray-600 font-medium">{sub.judul || '...'}</td>
+                                        <td className="border p-1 pl-4 italic text-gray-600 font-medium">
+                                          {sub.judul || '...'} 
+                                          {sub.praktik && <span className="ml-2 text-[6px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase tracking-tighter">Praktik</span>}
+                                        </td>
                                         <td className="border p-1 text-center text-gray-500 font-bold">{sub.jp || '...'} JP</td>
                                         {[...Array(30)].map((_, j) => (
                                           <td key={j} className="border p-1 text-center h-6"></td>
@@ -2094,7 +2219,10 @@ const App = () => {
                                     {m.subMateri.map((sub, sIdx) => (
                                       <tr key={`prosem-genap-sub-${i}-${sIdx}`}>
                                         <td className="border p-1 text-center text-[10px] text-gray-400 opacity-50">•</td>
-                                        <td className="border p-1 pl-4 italic text-gray-600 font-medium">{sub.judul || '...'}</td>
+                                        <td className="border p-1 pl-4 italic text-gray-600 font-medium">
+                                          {sub.judul || '...'} 
+                                          {sub.praktik && <span className="ml-2 text-[6px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase tracking-tighter">Praktik</span>}
+                                        </td>
                                         <td className="border p-1 text-center text-gray-500 font-bold">{sub.jp || '...'} JP</td>
                                         {[...Array(30)].map((_, j) => (
                                           <td key={j} className="border p-1 text-center h-6"></td>
