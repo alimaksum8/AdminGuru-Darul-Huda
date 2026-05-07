@@ -301,7 +301,11 @@ const App = () => {
   const totalPekanGenap = pekanDataGenap.reduce((acc, curr) => acc + curr.total, 0);
   const totalNonGenap = pekanDataGenap.reduce((acc, curr) => acc + curr.nonEfektif, 0);
   const totalEfektifGenap = totalPekanGenap - totalNonGenap;
-  const jpSessi = Math.max(1, Number(formData.jpPerPertemuan) || 0);
+
+  const jpSessi = Number(formData.jpPerPertemuan) || 0;
+  
+  const countAnalisisGanjil = (formData.semester.includes('Ganjil') && jpSessi > 0) ? Math.ceil(Number(formData.jpUlanganHarianGanjil) / jpSessi) : 0;
+  const countAnalisisGenap = (formData.semester.includes('Genap') && jpSessi > 0) ? Math.ceil(Number(formData.jpUlanganHarianGenap) / jpSessi) : 0;
 
   const hasilJpEfektifGanjil = totalPekanGanjil * jpSessi;
   const hasilJpTidakEfektifGanjil = totalNonGanjil * jpSessi;
@@ -330,9 +334,6 @@ const App = () => {
   const [selectedDocs, setSelectedDocs] = useState<string[]>([]);
   const [isGenerated, setIsGenerated] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-
-  const countAnalisisGanjil = (formData.semester.includes('Ganjil') && selectedDocs.includes('ANALISIS')) ? Math.max(1, Math.ceil((Number(formData.jpUlanganHarianGanjil) || 0) / (jpSessi || 2))) : 0;
-  const countAnalisisGenap = (formData.semester.includes('Genap') && selectedDocs.includes('ANALISIS')) ? Math.max(1, Math.ceil((Number(formData.jpUlanganHarianGenap) || 0) / (jpSessi || 2))) : 0;
 
   const documentTypes = [
     { id: 'PEKAN', name: 'PEKAN EFEKTIF', icon: <Calendar size={18} /> },
@@ -2025,7 +2026,7 @@ const App = () => {
                   const jmlPertemuan = Math.ceil(totalJp / jpPerSessi);
 
                   return (
-                    <PageContainer key={`MODUL-${i}`} id={`MODUL-${i}`} title={`MODUL AJAR: ${sm.judul}`} hideSignature={true}>
+                    <PageContainer key={`MODUL-${i}`} id={`MODUL-${i}`} title={`MODUL AJAR: ${sm.judul}`}>
                       <div className="space-y-2 print:space-y-1">
                         {/* Informasi Umum */}
                         <div className="grid grid-cols-2 gap-4 text-[10px] font-bold border-b border-indigo-600 pb-1 mb-2 print:mb-1">
@@ -2198,7 +2199,7 @@ const App = () => {
                 })}
 
                 {selectedDocs.includes('LKPD') && (
-                  <PageContainer key="LKPD" id="LKPD" title="LEMBAR KERJA PESERTA DIDIK (LKPD)" hideSignature={true}>
+                  <PageContainer key="LKPD" id="LKPD" title="LEMBAR KERJA PESERTA DIDIK (LKPD)">
                     <div className="border-4 border-double border-indigo-900 p-4 print:p-2 rounded-lg min-h-[500px]">
                       <div className="flex justify-between border-b pb-2 mb-4">
                         <div className="space-y-0.5 font-bold text-[10px]">
@@ -2294,7 +2295,7 @@ const App = () => {
                 )}
 
                   {selectedDocs.includes('ASESMEN_FORMATIF') && (
-                  <PageContainer key="ASESMEN_FORMATIF" id="ASESMEN_FORMATIF" title="ASESMEN FORMATIF (SIKAP & PROFIL)" hideSignature={true}>
+                  <PageContainer key="ASESMEN_FORMATIF" id="ASESMEN_FORMATIF" title="ASESMEN FORMATIF (SIKAP & PROFIL)">
                     <div className="space-y-4 print:space-y-2">
                       <section>
                         <h4 className="font-bold text-indigo-900 border-b pb-0.5 mb-2 text-xs">A. INSTRUMEN OBSERVASI SIKAP (FORMATIF)</h4>
@@ -2430,7 +2431,7 @@ const App = () => {
                 {selectedDocs.includes('ANALISIS') && (
                   <>
                     {[...Array(countAnalisisGanjil)].map((_, idx) => (
-                      <PageContainer key={`ANALISIS-GANJIL-${idx}`} id={`ANALISIS-GANJIL-${idx}`} title={`ANALISIS HASIL ULANGAN ${idx + 1} (GANJIL)`} hideSignature={true}>
+                      <PageContainer key={`ANALISIS-GANJIL-${idx}`} id={`ANALISIS-GANJIL-${idx}`} title={`ANALISIS HASIL ULANGAN ${idx + 1} (GANJIL)`}>
                         <div className="space-y-6">
                           <div className="p-4 bg-slate-50 border rounded-lg text-xs space-y-1">
                             <p>Mata Pelajaran: {formData.mapel}</p>
@@ -2495,7 +2496,7 @@ const App = () => {
                     ))}
 
                     {[...Array(countAnalisisGenap)].map((_, idx) => (
-                      <PageContainer key={`ANALISIS-GENAP-${idx}`} id={`ANALISIS-GENAP-${idx}`} title={`ANALISIS HASIL ULANGAN ${idx + 1} (GENAP)`} hideSignature={true}>
+                      <PageContainer key={`ANALISIS-GENAP-${idx}`} id={`ANALISIS-GENAP-${idx}`} title={`ANALISIS HASIL ULANGAN ${idx + 1} (GENAP)`}>
                         <div className="space-y-6">
                           <div className="p-4 bg-slate-50 border rounded-lg text-xs space-y-1">
                             <p>Mata Pelajaran: {formData.mapel}</p>
