@@ -1563,7 +1563,7 @@ const App = () => {
                         <tbody>
                           {materiList.map((m, i) => (
                             <tr key={i}>
-                              <td className="border border-slate-300 p-3 font-bold bg-slate-50 uppercase">
+                              <td className="border border-slate-300 p-3 font-bold bg-slate-50 uppercase align-top">
                                 {m.elemenCp && m.elemenCp.length > 0 ? (
                                   <div className="flex flex-col">
                                     {m.elemenCp.map((e, ei) => (
@@ -1572,10 +1572,10 @@ const App = () => {
                                   </div>
                                 ) : '...'}
                               </td>
-                              <td className="border border-slate-300 p-3 italic leading-relaxed">
+                              <td className="border border-slate-300 p-3 italic leading-relaxed align-top">
                                 Peserta didik mampu menganalisis secara kritis, melakukan observasi, serta menjelaskan prinsip-prinsip dasar yang berkaitan dengan {m.judul} dalam konteks kehidupan sehari-hari.
                               </td>
-                              <td className="border border-slate-300 p-3 font-medium">
+                              <td className="border border-slate-300 p-3 font-medium align-top">
                                 <ul className="list-disc pl-4 space-y-1">
                                   <li>Mendeskripsikan definisi dan ruang lingkup {m.judul}.</li>
                                   <li>Mengidentifikasi karakteristik utama dari {m.judul}.</li>
@@ -1591,7 +1591,7 @@ const App = () => {
                                   ))}
                                 </div>
                               </td>
-                              <td className="border border-slate-300 p-3 text-center font-bold">{formData.kelas} / {formData.semester.join('-')}</td>
+                              <td className="border border-slate-300 p-3 text-center font-bold align-top">{formData.kelas} / {formData.semester.join('-')}</td>
                             </tr>
                           ))}
                         </tbody>
