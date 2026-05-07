@@ -27,7 +27,8 @@ import {
   Upload,
   Loader2,
   Search,
-  Table
+  Table,
+  CheckCircle2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI, Type } from "@google/genai";
@@ -485,6 +486,20 @@ const App = () => {
     setIsGenerated(false);
   };
 
+  const toggleAllPraktik = (sem: 'Ganjil' | 'Genap', materiIdx: number) => {
+    if (sem === 'Ganjil') {
+      const newList = [...materiGanjil];
+      const allChecked = newList[materiIdx].subMateri.every(s => s.praktik);
+      newList[materiIdx].subMateri = newList[materiIdx].subMateri.map(s => ({ ...s, praktik: !allChecked }));
+      setMateriGanjil(newList);
+    } else {
+      const newList = [...materiGenap];
+      const allChecked = newList[materiIdx].subMateri.every(s => s.praktik);
+      newList[materiIdx].subMateri = newList[materiIdx].subMateri.map(s => ({ ...s, praktik: !allChecked }));
+      setMateriGenap(newList);
+    }
+  };
+
   const distributeJp = (sem: 'Ganjil' | 'Genap', materiIdx: number) => {
     const list = sem === 'Ganjil' ? [...materiGanjil] : [...materiGenap];
     const materi = list[materiIdx];
@@ -588,14 +603,16 @@ const App = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       id={id} 
-      className="bg-white shadow-2xl mx-auto my-8 border border-gray-100 print:shadow-none print:p-0 relative break-after-page"
+      className="bg-white shadow-2xl mx-auto my-8 border border-gray-100 print:shadow-none print:p-0 relative"
       style={{ 
         width: paperStyles[formData.paperSize as keyof typeof paperStyles].width,
         minHeight: paperStyles[formData.paperSize as keyof typeof paperStyles].height,
         paddingTop: '12.5mm',
         paddingBottom: '12.5mm',
         paddingLeft: '30mm',
-        paddingRight: '15mm'
+        paddingRight: '15mm',
+        pageBreakAfter: 'always',
+        breakAfter: 'page'
       }}
     >
       <div className="print:block">
@@ -903,6 +920,13 @@ const App = () => {
                       <p className="text-[9px] font-black text-indigo-400 uppercase">Sub Materi</p>
                       <div className="flex gap-2">
                         <button 
+                          onClick={() => toggleAllPraktik('Ganjil', idx)}
+                          className="flex items-center gap-1 text-[8px] font-bold text-slate-500 hover:text-indigo-600 bg-white border px-1.5 py-0.5 rounded shadow-sm"
+                          title="Ceklis Semua Praktik"
+                        >
+                          <CheckCircle2 size={10} /> Prktk Semua
+                        </button>
+                        <button 
                           onClick={() => distributeJp('Ganjil', idx)}
                           className="flex items-center gap-1 text-[8px] font-bold text-slate-500 hover:text-indigo-600 bg-white border px-1.5 py-0.5 rounded shadow-sm"
                           title="Bagi JP Otomatis"
@@ -1052,6 +1076,13 @@ const App = () => {
                     <div className="flex justify-between items-center">
                       <p className="text-[9px] font-black text-orange-400 uppercase">Sub Materi</p>
                       <div className="flex gap-2">
+                        <button 
+                          onClick={() => toggleAllPraktik('Genap', idx)}
+                          className="flex items-center gap-1 text-[8px] font-bold text-slate-500 hover:text-orange-600 bg-white border px-1.5 py-0.5 rounded shadow-sm"
+                          title="Ceklis Semua Praktik"
+                        >
+                          <CheckCircle2 size={10} /> Prktk Semua
+                        </button>
                         <button 
                           onClick={() => distributeJp('Genap', idx)}
                           className="flex items-center gap-1 text-[8px] font-bold text-slate-500 hover:text-orange-600 bg-white border px-1.5 py-0.5 rounded shadow-sm"
