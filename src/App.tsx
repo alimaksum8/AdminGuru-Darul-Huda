@@ -640,7 +640,7 @@ const App = () => {
 
         <div className="mt-8 print:mt-4 grid grid-cols-2 gap-10 text-center print:break-inside-avoid">
           <div className="print:break-inside-avoid">
-            <p className="mb-14 print:mb-8 text-[11px] print:text-[10px]">Mengetahui,<br/>
+            <p className="mb-20 print:mb-16 text-[11px] print:text-[10px]">Mengetahui,<br/>
               {formData.kelas.includes('VII') || formData.kelas.includes('VIII') || formData.kelas.includes('IX') ? 'Kepala MTs Darul Huda' : 
                formData.kelas.includes('X') || formData.kelas.includes('XI') || formData.kelas.includes('XII') ? 'Kepala MA Darul Huda' : 'Kepala Sekolah'}
             </p>
@@ -648,7 +648,7 @@ const App = () => {
             <p className="text-[10px] print:text-[9px] text-gray-500 italic">NIP. ..........................</p>
           </div>
           <div className="print:break-inside-avoid">
-            <p className="mb-14 print:mb-8 text-[11px] print:text-[10px]">
+            <p className="mb-20 print:mb-16 text-[11px] print:text-[10px]">
               {formData.kabupaten || 'Bondowoso'}, {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(formData.tanggalTtd))}
               <br/>
               Guru Mata Pelajaran
