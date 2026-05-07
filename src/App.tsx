@@ -603,7 +603,7 @@ const App = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       id={id} 
-      className="bg-white shadow-2xl mx-auto my-8 border border-gray-100 print:shadow-none print:p-0 relative"
+      className="bg-white shadow-2xl mx-auto my-8 border border-gray-100 print:shadow-none print:m-0 print:border-none relative"
       style={{ 
         width: paperStyles[formData.paperSize as keyof typeof paperStyles].width,
         minHeight: paperStyles[formData.paperSize as keyof typeof paperStyles].height,
@@ -663,6 +663,18 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col md:flex-row font-sans print:bg-white print:block">
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media print {
+          @page {
+            size: ${paperStyles[formData.paperSize as keyof typeof paperStyles].width} ${paperStyles[formData.paperSize as keyof typeof paperStyles].height};
+            margin: 0;
+          }
+          body {
+            margin: 0;
+            padding: 0;
+          }
+        }
+      ` }} />
       {/* Sidebar Controls */}
       <div className="w-full md:w-80 bg-white border-r border-gray-200 p-6 space-y-6 overflow-y-auto max-h-screen sticky top-0 print:hidden shadow-xl z-20">
         <div className="flex items-center gap-3 mb-6">
@@ -1401,7 +1413,19 @@ const App = () => {
                                   <span className="font-bold text-indigo-700 uppercase ml-1">{m.judul || 'Materi Pokok'}</span>
                                 )}
                               </div>
-                              <p className="text-sm">Pada akhir {formData.fase}, peserta didik mampu mendeskripsikan, menganalisis, serta mengevaluasi konsep-konsep yang berkaitan dengan <strong>{m.judul}</strong>. Peserta didik dapat mengintegrasikan pengetahuan tersebut untuk memecahkan masalah kontekstual dalam kehidupan masyarakat serta mampu mengomunikasikan ide secara terstruktur dan ilmiah.</p>
+                              <p className="text-sm mb-3">Pada akhir {formData.fase}, peserta didik mampu mendeskripsikan, menganalisis, serta mengevaluasi konsep-konsep yang berkaitan dengan <strong>{m.judul}</strong>. Peserta didik dapat mengintegrasikan pengetahuan tersebut untuk memecahkan masalah kontekstual dalam kehidupan masyarakat serta mampu mengomunikasikan ide secara terstruktur dan ilmiah.</p>
+                              
+                              <div className="mt-2 pt-2 border-t border-gray-200">
+                                <p className="text-[10px] font-black text-gray-400 uppercase mb-1">Rincian Sub-Kompetensi:</p>
+                                <div className="flex flex-wrap gap-2">
+                                  {m.subMateri.map((sub, sIdx) => (
+                                    <div key={sIdx} className="bg-white border rounded px-2 py-1 flex items-center gap-2 shadow-sm text-[10px]">
+                                      <span className="text-gray-600 italic">{sub.judul || '...'}</span>
+                                      {sub.praktik && <span className="text-[7px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase">Praktik</span>}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -1439,6 +1463,23 @@ const App = () => {
                             <p className="text-sm font-medium leading-relaxed pt-2">
                               <strong>Tujuan Akhir:</strong> Melalui serangkaian kegiatan mandiri dan kelompok, peserta didik dapat mengaplikasikan prinsip {m.judul} untuk menciptakan solusi nyata yang berdaya guna bagi lingkungan sekitar.
                             </p>
+                            
+                            <div className="mt-2 pt-2 border-t border-slate-100">
+                              <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Alur Pencapaian Kompetensi:</p>
+                              <div className="space-y-1">
+                                {m.subMateri.map((sub, sIdx) => (
+                                  <div key={sIdx} className="flex items-center gap-2 text-[11px]">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
+                                    <span className="text-slate-700">{sub.judul || '...'}</span>
+                                    {sub.praktik && (
+                                      <span className="text-[8px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 uppercase flex items-center gap-1">
+                                        <CheckCircle2 size={8} /> Sesi Praktik
+                                      </span>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -1464,7 +1505,16 @@ const App = () => {
                               <td className="border border-slate-300 p-3 text-center font-bold">{i+1}</td>
                               <td className="border border-slate-300 p-3 leading-relaxed">
                                 <strong>Materi: {m.judul}</strong><br/>
-                                Menjelaskan hubungan antara konsep dasar {m.judul} dengan fenomena yang terjadi di masyarakat secara logis.
+                                <div className="mt-1 space-y-1">
+                                  {m.subMateri.map((sub, sIdx) => (
+                                    <div key={sIdx} className="flex items-center gap-2">
+                                      <span className="text-slate-400">•</span>
+                                      <span>{sub.judul || '...'}</span>
+                                      {sub.praktik && <span className="text-[7px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase">Praktik</span>}
+                                    </div>
+                                  ))}
+                                </div>
+                                <p className="mt-2 italic opacity-75">Menjelaskan hubungan antara konsep dasar {m.judul} dengan fenomena yang terjadi di masyarakat secara logis.</p>
                               </td>
                               <td className="border border-slate-300 p-3 text-center font-bold italic">{m.jp || '4'} JP</td>
                               <td className="border border-slate-300 p-3 italic">Beriman, Mandiri, Bernalar Kritis, Kreatif.</td>
@@ -1512,6 +1562,15 @@ const App = () => {
                                   <li>Mengidentifikasi karakteristik utama dari {m.judul}.</li>
                                   <li>Menganalisis dampak {m.judul} terhadap masyarakat.</li>
                                 </ul>
+                                <div className="mt-2 pt-2 border-t border-slate-100 space-y-1">
+                                  {m.subMateri.map((sub, sIdx) => (
+                                    <div key={sIdx} className="flex items-center gap-1.5 text-[9px]">
+                                      <span className="text-slate-300">↳</span>
+                                      <span className="text-slate-500 uppercase font-black">{sub.judul || '...'}</span>
+                                      {sub.praktik && <span className="text-[7px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase">Praktik</span>}
+                                    </div>
+                                  ))}
+                                </div>
                               </td>
                               <td className="border border-slate-300 p-3 text-center font-bold">{formData.kelas} / {formData.semester.join('-')}</td>
                             </tr>
@@ -1807,6 +1866,43 @@ const App = () => {
                           </tbody>
                         </table>
                       </section>
+
+                      {materiList.some(m => m.subMateri.some(s => s.praktik)) && (
+                        <section className="bg-emerald-50 p-4 border border-emerald-200 rounded-lg animate-in fade-in zoom-in duration-500">
+                          <h4 className="font-bold text-emerald-900 border-b border-emerald-200 pb-1 mb-4 flex items-center gap-2 uppercase text-xs">
+                            <CheckCircle2 size={16} className="text-emerald-600" /> C. JURNAL PENILAIAN PRAKTIK / UNJUK KERJA
+                          </h4>
+                          <div className="space-y-4">
+                            {materiList.map((m, mIdx) => (
+                              m.subMateri.some(s => s.praktik) && (
+                                <div key={mIdx}>
+                                  <p className="text-[10px] font-bold text-emerald-700 bg-white px-2 py-0.5 inline-block mb-1.5 border border-emerald-100 rounded">Materi: {m.judul}</p>
+                                  <table className="w-full border-collapse border border-emerald-200 text-[9px] bg-white">
+                                    <thead>
+                                      <tr className="bg-emerald-100">
+                                        <th className="border border-emerald-200 p-1.5 w-8">No</th>
+                                        <th className="border border-emerald-200 p-1.5 text-left uppercase tracking-tighter">Sub-Materi Praktik</th>
+                                        <th className="border border-emerald-200 p-1.5 text-left uppercase tracking-tighter">Kriteria Ketuntasan Praktis</th>
+                                        <th className="border border-emerald-200 p-1.5 w-16 text-center uppercase tracking-tighter">Keterangan</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {m.subMateri.filter(s => s.praktik).map((sub, sIdx) => (
+                                        <tr key={sIdx}>
+                                          <td className="border border-emerald-200 p-2 text-center text-slate-400 font-mono">{sIdx + 1}</td>
+                                          <td className="border border-emerald-200 p-2 font-bold italic text-slate-800">{sub.judul}</td>
+                                          <td className="border border-emerald-200 p-2 text-slate-500 italic">Peserta didik mampu mendemonstrasikan keterampilan teknis dan prosedur kerja yang benar sesuai rubrik {sub.judul}.</td>
+                                          <td className="border border-emerald-200 p-2 text-center text-[7px] text-slate-400 font-black">TUNTAS / BELUM</td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              )
+                            ))}
+                          </div>
+                        </section>
+                      )}
                     </div>
                   </PageContainer>
                 )}
@@ -1873,6 +1969,17 @@ const App = () => {
                                 <td className="border p-2 text-center font-medium bg-green-50 text-green-700">Menerapkan secara mandiri</td>
                                 <td className="border p-2 text-center font-medium bg-indigo-50 text-indigo-700">Menciptakan solusi inovatif</td>
                               </tr>
+                              {m.subMateri.filter(s => s.praktik).map((sub, sIdx) => (
+                                <tr key={`kktp-praktik-${sIdx}`} className="bg-emerald-50/30">
+                                  <td className="border p-2 font-bold flex items-center gap-1.5 uppercase text-[9px] text-emerald-800">
+                                    <CheckCircle2 size={10} /> {sub.judul} (Unjuk Kerja)
+                                  </td>
+                                  <td className="border p-2 text-center italic opacity-60">Prosedur langkah salah</td>
+                                  <td className="border p-2 text-center font-medium italic">Langkah benar tapi kurang rapih</td>
+                                  <td className="border p-2 text-center font-medium italic text-emerald-700">Langkah benar dan hasil akurat</td>
+                                  <td className="border p-2 text-center font-medium italic text-indigo-700 font-bold">Hasil presisi & teknik excelent</td>
+                                </tr>
+                              ))}
                             </tbody>
                           </table>
                         </div>
