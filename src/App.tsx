@@ -336,19 +336,19 @@ const App = () => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const documentTypes = [
-    { id: 'PEKAN', name: 'PEKAN EFEKTIF', icon: <Calendar size={18} /> },
-    { id: 'PROTA', name: 'PROTA', icon: <FileText size={18} /> },
-    { id: 'PROSEM', name: 'PROMES', icon: <ClipboardList size={18} /> },
     { id: 'CP', name: 'CP', icon: <BookOpen size={18} /> },
     { id: 'TP', name: 'TP', icon: <Sparkles size={18} /> },
     { id: 'ATP', name: 'ATP', icon: <PenTool size={18} /> },
-    { id: 'MATRIX', name: 'MATRIX CP/TP', icon: <Table size={18} /> },
-    { id: 'MODUL', name: 'MODUL AJAR', icon: <FileText size={18} /> },
+    { id: 'MATRIX', name: 'Matrix CP/TP', icon: <Table size={18} /> },
+    { id: 'MODUL', name: 'Modul Ajar', icon: <FileText size={18} /> },
     { id: 'LKPD', name: 'LKPD', icon: <ClipboardList size={18} /> },
+    { id: 'ASESMEN_FORMATIF', name: 'Asesmen Formatif', icon: <UserCheck size={18} /> },
+    { id: 'ASESMEN_SUMATIF', name: 'Asesmen Sumatif', icon: <CheckSquare size={18} /> },
     { id: 'KKTP', name: 'KKTP', icon: <GraduationCap size={18} /> },
-    { id: 'ASESMEN_FORMATIF', name: 'ASESMEN FORMATIF', icon: <UserCheck size={18} /> },
-    { id: 'ASESMEN_SUMATIF', name: 'ASESMEN SUMATIF', icon: <CheckSquare size={18} /> },
-    { id: 'ANALISIS', name: 'ANALISIS HASIL ULANGAN', icon: <BarChart2 size={18} /> },
+    { id: 'PEKAN', name: 'Pekan Efektif', icon: <Calendar size={18} /> },
+    { id: 'PROTA', name: 'Prota', icon: <FileText size={18} /> },
+    { id: 'PROSEM', name: 'Promis', icon: <ClipboardList size={18} /> },
+    { id: 'ANALISIS', name: 'Analisis Hasil Ulangan', icon: <BarChart2 size={18} /> },
   ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -597,7 +597,7 @@ const App = () => {
   };
 
   // Modern PDF-style Page Wrapper
-  const PageContainer = ({ children, title, id, hideSignature = false }: { children: React.ReactNode, title: string, id: string, key?: React.Key, hideSignature?: boolean }) => (
+  const PageContainer = ({ children, title, id }: { children: React.ReactNode, title: string, id: string, key?: React.Key }) => (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -638,27 +638,25 @@ const App = () => {
           {children}
         </div>
 
-        {!hideSignature && (
-          <div className="mt-8 print:mt-4 grid grid-cols-2 gap-10 text-center print:break-inside-avoid">
-            <div className="print:break-inside-avoid">
-              <p className="mb-28 print:mb-24 text-[11px] print:text-[10px]">Mengetahui,<br/>
-                {formData.kelas.includes('VII') || formData.kelas.includes('VIII') || formData.kelas.includes('IX') ? 'Kepala MTs Darul Huda' : 
-                 formData.kelas.includes('X') || formData.kelas.includes('XI') || formData.kelas.includes('XII') ? 'Kepala MA Darul Huda' : 'Kepala Sekolah'}
-              </p>
-              <p className="font-bold underline uppercase text-[11px] print:text-[10px]">{formData.namaKepalaSekolah || '..........................'}</p>
-              <p className="text-[10px] print:text-[9px] text-gray-500 italic">NIP. ..........................</p>
-            </div>
-            <div className="print:break-inside-avoid">
-              <p className="mb-28 print:mb-24 text-[11px] print:text-[10px]">
-                {formData.kabupaten || 'Bondowoso'}, {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(formData.tanggalTtd))}
-                <br/>
-                Guru Mata Pelajaran
-              </p>
-              <p className="font-bold underline uppercase text-[11px] print:text-[10px]">{formData.namaGuru || '..........................'}</p>
-              <p className="text-[10px] print:text-[9px] text-gray-500 italic">NIP. ..........................</p>
-            </div>
+        <div className="mt-8 print:mt-4 grid grid-cols-2 gap-10 text-center print:break-inside-avoid">
+          <div className="print:break-inside-avoid">
+            <p className="mb-20 print:mb-16 text-[11px] print:text-[10px]">Mengetahui,<br/>
+              {formData.kelas.includes('VII') || formData.kelas.includes('VIII') || formData.kelas.includes('IX') ? 'Kepala MTs Darul Huda' : 
+               formData.kelas.includes('X') || formData.kelas.includes('XI') || formData.kelas.includes('XII') ? 'Kepala MA Darul Huda' : 'Kepala Sekolah'}
+            </p>
+            <p className="font-bold underline uppercase text-[11px] print:text-[10px]">{formData.namaKepalaSekolah || '..........................'}</p>
+            <p className="text-[10px] print:text-[9px] text-gray-500 italic">NIP. ..........................</p>
           </div>
-        )}
+          <div className="print:break-inside-avoid">
+            <p className="mb-20 print:mb-16 text-[11px] print:text-[10px]">
+              {formData.kabupaten || 'Bondowoso'}, {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(formData.tanggalTtd))}
+              <br/>
+              Guru Mata Pelajaran
+            </p>
+            <p className="font-bold underline uppercase text-[11px] print:text-[10px]">{formData.namaGuru || '..........................'}</p>
+            <p className="text-[10px] print:text-[9px] text-gray-500 italic">NIP. ..........................</p>
+          </div>
+        </div>
       </div>
     </motion.div>
   );
@@ -1409,421 +1407,6 @@ const App = () => {
           <AnimatePresence>
             {isGenerated && !isGenerating && (
               <>
-                {selectedDocs.includes('PEKAN') && (
-                  <PageContainer key="PEKAN" id="PEKAN" title="ANALISIS PEKAN EFEKTIF">
-                    <div className="space-y-8">
-                      <div className="grid grid-cols-2 gap-4 text-xs">
-                        <div className="p-3 border rounded-lg bg-indigo-50 border-indigo-200">
-                          <p className="font-bold text-indigo-900 mb-1 uppercase">Identitas Waktu</p>
-                          <p>Semester: {formData.semester.join(' / ')}</p>
-                          <p>Tahun Ajaran: {formData.tahunAjaran}</p>
-                          <p>Parameter JP: {formData.jpPerPertemuan} JP/Minggu</p>
-                          {formData.semester.includes('Ganjil') && <p>Pekan Efektif Ganjil: {totalEfektifGanjil} Minggu</p>}
-                          {formData.semester.includes('Genap') && <p>Pekan Efektif Genap: {totalEfektifGenap} Minggu</p>}
-                          {(formData.totalJpGanjil && formData.semester.includes('Ganjil')) && <p>Total JP Ganjil: {formData.totalJpGanjil} JP</p>}
-                          {(formData.totalJpGenap && formData.semester.includes('Genap')) && <p>Total JP Genap: {formData.totalJpGenap} JP</p>}
-                        </div>
-                        <div className="p-3 border rounded-lg bg-slate-50 border-slate-200 text-right">
-                          <p className="font-bold text-slate-900 mb-1 uppercase">Total Jam Pelajaran</p>
-                          <p className="text-2xl font-black text-indigo-600">{totalJpKeseluruhan} JP</p>
-                        </div>
-                      </div>
-
-                      <section>
-                        <h4 className="font-bold border-b-2 mb-4 text-sm uppercase">I. Perhitungan Pekan (Distribusi Waktu)</h4>
-                        
-                        {formData.semester.includes('Ganjil') && (
-                          <div className="mb-8">
-                            <h5 className="text-[10px] font-bold text-indigo-700 mb-2 uppercase tracking-wider italic bg-indigo-50 px-2 py-1 inline-block rounded">Semester Ganjil (Gasal)</h5>
-                            <table className="w-full border-collapse border border-slate-300 text-[11px]">
-                              <thead className="bg-slate-200 uppercase font-bold text-center">
-                                <tr>
-                                  <th className="border p-2">Bulan</th>
-                                  <th className="border p-2">Jml Pekan</th>
-                                  <th className="border p-2">Pekan Tidak Efektif</th>
-                                  <th className="border p-2">Pekan Efektif</th>
-                                  <th className="border p-2">Keterangan</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {pekanDataGanjil.map((row, i) => (
-                                  <tr key={`ganjil-pekan-${i}`} className="text-center">
-                                    <td className="border p-2 font-bold text-left px-4">{row.bulan}</td>
-                                    <td className="border p-2">{row.total}</td>
-                                    <td className="border p-2 text-red-500 font-medium">{row.nonEfektif}</td>
-                                    <td className="border p-2 bg-green-50 font-bold">{row.total - row.nonEfektif}</td>
-                                    <td className="border p-2 text-left italic">{row.keterangan}</td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                              <tfoot className="bg-slate-800 text-white font-bold text-center uppercase">
-                                <tr>
-                                  <td className="border p-2 text-left px-4">JUMLAH GANJIL</td>
-                                  <td className="border p-2">{totalPekanGanjil}</td>
-                                  <td className="border p-2">{totalNonGanjil}</td>
-                                  <td className="border p-2">{totalEfektifGanjil}</td>
-                                  <td className="border p-2">-</td>
-                                </tr>
-                              </tfoot>
-                            </table>
-                          </div>
-                        )}
-
-                        {formData.semester.includes('Genap') && (
-                          <div>
-                            <h5 className="text-[10px] font-bold text-orange-700 mb-2 uppercase tracking-wider italic bg-orange-50 px-2 py-1 inline-block rounded">Semester Genap (Dua)</h5>
-                            <table className="w-full border-collapse border border-slate-300 text-[11px]">
-                              <thead className="bg-slate-200 uppercase font-bold text-center">
-                                <tr>
-                                  <th className="border p-2">Bulan</th>
-                                  <th className="border p-2">Jml Pekan</th>
-                                  <th className="border p-2">Pekan Tidak Efektif</th>
-                                  <th className="border p-2">Pekan Efektif</th>
-                                  <th className="border p-2">Keterangan</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {pekanDataGenap.map((row, i) => (
-                                  <tr key={`genap-pekan-${i}`} className="text-center">
-                                    <td className="border p-2 font-bold text-left px-4">{row.bulan}</td>
-                                    <td className="border p-2">{row.total}</td>
-                                    <td className="border p-2 text-red-500 font-medium">{row.nonEfektif}</td>
-                                    <td className="border p-2 bg-green-50 font-bold">{row.total - row.nonEfektif}</td>
-                                    <td className="border p-2 text-left italic">{row.keterangan}</td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                              <tfoot className="bg-slate-800 text-white font-bold text-center uppercase">
-                                <tr>
-                                  <td className="border p-2 text-left px-4">JUMLAH GENAP</td>
-                                  <td className="border p-2">{totalPekanGenap}</td>
-                                  <td className="border p-2">{totalNonGenap}</td>
-                                  <td className="border p-2">{totalEfektifGenap}</td>
-                                  <td className="border p-2">-</td>
-                                </tr>
-                              </tfoot>
-                            </table>
-                          </div>
-                        )}
-
-                        {formData.semester.length > 1 && (
-                          <div className="mt-4 p-2 bg-slate-100 border border-slate-300 flex justify-between items-center text-[10px] font-black uppercase text-slate-800">
-                             <span>TOTAL PEKAN EFEKTIF SELURUH TAHUN:</span>
-                             <span className="text-indigo-700 text-xs">{totalEfektifTahun} PEKAN</span>
-                          </div>
-                        )}
-                      </section>
-
-                      <section>
-                        <h4 className="font-bold border-b-2 mb-4 text-sm uppercase">II. Distribusi Jam Pelajaran</h4>
-                        <ul className="space-y-2 text-xs">
-                          <li className="flex justify-between border-b pb-1">
-                            <span>Materi Inti (Regular):</span>
-                            <span className="font-bold">{totalJpMateri} JP</span>
-                          </li>
-                          <li className="flex justify-between border-b pb-1">
-                            <span>Cadangan / Ulangan Harian (Extra):</span>
-                            <span className="font-bold">{totalJpExtra} JP</span>
-                          </li>
-                          <li className="flex justify-between pt-2 text-indigo-600 font-black text-sm">
-                            <span>Total Distribusi Jam Pelajaran:</span>
-                            <span>{totalJpKeseluruhan} JP</span>
-                          </li>
-                        </ul>
-                      </section>
-                    </div>
-                  </PageContainer>
-                )}
-                {selectedDocs.includes('PROTA') && (
-                  <PageContainer key="PROTA" id="PROTA" title="PROGRAM TAHUNAN (PROTA)">
-                    <div className="space-y-6">
-                      <div className="p-4 bg-slate-50 border rounded-lg text-xs space-y-1">
-                        <p>Mata Pelajaran: {formData.mapel}</p>
-                        <p>Satuan Pendidikan: {formData.namaSekolah}</p>
-                        <p>Tahun Pelajaran: {formData.tahunAjaran}</p>
-                        <p>Fase: {formData.fase} / {formData.kelas}</p>
-                      </div>
-
-                      <table className="w-full border-collapse border-2 border-slate-800 text-[11px]">
-                        <thead className="bg-slate-800 text-white uppercase text-center">
-                          <tr>
-                            <th className="border p-2 w-12">SMT</th>
-                            <th className="border p-2">Tujuan Pembelajaran / Lingkup Materi</th>
-                            <th className="border p-2 w-24">Alokasi Waktu</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {(formData.semester.includes('Ganjil') || formData.semester.length === 0) && (
-                            <>
-                              <tr className="bg-slate-100 font-bold">
-                                <td className="border p-2 text-center">I</td>
-                                <td className="border p-2">SEMESTER GANJIL</td>
-                                <td className="border p-2 text-center">{totalGanjil} JP</td>
-                              </tr>
-                              {materiGanjil.map((m, i) => (
-                                <React.Fragment key={`prota-ganjil-${i}`}>
-                                  <tr className="bg-slate-50/50 font-bold">
-                                    <td className="border p-2 text-center">{i + 1}</td>
-                                    <td className="border p-2">{m.judul || '...'}</td>
-                                    <td className="border p-2 text-center">{m.jp || '...'} JP</td>
-                                  </tr>
-                                  {m.subMateri.map((sub, sIdx) => (
-                                    <tr key={`prota-ganjil-sub-${i}-${sIdx}`}>
-                                      <td className="border p-2 text-center text-[10px] text-gray-400 opacity-50">•</td>
-                                      <td className="border p-2 pl-6 italic text-gray-600">
-                                        {sub.judul || '...'} 
-                                        {sub.praktik && <span className="ml-2 text-[8px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase">Praktik</span>}
-                                      </td>
-                                      <td className="border p-2 text-center text-gray-500 font-medium">{sub.jp || '...'} JP</td>
-                                    </tr>
-                                  ))}
-                                </React.Fragment>
-                              ))}
-                              {formData.jpUlanganHarianGanjil && (
-                                <tr className="bg-slate-50 italic">
-                                  <td className="border p-2 text-center">-</td>
-                                  <td className="border p-2 text-indigo-700 font-medium">Ulangan Harian (Ganjil)</td>
-                                  <td className="border p-2 text-center">{formData.jpUlanganHarianGanjil} JP</td>
-                                </tr>
-                              )}
-                              {formData.jpCadanganGanjil && (
-                                <tr className="bg-slate-50 italic">
-                                  <td className="border p-2 text-center">-</td>
-                                  <td className="border p-2 text-indigo-700 font-medium">Materi Cadangan (Ganjil)</td>
-                                  <td className="border p-2 text-center">{formData.jpCadanganGanjil} JP</td>
-                                </tr>
-                              )}
-                            </>
-                          )}
-                          
-                          {(formData.semester.includes('Genap') || formData.semester.length === 0) && (
-                            <>
-                              <tr className="bg-slate-100 font-bold">
-                                <td className="border p-2 text-center">II</td>
-                                <td className="border p-2">SEMESTER GENAP</td>
-                                <td className="border p-2 text-center">{totalGenap} JP</td>
-                              </tr>
-                              {materiGenap.map((m, i) => (
-                                <React.Fragment key={`prota-genap-${i}`}>
-                                  <tr className="bg-slate-50/50 font-bold">
-                                    <td className="border p-2 text-center">{(formData.semester.includes('Ganjil') ? materiGanjil.length : 0) + i + 1}</td>
-                                    <td className="border p-2">{m.judul || '...'}</td>
-                                    <td className="border p-2 text-center">{m.jp || '...'} JP</td>
-                                  </tr>
-                                  {m.subMateri.map((sub, sIdx) => (
-                                    <tr key={`prota-genap-sub-${i}-${sIdx}`}>
-                                      <td className="border p-2 text-center text-[10px] text-gray-400 opacity-50">•</td>
-                                      <td className="border p-2 pl-6 italic text-gray-600">
-                                        {sub.judul || '...'}
-                                        {sub.praktik && <span className="ml-2 text-[8px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase">Praktik</span>}
-                                      </td>
-                                      <td className="border p-2 text-center text-gray-500 font-medium">{sub.jp || '...'} JP</td>
-                                    </tr>
-                                  ))}
-                                </React.Fragment>
-                              ))}
-                              {formData.jpUlanganHarianGenap && (
-                                <tr className="bg-slate-50 italic">
-                                  <td className="border p-2 text-center">-</td>
-                                  <td className="border p-2 text-orange-700 font-medium">Ulangan Harian (Genap)</td>
-                                  <td className="border p-2 text-center">{formData.jpUlanganHarianGenap} JP</td>
-                                </tr>
-                              )}
-                              {formData.jpCadanganGenap && (
-                                <tr className="bg-slate-50 italic">
-                                  <td className="border p-2 text-center">-</td>
-                                  <td className="border p-2 text-orange-700 font-medium">Materi Cadangan (Genap)</td>
-                                  <td className="border p-2 text-center">{formData.jpCadanganGenap} JP</td>
-                                </tr>
-                              )}
-                            </>
-                          )}
-                        </tbody>
-                        <tfoot className="bg-slate-200 font-bold text-center">
-                          <tr>
-                            <td colSpan={2} className="border p-2 text-right px-4">TOTAL ALOKASI WAKTU TAHUNAN</td>
-                            <td className="border p-2">{totalJpKeseluruhan} JP</td>
-                          </tr>
-                        </tfoot>
-                      </table>
-                    </div>
-                  </PageContainer>
-                )}
-
-                {selectedDocs.includes('PROSEM') && (
-                  <PageContainer key="PROSEM" id="PROSEM" title="PROGRAM SEMESTER (PROSEM/PROMIS)">
-                    <div className="space-y-12">
-                      <div className="p-4 bg-slate-50 border rounded-lg text-xs space-y-1">
-                        <p>Semester: {formData.semester.join(' / ')}</p>
-                        <p>Mata Pelajaran: {formData.mapel}</p>
-                        <p>Tahun Pelajaran: {formData.tahunAjaran}</p>
-                        <p>Parameter JP: {formData.jpPerPertemuan} JP/Minggu</p>
-                        {formData.semester.includes('Ganjil') && <p>Pekan Efektif Ganjil: {totalEfektifGanjil} Minggu</p>}
-                        {formData.semester.includes('Genap') && <p>Pekan Efektif Genap: {totalEfektifGenap} Minggu</p>}
-                        {(formData.totalJpGanjil && formData.semester.includes('Ganjil')) && <p>Total JP Semester Ganjil: {formData.totalJpGanjil} JP</p>}
-                        {(formData.totalJpGenap && formData.semester.includes('Genap')) && <p>Total JP Semester Genap: {formData.totalJpGenap} JP</p>}
-                      </div>
-
-                      {/* SEMESTER GANJIL TABLE */}
-                      {formData.semester.includes('Ganjil') && (
-                        <div className="space-y-4">
-                          <h4 className="font-bold text-sm bg-indigo-50 p-2 border-l-4 border-indigo-500 uppercase tracking-widest">Semester Ganjil (Juli - Desember)</h4>
-                          <div className="overflow-x-auto">
-                            <table className="w-full border-collapse border-2 border-slate-800 text-[9px]">
-                              <thead className="bg-slate-800 text-white uppercase text-center">
-                                <tr>
-                                  <th rowSpan={2} className="border p-1 w-8">No</th>
-                                  <th rowSpan={2} className="border p-1">Materi Pokok / Tujuan Pembelajaran</th>
-                                  <th rowSpan={2} className="border p-1 w-10">JML JP</th>
-                                  <th colSpan={5} className="border p-1">Juli</th>
-                                  <th colSpan={5} className="border p-1">Agustus</th>
-                                  <th colSpan={5} className="border p-1">September</th>
-                                  <th colSpan={5} className="border p-1">Oktober</th>
-                                  <th colSpan={5} className="border p-1">November</th>
-                                  <th colSpan={5} className="border p-1">Desember</th>
-                                </tr>
-                                <tr>
-                                  {[...Array(30)].map((_, i) => (
-                                    <th key={i} className="border p-1 w-4 text-[7px]">{ (i % 5) + 1 }</th>
-                                  ))}
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {materiGanjil.map((m, i) => (
-                                  <React.Fragment key={`prosem-ganjil-${i}`}>
-                                    <tr className="bg-slate-50/50 font-bold">
-                                      <td className="border p-1 text-center">{i + 1}</td>
-                                      <td className="border p-1">{m.judul || '...'}</td>
-                                      <td className="border p-1 text-center">{m.jp || '...'} JP</td>
-                                      {[...Array(30)].map((_, j) => (
-                                        <td key={j} className="border p-1 text-center h-6"></td>
-                                      ))}
-                                    </tr>
-                                    {m.subMateri.map((sub, sIdx) => (
-                                      <tr key={`prosem-ganjil-sub-${i}-${sIdx}`}>
-                                        <td className="border p-1 text-center text-[10px] text-gray-400 opacity-50">•</td>
-                                        <td className="border p-1 pl-4 italic text-gray-600 font-medium">
-                                          {sub.judul || '...'} 
-                                          {sub.praktik && <span className="ml-2 text-[6px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase tracking-tighter">Praktik</span>}
-                                        </td>
-                                        <td className="border p-1 text-center text-gray-500 font-bold">{sub.jp || '...'} JP</td>
-                                        {[...Array(30)].map((_, j) => (
-                                          <td key={j} className="border p-1 text-center h-6"></td>
-                                        ))}
-                                      </tr>
-                                    ))}
-                                  </React.Fragment>
-                                ))}
-                                {formData.jpUlanganHarianGanjil && (
-                                  <tr className="bg-slate-50 italic">
-                                    <td className="border p-1 text-center font-bold">-</td>
-                                    <td className="border p-1 font-medium text-indigo-700">Ulangan Harian (Ganjil)</td>
-                                    <td className="border p-1 text-center font-bold">{formData.jpUlanganHarianGanjil} JP</td>
-                                    {[...Array(30)].map((_, j) => (
-                                      <td key={j} className="border p-1 text-center font-bold"></td>
-                                    ))}
-                                  </tr>
-                                )}
-                                {formData.jpCadanganGanjil && (
-                                  <tr className="bg-slate-50 italic">
-                                    <td className="border p-1 text-center font-bold">-</td>
-                                    <td className="border p-1 font-medium text-indigo-700">Materi Cadangan (Ganjil)</td>
-                                    <td className="border p-1 text-center font-bold">{formData.jpCadanganGanjil} JP</td>
-                                    {[...Array(30)].map((_, j) => (
-                                      <td key={j} className="border p-1 text-center font-bold"></td>
-                                    ))}
-                                  </tr>
-                                )}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* SEMESTER GENAP TABLE */}
-                      {formData.semester.includes('Genap') && (
-                        <div className="space-y-4">
-                          <h4 className="font-bold text-sm bg-orange-50 p-2 border-l-4 border-orange-500 uppercase tracking-widest">Semester Genap (Januari - Juni)</h4>
-                          <div className="overflow-x-auto">
-                            <table className="w-full border-collapse border-2 border-slate-800 text-[9px]">
-                              <thead className="bg-slate-800 text-white uppercase text-center">
-                                <tr>
-                                  <th rowSpan={2} className="border p-1 w-8">No</th>
-                                  <th rowSpan={2} className="border p-1">Materi Pokok / Tujuan Pembelajaran</th>
-                                  <th rowSpan={2} className="border p-1 w-10">JML JP</th>
-                                  <th colSpan={5} className="border p-1">Januari</th>
-                                  <th colSpan={5} className="border p-1">Februari</th>
-                                  <th colSpan={5} className="border p-1">Maret</th>
-                                  <th colSpan={5} className="border p-1">April</th>
-                                  <th colSpan={5} className="border p-1">Mei</th>
-                                  <th colSpan={5} className="border p-1">Juni</th>
-                                </tr>
-                                <tr>
-                                  {[...Array(30)].map((_, i) => (
-                                    <th key={i} className="border p-1 w-4 text-[7px]">{ (i % 5) + 1 }</th>
-                                  ))}
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {materiGenap.map((m, i) => (
-                                  <React.Fragment key={`prosem-genap-${i}`}>
-                                    <tr className="bg-slate-50/50 font-bold">
-                                      <td className="border p-1 text-center font-bold">{(formData.semester.includes('Ganjil') ? materiGanjil.length : 0) + i + 1}</td>
-                                      <td className="border p-1">{m.judul || '...'}</td>
-                                      <td className="border p-1 text-center font-bold">{m.jp || '...'} JP</td>
-                                      {[...Array(30)].map((_, j) => (
-                                        <td key={j} className="border p-1 text-center h-6"></td>
-                                      ))}
-                                    </tr>
-                                    {m.subMateri.map((sub, sIdx) => (
-                                      <tr key={`prosem-genap-sub-${i}-${sIdx}`}>
-                                        <td className="border p-1 text-center text-[10px] text-gray-400 opacity-50">•</td>
-                                        <td className="border p-1 pl-4 italic text-gray-600 font-medium">
-                                          {sub.judul || '...'} 
-                                          {sub.praktik && <span className="ml-2 text-[6px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase tracking-tighter">Praktik</span>}
-                                        </td>
-                                        <td className="border p-1 text-center text-gray-500 font-bold">{sub.jp || '...'} JP</td>
-                                        {[...Array(30)].map((_, j) => (
-                                          <td key={j} className="border p-1 text-center h-6"></td>
-                                        ))}
-                                      </tr>
-                                    ))}
-                                  </React.Fragment>
-                                ))}
-                                {formData.jpUlanganHarianGenap && (
-                                  <tr className="bg-slate-50 italic border-t-2 border-orange-100">
-                                    <td className="border p-1 text-center font-bold">-</td>
-                                    <td className="border p-1 font-medium text-orange-700">Ulangan Harian (Genap)</td>
-                                    <td className="border p-1 text-center font-bold">{formData.jpUlanganHarianGenap} JP</td>
-                                    {[...Array(30)].map((_, j) => (
-                                      <td key={j} className="border p-1 text-center font-bold"></td>
-                                    ))}
-                                  </tr>
-                                )}
-                                {formData.jpCadanganGenap && (
-                                  <tr className="bg-slate-50 italic">
-                                    <td className="border p-1 text-center font-bold">-</td>
-                                    <td className="border p-1 font-medium text-orange-700">Materi Cadangan (Genap)</td>
-                                    <td className="border p-1 text-center font-bold">{formData.jpCadanganGenap} JP</td>
-                                    {[...Array(30)].map((_, j) => (
-                                      <td key={j} className="border p-1 text-center font-bold"></td>
-                                    ))}
-                                  </tr>
-                                )}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      )}
-                      
-                      <div className="flex gap-4 text-[8px] font-bold">
-                        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-indigo-400"></div> KBM Terjadwal</div>
-                        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-red-400"></div> Asesmen Sumatif</div>
-                      </div>
-                    </div>
-                  </PageContainer>
-                )}
-
                 {selectedDocs.includes('CP') && (
                   <PageContainer key="CP" id="CP" title="CAPAIAN PEMBELAJARAN (CP)">
                     <div className="space-y-8 text-justify">
@@ -2239,61 +1822,6 @@ const App = () => {
                   </PageContainer>
                   )}
 
-
-                  {selectedDocs.includes('KKTP') && (
-                  <PageContainer key="KKTP" id="KKTP" title="KRITERIA KETERCAPAIAN TUJUAN PEMBELAJARAN (KKTP)">
-                    <div className="space-y-8">
-                      <p className="text-justify bg-amber-50 p-4 border-l-4 border-amber-400 text-xs italic">
-                        KKTP ini disusun menggunakan pendekatan interval nilai untuk menentukan ketuntasan pemahaman peserta didik terhadap materi <strong>{formData.mapel}</strong> pada {formData.fase}.
-                      </p>
-
-                      {materiList.map((m, i) => (
-                        <div key={i} className="space-y-4">
-                          <h4 className="font-bold text-sm bg-slate-100 p-2 border rounded uppercase">Materi {i+1}: {m.judul}</h4>
-                          <table className="w-full border-collapse border border-slate-300 text-[11px]">
-                            <thead className="bg-slate-800 text-white uppercase">
-                              <tr>
-                                <th className="border p-2">Kriteria Ketuntasan</th>
-                                <th className="border p-2">0 - 64 (Perlu Bimbingan)</th>
-                                <th className="border p-2">65 - 75 (Cukup)</th>
-                                <th className="border p-2">76 - 85 (Baik)</th>
-                                <th className="border p-2">86 - 100 (Sangat Baik)</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <td className="border p-2 font-bold">Pemahaman Konsep {m.judul}</td>
-                                <td className="border p-2 text-center italic opacity-60">Belum mampu menjelaskan</td>
-                                <td className="border p-2 text-center font-medium bg-amber-50">Mampu menjelaskan secara parsial</td>
-                                <td className="border p-2 text-center font-medium bg-green-50 text-green-700">Mampu menjelaskan dengan detail</td>
-                                <td className="border p-2 text-center font-medium bg-indigo-50 text-indigo-700">Mampu menganalisis & mengaitkan</td>
-                              </tr>
-                              <tr>
-                                <td className="border p-2 font-bold">Aplikasi Praktis {m.judul}</td>
-                                <td className="border p-2 text-center italic opacity-60">Tidak dapat menerapkan</td>
-                                <td className="border p-2 text-center font-medium bg-amber-50">Menerapkan dengan bantuan</td>
-                                <td className="border p-2 text-center font-medium bg-green-50 text-green-700">Menerapkan secara mandiri</td>
-                                <td className="border p-2 text-center font-medium bg-indigo-50 text-indigo-700">Menciptakan solusi inovatif</td>
-                              </tr>
-                              {m.subMateri.filter(s => s.praktik).map((sub, sIdx) => (
-                                <tr key={`kktp-praktik-${sIdx}`} className="bg-emerald-50/30">
-                                  <td className="border p-2 font-bold flex items-center gap-1.5 uppercase text-[9px] text-emerald-800">
-                                    <CheckCircle2 size={10} /> {sub.judul} (Unjuk Kerja)
-                                  </td>
-                                  <td className="border p-2 text-center italic opacity-60">Prosedur langkah salah</td>
-                                  <td className="border p-2 text-center font-medium italic">Langkah benar tapi kurang rapih</td>
-                                  <td className="border p-2 text-center font-medium italic text-emerald-700">Langkah benar dan hasil akurat</td>
-                                  <td className="border p-2 text-center font-medium italic text-indigo-700 font-bold">Hasil presisi & teknik excelent</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      ))}
-                    </div>
-                  </PageContainer>
-                )}
-
                   {selectedDocs.includes('ASESMEN_FORMATIF') && (
                   <PageContainer key="ASESMEN_FORMATIF" id="ASESMEN_FORMATIF" title="ASESMEN FORMATIF (SIKAP & PROFIL)">
                     <div className="space-y-4 print:space-y-2">
@@ -2425,8 +1953,474 @@ const App = () => {
                   </PageContainer>
                 )}
 
+                {selectedDocs.includes('KKTP') && (
+                  <PageContainer key="KKTP" id="KKTP" title="KRITERIA KETERCAPAIAN TUJUAN PEMBELAJARAN (KKTP)">
+                    <div className="space-y-8">
+                      <p className="text-justify bg-amber-50 p-4 border-l-4 border-amber-400 text-xs italic">
+                        KKTP ini disusun menggunakan pendekatan interval nilai untuk menentukan ketuntasan pemahaman peserta didik terhadap materi <strong>{formData.mapel}</strong> pada {formData.fase}.
+                      </p>
 
+                      {materiList.map((m, i) => (
+                        <div key={i} className="space-y-4">
+                          <h4 className="font-bold text-sm bg-slate-100 p-2 border rounded uppercase">Materi {i+1}: {m.judul}</h4>
+                          <table className="w-full border-collapse border border-slate-300 text-[11px]">
+                            <thead className="bg-slate-800 text-white uppercase">
+                              <tr>
+                                <th className="border p-2">Kriteria Ketuntasan</th>
+                                <th className="border p-2">0 - 64 (Perlu Bimbingan)</th>
+                                <th className="border p-2">65 - 75 (Cukup)</th>
+                                <th className="border p-2">76 - 85 (Baik)</th>
+                                <th className="border p-2">86 - 100 (Sangat Baik)</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td className="border p-2 font-bold">Pemahaman Konsep {m.judul}</td>
+                                <td className="border p-2 text-center italic opacity-60">Belum mampu menjelaskan</td>
+                                <td className="border p-2 text-center font-medium bg-amber-50">Mampu menjelaskan secara parsial</td>
+                                <td className="border p-2 text-center font-medium bg-green-50 text-green-700">Mampu menjelaskan dengan detail</td>
+                                <td className="border p-2 text-center font-medium bg-indigo-50 text-indigo-700">Mampu menganalisis & mengaitkan</td>
+                              </tr>
+                              <tr>
+                                <td className="border p-2 font-bold">Aplikasi Praktis {m.judul}</td>
+                                <td className="border p-2 text-center italic opacity-60">Tidak dapat menerapkan</td>
+                                <td className="border p-2 text-center font-medium bg-amber-50">Menerapkan dengan bantuan</td>
+                                <td className="border p-2 text-center font-medium bg-green-50 text-green-700">Menerapkan secara mandiri</td>
+                                <td className="border p-2 text-center font-medium bg-indigo-50 text-indigo-700">Menciptakan solusi inovatif</td>
+                              </tr>
+                              {m.subMateri.filter(s => s.praktik).map((sub, sIdx) => (
+                                <tr key={`kktp-praktik-${sIdx}`} className="bg-emerald-50/30">
+                                  <td className="border p-2 font-bold flex items-center gap-1.5 uppercase text-[9px] text-emerald-800">
+                                    <CheckCircle2 size={10} /> {sub.judul} (Unjuk Kerja)
+                                  </td>
+                                  <td className="border p-2 text-center italic opacity-60">Prosedur langkah salah</td>
+                                  <td className="border p-2 text-center font-medium italic">Langkah benar tapi kurang rapih</td>
+                                  <td className="border p-2 text-center font-medium italic text-emerald-700">Langkah benar dan hasil akurat</td>
+                                  <td className="border p-2 text-center font-medium italic text-indigo-700 font-bold">Hasil presisi & teknik excelent</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ))}
+                    </div>
+                  </PageContainer>
+                )}
 
+                {selectedDocs.includes('PEKAN') && (
+                  <PageContainer key="PEKAN" id="PEKAN" title="ANALISIS PEKAN EFEKTIF">
+                    <div className="space-y-8">
+                      <div className="grid grid-cols-2 gap-4 text-xs">
+                        <div className="p-3 border rounded-lg bg-indigo-50 border-indigo-200">
+                          <p className="font-bold text-indigo-900 mb-1 uppercase">Identitas Waktu</p>
+                          <p>Semester: {formData.semester.join(' / ')}</p>
+                          <p>Tahun Ajaran: {formData.tahunAjaran}</p>
+                          <p>Parameter JP: {formData.jpPerPertemuan} JP/Minggu</p>
+                          {formData.semester.includes('Ganjil') && <p>Pekan Efektif Ganjil: {totalEfektifGanjil} Minggu</p>}
+                          {formData.semester.includes('Genap') && <p>Pekan Efektif Genap: {totalEfektifGenap} Minggu</p>}
+                          {(formData.totalJpGanjil && formData.semester.includes('Ganjil')) && <p>Total JP Ganjil: {formData.totalJpGanjil} JP</p>}
+                          {(formData.totalJpGenap && formData.semester.includes('Genap')) && <p>Total JP Genap: {formData.totalJpGenap} JP</p>}
+                        </div>
+                        <div className="p-3 border rounded-lg bg-slate-50 border-slate-200 text-right">
+                          <p className="font-bold text-slate-900 mb-1 uppercase">Total Jam Pelajaran</p>
+                          <p className="text-2xl font-black text-indigo-600">{totalJpKeseluruhan} JP</p>
+                        </div>
+                      </div>
+
+                      <section>
+                        <h4 className="font-bold border-b-2 mb-4 text-sm uppercase">I. Perhitungan Pekan (Distribusi Waktu)</h4>
+                        
+                        {formData.semester.includes('Ganjil') && (
+                          <div className="mb-8">
+                            <h5 className="text-[10px] font-bold text-indigo-700 mb-2 uppercase tracking-wider italic bg-indigo-50 px-2 py-1 inline-block rounded">Semester Ganjil (Gasal)</h5>
+                            <table className="w-full border-collapse border border-slate-300 text-[11px]">
+                              <thead className="bg-slate-200 uppercase font-bold text-center">
+                                <tr>
+                                  <th className="border p-2">Bulan</th>
+                                  <th className="border p-2">Jml Pekan</th>
+                                  <th className="border p-2">Pekan Tidak Efektif</th>
+                                  <th className="border p-2">Pekan Efektif</th>
+                                  <th className="border p-2">Keterangan</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {pekanDataGanjil.map((row, i) => (
+                                  <tr key={`ganjil-pekan-${i}`} className="text-center">
+                                    <td className="border p-2 font-bold text-left px-4">{row.bulan}</td>
+                                    <td className="border p-2">{row.total}</td>
+                                    <td className="border p-2 text-red-500 font-medium">{row.nonEfektif}</td>
+                                    <td className="border p-2 bg-green-50 font-bold">{row.total - row.nonEfektif}</td>
+                                    <td className="border p-2 text-left italic">{row.keterangan}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                              <tfoot className="bg-slate-800 text-white font-bold text-center uppercase">
+                                <tr>
+                                  <td className="border p-2 text-left px-4">JUMLAH GANJIL</td>
+                                  <td className="border p-2">{totalPekanGanjil}</td>
+                                  <td className="border p-2">{totalNonGanjil}</td>
+                                  <td className="border p-2">{totalEfektifGanjil}</td>
+                                  <td className="border p-2">-</td>
+                                </tr>
+                              </tfoot>
+                            </table>
+                          </div>
+                        )}
+
+                        {formData.semester.includes('Genap') && (
+                          <div>
+                            <h5 className="text-[10px] font-bold text-orange-700 mb-2 uppercase tracking-wider italic bg-orange-50 px-2 py-1 inline-block rounded">Semester Genap (Dua)</h5>
+                            <table className="w-full border-collapse border border-slate-300 text-[11px]">
+                              <thead className="bg-slate-200 uppercase font-bold text-center">
+                                <tr>
+                                  <th className="border p-2">Bulan</th>
+                                  <th className="border p-2">Jml Pekan</th>
+                                  <th className="border p-2">Pekan Tidak Efektif</th>
+                                  <th className="border p-2">Pekan Efektif</th>
+                                  <th className="border p-2">Keterangan</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {pekanDataGenap.map((row, i) => (
+                                  <tr key={`genap-pekan-${i}`} className="text-center">
+                                    <td className="border p-2 font-bold text-left px-4">{row.bulan}</td>
+                                    <td className="border p-2">{row.total}</td>
+                                    <td className="border p-2 text-red-500 font-medium">{row.nonEfektif}</td>
+                                    <td className="border p-2 bg-green-50 font-bold">{row.total - row.nonEfektif}</td>
+                                    <td className="border p-2 text-left italic">{row.keterangan}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                              <tfoot className="bg-slate-800 text-white font-bold text-center uppercase">
+                                <tr>
+                                  <td className="border p-2 text-left px-4">JUMLAH GENAP</td>
+                                  <td className="border p-2">{totalPekanGenap}</td>
+                                  <td className="border p-2">{totalNonGenap}</td>
+                                  <td className="border p-2">{totalEfektifGenap}</td>
+                                  <td className="border p-2">-</td>
+                                </tr>
+                              </tfoot>
+                            </table>
+                          </div>
+                        )}
+
+                        {formData.semester.length > 1 && (
+                          <div className="mt-4 p-2 bg-slate-100 border border-slate-300 flex justify-between items-center text-[10px] font-black uppercase text-slate-800">
+                             <span>TOTAL PEKAN EFEKTIF SELURUH TAHUN:</span>
+                             <span className="text-indigo-700 text-xs">{totalEfektifTahun} PEKAN</span>
+                          </div>
+                        )}
+                      </section>
+
+                      <section>
+                        <h4 className="font-bold border-b-2 mb-4 text-sm uppercase">II. Distribusi Jam Pelajaran</h4>
+                        <ul className="space-y-2 text-xs">
+                          <li className="flex justify-between border-b pb-1">
+                            <span>Materi Inti (Regular):</span>
+                            <span className="font-bold">{totalJpMateri} JP</span>
+                          </li>
+                          <li className="flex justify-between border-b pb-1">
+                            <span>Cadangan / Ulangan Harian (Extra):</span>
+                            <span className="font-bold">{totalJpExtra} JP</span>
+                          </li>
+                          <li className="flex justify-between pt-2 text-indigo-600 font-black text-sm">
+                            <span>Total Distribusi Jam Pelajaran:</span>
+                            <span>{totalJpKeseluruhan} JP</span>
+                          </li>
+                        </ul>
+                      </section>
+                    </div>
+                  </PageContainer>
+                )}
+                {selectedDocs.includes('PROTA') && (
+                  <PageContainer key="PROTA" id="PROTA" title="PROGRAM TAHUNAN (PROTA)">
+                    <div className="space-y-6">
+                      <div className="p-4 bg-slate-50 border rounded-lg text-xs space-y-1">
+                        <p>Mata Pelajaran: {formData.mapel}</p>
+                        <p>Satuan Pendidikan: {formData.namaSekolah}</p>
+                        <p>Tahun Pelajaran: {formData.tahunAjaran}</p>
+                        <p>Fase: {formData.fase} / {formData.kelas}</p>
+                      </div>
+
+                      <table className="w-full border-collapse border-2 border-slate-800 text-[11px]">
+                        <thead className="bg-slate-800 text-white uppercase text-center">
+                          <tr>
+                            <th className="border p-2 w-12">SMT</th>
+                            <th className="border p-2">Tujuan Pembelajaran / Lingkup Materi</th>
+                            <th className="border p-2 w-24">Alokasi Waktu</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(formData.semester.includes('Ganjil') || formData.semester.length === 0) && (
+                            <>
+                              <tr className="bg-slate-100 font-bold">
+                                <td className="border p-2 text-center">I</td>
+                                <td className="border p-2">SEMESTER GANJIL</td>
+                                <td className="border p-2 text-center">{totalGanjil} JP</td>
+                              </tr>
+                              {materiGanjil.map((m, i) => (
+                                <React.Fragment key={`prota-ganjil-${i}`}>
+                                  <tr className="bg-slate-50/50 font-bold">
+                                    <td className="border p-2 text-center">{i + 1}</td>
+                                    <td className="border p-2">{m.judul || '...'}</td>
+                                    <td className="border p-2 text-center">{m.jp || '...'} JP</td>
+                                  </tr>
+                                  {m.subMateri.map((sub, sIdx) => (
+                                    <tr key={`prota-ganjil-sub-${i}-${sIdx}`}>
+                                      <td className="border p-2 text-center text-[10px] text-gray-400 opacity-50">•</td>
+                                      <td className="border p-2 pl-6 italic text-gray-600">
+                                        {sub.judul || '...'} 
+                                        {sub.praktik && <span className="ml-2 text-[8px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase">Praktik</span>}
+                                      </td>
+                                      <td className="border p-2 text-center text-gray-500 font-medium">{sub.jp || '...'} JP</td>
+                                    </tr>
+                                  ))}
+                                </React.Fragment>
+                              ))}
+                              {formData.jpUlanganHarianGanjil && (
+                                <tr className="bg-slate-50 italic">
+                                  <td className="border p-2 text-center">-</td>
+                                  <td className="border p-2 text-indigo-700 font-medium">Ulangan Harian (Ganjil)</td>
+                                  <td className="border p-2 text-center">{formData.jpUlanganHarianGanjil} JP</td>
+                                </tr>
+                              )}
+                              {formData.jpCadanganGanjil && (
+                                <tr className="bg-slate-50 italic">
+                                  <td className="border p-2 text-center">-</td>
+                                  <td className="border p-2 text-indigo-700 font-medium">Materi Cadangan (Ganjil)</td>
+                                  <td className="border p-2 text-center">{formData.jpCadanganGanjil} JP</td>
+                                </tr>
+                              )}
+                            </>
+                          )}
+                          
+                          {(formData.semester.includes('Genap') || formData.semester.length === 0) && (
+                            <>
+                              <tr className="bg-slate-100 font-bold">
+                                <td className="border p-2 text-center">II</td>
+                                <td className="border p-2">SEMESTER GENAP</td>
+                                <td className="border p-2 text-center">{totalGenap} JP</td>
+                              </tr>
+                              {materiGenap.map((m, i) => (
+                                <React.Fragment key={`prota-genap-${i}`}>
+                                  <tr className="bg-slate-50/50 font-bold">
+                                    <td className="border p-2 text-center">{(formData.semester.includes('Ganjil') ? materiGanjil.length : 0) + i + 1}</td>
+                                    <td className="border p-2">{m.judul || '...'}</td>
+                                    <td className="border p-2 text-center">{m.jp || '...'} JP</td>
+                                  </tr>
+                                  {m.subMateri.map((sub, sIdx) => (
+                                    <tr key={`prota-genap-sub-${i}-${sIdx}`}>
+                                      <td className="border p-2 text-center text-[10px] text-gray-400 opacity-50">•</td>
+                                      <td className="border p-2 pl-6 italic text-gray-600">
+                                        {sub.judul || '...'}
+                                        {sub.praktik && <span className="ml-2 text-[8px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase">Praktik</span>}
+                                      </td>
+                                      <td className="border p-2 text-center text-gray-500 font-medium">{sub.jp || '...'} JP</td>
+                                    </tr>
+                                  ))}
+                                </React.Fragment>
+                              ))}
+                              {formData.jpUlanganHarianGenap && (
+                                <tr className="bg-slate-50 italic">
+                                  <td className="border p-2 text-center">-</td>
+                                  <td className="border p-2 text-orange-700 font-medium">Ulangan Harian (Genap)</td>
+                                  <td className="border p-2 text-center">{formData.jpUlanganHarianGenap} JP</td>
+                                </tr>
+                              )}
+                              {formData.jpCadanganGenap && (
+                                <tr className="bg-slate-50 italic">
+                                  <td className="border p-2 text-center">-</td>
+                                  <td className="border p-2 text-orange-700 font-medium">Materi Cadangan (Genap)</td>
+                                  <td className="border p-2 text-center">{formData.jpCadanganGenap} JP</td>
+                                </tr>
+                              )}
+                            </>
+                          )}
+                        </tbody>
+                        <tfoot className="bg-slate-200 font-bold text-center">
+                          <tr>
+                            <td colSpan={2} className="border p-2 text-right px-4">TOTAL ALOKASI WAKTU TAHUNAN</td>
+                            <td className="border p-2">{totalJpKeseluruhan} JP</td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  </PageContainer>
+                )}
+
+                {selectedDocs.includes('PROSEM') && (
+                  <PageContainer key="PROSEM" id="PROSEM" title="PROGRAM SEMESTER (PROSEM/PROMIS)">
+                    <div className="space-y-12">
+                      <div className="p-4 bg-slate-50 border rounded-lg text-xs space-y-1">
+                        <p>Semester: {formData.semester.join(' / ')}</p>
+                        <p>Mata Pelajaran: {formData.mapel}</p>
+                        <p>Tahun Pelajaran: {formData.tahunAjaran}</p>
+                        <p>Parameter JP: {formData.jpPerPertemuan} JP/Minggu</p>
+                        {formData.semester.includes('Ganjil') && <p>Pekan Efektif Ganjil: {totalEfektifGanjil} Minggu</p>}
+                        {formData.semester.includes('Genap') && <p>Pekan Efektif Genap: {totalEfektifGenap} Minggu</p>}
+                        {(formData.totalJpGanjil && formData.semester.includes('Ganjil')) && <p>Total JP Semester Ganjil: {formData.totalJpGanjil} JP</p>}
+                        {(formData.totalJpGenap && formData.semester.includes('Genap')) && <p>Total JP Semester Genap: {formData.totalJpGenap} JP</p>}
+                      </div>
+
+                      {/* SEMESTER GANJIL TABLE */}
+                      {formData.semester.includes('Ganjil') && (
+                        <div className="space-y-4">
+                          <h4 className="font-bold text-sm bg-indigo-50 p-2 border-l-4 border-indigo-500 uppercase tracking-widest">Semester Ganjil (Juli - Desember)</h4>
+                          <div className="overflow-x-auto">
+                            <table className="w-full border-collapse border-2 border-slate-800 text-[9px]">
+                              <thead className="bg-slate-800 text-white uppercase text-center">
+                                <tr>
+                                  <th rowSpan={2} className="border p-1 w-8">No</th>
+                                  <th rowSpan={2} className="border p-1">Materi Pokok / Tujuan Pembelajaran</th>
+                                  <th rowSpan={2} className="border p-1 w-10">JML JP</th>
+                                  <th colSpan={5} className="border p-1">Juli</th>
+                                  <th colSpan={5} className="border p-1">Agustus</th>
+                                  <th colSpan={5} className="border p-1">September</th>
+                                  <th colSpan={5} className="border p-1">Oktober</th>
+                                  <th colSpan={5} className="border p-1">November</th>
+                                  <th colSpan={5} className="border p-1">Desember</th>
+                                </tr>
+                                <tr>
+                                  {[...Array(30)].map((_, i) => (
+                                    <th key={i} className="border p-1 w-4 text-[7px]">{ (i % 5) + 1 }</th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {materiGanjil.map((m, i) => (
+                                  <React.Fragment key={`prosem-ganjil-${i}`}>
+                                    <tr className="bg-slate-50/50 font-bold">
+                                      <td className="border p-1 text-center">{i + 1}</td>
+                                      <td className="border p-1">{m.judul || '...'}</td>
+                                      <td className="border p-1 text-center">{m.jp || '...'} JP</td>
+                                      {[...Array(30)].map((_, j) => (
+                                        <td key={j} className="border p-1 text-center h-6"></td>
+                                      ))}
+                                    </tr>
+                                    {m.subMateri.map((sub, sIdx) => (
+                                      <tr key={`prosem-ganjil-sub-${i}-${sIdx}`}>
+                                        <td className="border p-1 text-center text-[10px] text-gray-400 opacity-50">•</td>
+                                        <td className="border p-1 pl-4 italic text-gray-600 font-medium">
+                                          {sub.judul || '...'} 
+                                          {sub.praktik && <span className="ml-2 text-[6px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase tracking-tighter">Praktik</span>}
+                                        </td>
+                                        <td className="border p-1 text-center text-gray-500 font-bold">{sub.jp || '...'} JP</td>
+                                        {[...Array(30)].map((_, j) => (
+                                          <td key={j} className="border p-1 text-center h-6"></td>
+                                        ))}
+                                      </tr>
+                                    ))}
+                                  </React.Fragment>
+                                ))}
+                                {formData.jpUlanganHarianGanjil && (
+                                  <tr className="bg-slate-50 italic">
+                                    <td className="border p-1 text-center font-bold">-</td>
+                                    <td className="border p-1 font-medium text-indigo-700">Ulangan Harian (Ganjil)</td>
+                                    <td className="border p-1 text-center font-bold">{formData.jpUlanganHarianGanjil} JP</td>
+                                    {[...Array(30)].map((_, j) => (
+                                      <td key={j} className="border p-1 text-center font-bold"></td>
+                                    ))}
+                                  </tr>
+                                )}
+                                {formData.jpCadanganGanjil && (
+                                  <tr className="bg-slate-50 italic">
+                                    <td className="border p-1 text-center font-bold">-</td>
+                                    <td className="border p-1 font-medium text-indigo-700">Materi Cadangan (Ganjil)</td>
+                                    <td className="border p-1 text-center font-bold">{formData.jpCadanganGanjil} JP</td>
+                                    {[...Array(30)].map((_, j) => (
+                                      <td key={j} className="border p-1 text-center font-bold"></td>
+                                    ))}
+                                  </tr>
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* SEMESTER GENAP TABLE */}
+                      {formData.semester.includes('Genap') && (
+                        <div className="space-y-4">
+                          <h4 className="font-bold text-sm bg-orange-50 p-2 border-l-4 border-orange-500 uppercase tracking-widest">Semester Genap (Januari - Juni)</h4>
+                          <div className="overflow-x-auto">
+                            <table className="w-full border-collapse border-2 border-slate-800 text-[9px]">
+                              <thead className="bg-slate-800 text-white uppercase text-center">
+                                <tr>
+                                  <th rowSpan={2} className="border p-1 w-8">No</th>
+                                  <th rowSpan={2} className="border p-1">Materi Pokok / Tujuan Pembelajaran</th>
+                                  <th rowSpan={2} className="border p-1 w-10">JML JP</th>
+                                  <th colSpan={5} className="border p-1">Januari</th>
+                                  <th colSpan={5} className="border p-1">Februari</th>
+                                  <th colSpan={5} className="border p-1">Maret</th>
+                                  <th colSpan={5} className="border p-1">April</th>
+                                  <th colSpan={5} className="border p-1">Mei</th>
+                                  <th colSpan={5} className="border p-1">Juni</th>
+                                </tr>
+                                <tr>
+                                  {[...Array(30)].map((_, i) => (
+                                    <th key={i} className="border p-1 w-4 text-[7px]">{ (i % 5) + 1 }</th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {materiGenap.map((m, i) => (
+                                  <React.Fragment key={`prosem-genap-${i}`}>
+                                    <tr className="bg-slate-50/50 font-bold">
+                                      <td className="border p-1 text-center font-bold">{(formData.semester.includes('Ganjil') ? materiGanjil.length : 0) + i + 1}</td>
+                                      <td className="border p-1">{m.judul || '...'}</td>
+                                      <td className="border p-1 text-center font-bold">{m.jp || '...'} JP</td>
+                                      {[...Array(30)].map((_, j) => (
+                                        <td key={j} className="border p-1 text-center h-6"></td>
+                                      ))}
+                                    </tr>
+                                    {m.subMateri.map((sub, sIdx) => (
+                                      <tr key={`prosem-genap-sub-${i}-${sIdx}`}>
+                                        <td className="border p-1 text-center text-[10px] text-gray-400 opacity-50">•</td>
+                                        <td className="border p-1 pl-4 italic text-gray-600 font-medium">
+                                          {sub.judul || '...'} 
+                                          {sub.praktik && <span className="ml-2 text-[6px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase tracking-tighter">Praktik</span>}
+                                        </td>
+                                        <td className="border p-1 text-center text-gray-500 font-bold">{sub.jp || '...'} JP</td>
+                                        {[...Array(30)].map((_, j) => (
+                                          <td key={j} className="border p-1 text-center h-6"></td>
+                                        ))}
+                                      </tr>
+                                    ))}
+                                  </React.Fragment>
+                                ))}
+                                {formData.jpUlanganHarianGenap && (
+                                  <tr className="bg-slate-50 italic border-t-2 border-orange-100">
+                                    <td className="border p-1 text-center font-bold">-</td>
+                                    <td className="border p-1 font-medium text-orange-700">Ulangan Harian (Genap)</td>
+                                    <td className="border p-1 text-center font-bold">{formData.jpUlanganHarianGenap} JP</td>
+                                    {[...Array(30)].map((_, j) => (
+                                      <td key={j} className="border p-1 text-center font-bold"></td>
+                                    ))}
+                                  </tr>
+                                )}
+                                {formData.jpCadanganGenap && (
+                                  <tr className="bg-slate-50 italic">
+                                    <td className="border p-1 text-center font-bold">-</td>
+                                    <td className="border p-1 font-medium text-orange-700">Materi Cadangan (Genap)</td>
+                                    <td className="border p-1 text-center font-bold">{formData.jpCadanganGenap} JP</td>
+                                    {[...Array(30)].map((_, j) => (
+                                      <td key={j} className="border p-1 text-center font-bold"></td>
+                                    ))}
+                                  </tr>
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="flex gap-4 text-[8px] font-bold">
+                        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-indigo-400"></div> KBM Terjadwal</div>
+                        <div className="flex items-center gap-1"><div className="w-3 h-3 bg-red-400"></div> Asesmen Sumatif</div>
+                      </div>
+                    </div>
+                  </PageContainer>
+                )}
 
                 {selectedDocs.includes('ANALISIS') && (
                   <>
