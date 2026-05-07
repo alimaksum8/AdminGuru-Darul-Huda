@@ -616,7 +616,7 @@ const App = () => {
       }}
     >
       <div className="print:block">
-        <div className="text-center border-b-4 border-double border-gray-800 pb-4 mb-8">
+        <div className="text-center border-b-2 border-double border-gray-800 pb-2 mb-4 print:mb-2 print:pb-1">
           <h2 className="text-sm font-bold uppercase tracking-widest text-gray-700">YAYASAN PON-PES DARUL HUDA</h2>
           <h1 className="text-xl font-bold uppercase tracking-wider leading-tight">{formData.namaSekolah || 'NAMA SEKOLAH ANDA'}</h1>
           <p className="text-[10px] font-bold text-gray-700">TAHUN PELAJARAN {formData.tahunAjaran}</p>
@@ -670,8 +670,8 @@ const App = () => {
             margin: 0;
           }
           body {
-            margin: 0;
-            padding: 0;
+            margin: 0 !important;
+            padding: 0 !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
@@ -682,6 +682,15 @@ const App = () => {
             border: none !important;
             position: relative !important;
             overflow: hidden !important;
+            height: ${paperStyles[formData.paperSize as keyof typeof paperStyles].height} !important;
+            width: ${paperStyles[formData.paperSize as keyof typeof paperStyles].width} !important;
+            padding-top: 10mm !important;
+            padding-bottom: 10mm !important;
+            padding-left: 20mm !important;
+            padding-right: 15mm !important;
+          }
+          .page-container * {
+            max-width: 100% !important;
           }
         }
       ` }} />
@@ -1601,9 +1610,9 @@ const App = () => {
 
                   return (
                     <PageContainer key={`MODUL-${i}`} id={`MODUL-${i}`} title={`MODUL AJAR: ${sm.judul}`}>
-                      <div className="space-y-4">
+                      <div className="space-y-2 print:space-y-1">
                         {/* Informasi Umum */}
-                        <div className="grid grid-cols-2 gap-4 text-[10px] font-bold border-b border-indigo-600 pb-2 mb-4">
+                        <div className="grid grid-cols-2 gap-4 text-[10px] font-bold border-b border-indigo-600 pb-1 mb-2 print:mb-1">
                           <div className="space-y-1">
                             <p>PENYUSUN: {formData.namaGuru}</p>
                             <p>SEKOLAH: {formData.namaSekolah}</p>
@@ -1619,7 +1628,7 @@ const App = () => {
                           </div>
                         </div>
 
-                        <div className="space-y-3">
+                        <div className="space-y-2 print:space-y-1">
                           {/* Panca Cinta - Kemenag Cinta */}
                           {formData.kurikulum === 'Kurikulum Berbasis Cinta' && (
                             <div className="p-2 bg-rose-50 border-2 border-rose-200 rounded-lg space-y-1">
@@ -1659,17 +1668,17 @@ const App = () => {
                             </div>
                           </div>
                           
-                          <div className="space-y-4">
+                          <div className="space-y-3 print:space-y-2">
                             <p className="font-bold underline text-[10pt]">1. Pertanyaan Pemantik:</p>
-                            <p className="italic text-slate-600 text-[10pt]">"Pernahkah Anda terpikir bagaimana konsep {sm.judul} mempengaruhi kenyamanan hidup kita setiap harinya? Apa yang terjadi jika {sm.judul} tidak ada?"</p>
+                            <p className="italic text-slate-600 text-[10pt] leading-tight">"Pernahkah Anda terpikir bagaimana konsep {sm.judul} mempengaruhi kenyamanan hidup kita setiap harinya? Apa yang terjadi jika {sm.judul} tidak ada?"</p>
                           </div>
 
-                          <div className="space-y-4 border-l-2 border-indigo-200 pl-4">
+                          <div className="space-y-2 border-l-2 border-indigo-200 pl-4">
                             <p className="font-bold underline text-[10pt] uppercase">2. Rincian Kegiatan Pembelajaran:</p>
-                            <ul className="list-decimal ml-5 space-y-2 text-[10pt] leading-relaxed">
+                            <ul className="list-decimal ml-5 space-y-1 text-[10pt] leading-snug">
                               <li>
-                                <span className="font-bold text-indigo-700 block mb-1">Kegiatan Awal (15 Menit):</span>
-                                <div className="space-y-0.5 pl-2">
+                                <span className="font-bold text-indigo-700 block mb-0.5">Kegiatan Awal (15 Menit):</span>
+                                <div className="space-y-0 pl-2">
                                   <p>• Salam</p>
                                   <p>• Do'a sebelum belajar</p>
                                   <p>• Absensi</p>
@@ -1679,8 +1688,8 @@ const App = () => {
                                 </div>
                               </li>
                               <li>
-                                <span className="font-bold text-indigo-700 block mb-1">Kegiatan Inti (50 Menit):</span>
-                                <div className="space-y-1 pl-2">
+                                <span className="font-bold text-indigo-700 block mb-0.5">Kegiatan Inti (50 Menit):</span>
+                                <div className="space-y-0.5 pl-2">
                                   {formData.metode === 'Problem Based Learning' ? (
                                     <>
                                       <p>• Orientasi peserta didik pada masalah.</p>
@@ -1747,13 +1756,13 @@ const App = () => {
                               </li>
                               {sm.praktik && (
                                 <li className="bg-emerald-50 p-2 rounded border border-emerald-100">
-                                  <span className="font-bold text-emerald-700 block mb-1">Sesi Praktik (Ekstensi):</span>
+                                  <span className="font-bold text-emerald-700 block mb-0.5">Sesi Praktik (Ekstensi):</span>
                                   <p className="pl-2">• Mengadakan sesi praktik langsung terkait {sm.judul} untuk menguji pemahaman dan keterampilan teknis peserta didik di akhir pertemuan.</p>
                                 </li>
                               )}
                               <li>
-                                <span className="font-bold text-indigo-700 block mb-1">Kegiatan Penutup (15 Menit):</span>
-                                <div className="space-y-0.5 pl-2">
+                                <span className="font-bold text-indigo-700 block mb-0.5">Kegiatan Penutup (15 Menit):</span>
+                                <div className="space-y-0 pl-2">
                                   <p>• Refleksi bersama antara guru dan peserta didik.</p>
                                   <p>• Penarikan kesimpulan kunci dari materi yang dipelajari.</p>
                                   <p>• Pemberian tugas penguatan mandiri atau tindak lanjut.</p>
