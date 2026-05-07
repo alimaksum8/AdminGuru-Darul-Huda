@@ -603,7 +603,7 @@ const App = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       id={id} 
-      className="page-container bg-white shadow-2xl mx-auto my-8 border border-gray-100 print:shadow-none print:m-0 print:border-none relative"
+      className="page-container bg-white shadow-2xl mx-auto my-8 border border-gray-100 print:shadow-none print:m-0 print:border-none relative flex flex-col"
       style={{ 
         width: paperStyles[formData.paperSize as keyof typeof paperStyles].width,
         minHeight: paperStyles[formData.paperSize as keyof typeof paperStyles].height,
@@ -615,7 +615,7 @@ const App = () => {
         breakAfter: 'page'
       }}
     >
-      <div className="print:block">
+      <div className="print:block flex-grow flex flex-col">
         <div className="text-center border-b-2 border-double border-gray-800 pb-2 mb-4 print:mb-2 print:pb-1">
           <h2 className="text-sm font-bold uppercase tracking-widest text-gray-700">YAYASAN PON-PES DARUL HUDA</h2>
           <h1 className="text-xl font-bold uppercase tracking-wider leading-tight">{formData.namaSekolah || 'NAMA SEKOLAH ANDA'}</h1>
@@ -634,27 +634,27 @@ const App = () => {
           {title}
         </h2>
 
-        <div className="text-sm leading-relaxed text-gray-800 printable-content">
+        <div className="text-sm leading-relaxed text-gray-800 printable-content flex-grow">
           {children}
         </div>
 
-        <div className="mt-16 grid grid-cols-2 gap-20 text-center print:break-inside-avoid">
+        <div className="mt-8 print:mt-4 grid grid-cols-2 gap-10 text-center print:break-inside-avoid">
           <div className="print:break-inside-avoid">
-            <p className="mb-20">Mengetahui,<br/>
+            <p className="mb-14 print:mb-8 text-[11px] print:text-[10px]">Mengetahui,<br/>
               {formData.kelas.includes('VII') || formData.kelas.includes('VIII') || formData.kelas.includes('IX') ? 'Kepala MTs Darul Huda' : 
                formData.kelas.includes('X') || formData.kelas.includes('XI') || formData.kelas.includes('XII') ? 'Kepala MA Darul Huda' : 'Kepala Sekolah'}
             </p>
-            <p className="font-bold underline uppercase">{formData.namaKepalaSekolah || '..........................'}</p>
-            <p className="text-xs text-gray-500 italic">NIP. ..........................</p>
+            <p className="font-bold underline uppercase text-[11px] print:text-[10px]">{formData.namaKepalaSekolah || '..........................'}</p>
+            <p className="text-[10px] print:text-[9px] text-gray-500 italic">NIP. ..........................</p>
           </div>
           <div className="print:break-inside-avoid">
-            <p className="mb-20">
+            <p className="mb-14 print:mb-8 text-[11px] print:text-[10px]">
               {formData.kabupaten || 'Bondowoso'}, {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(formData.tanggalTtd))}
               <br/>
               Guru Mata Pelajaran
             </p>
-            <p className="font-bold underline uppercase">{formData.namaGuru || '..........................'}</p>
-            <p className="text-xs text-gray-500 italic">NIP. ..........................</p>
+            <p className="font-bold underline uppercase text-[11px] print:text-[10px]">{formData.namaGuru || '..........................'}</p>
+            <p className="text-[10px] print:text-[9px] text-gray-500 italic">NIP. ..........................</p>
           </div>
         </div>
       </div>
@@ -681,7 +681,7 @@ const App = () => {
             margin: 0 !important;
             border: none !important;
             position: relative !important;
-            overflow: hidden !important;
+            overflow: visible !important;
             height: ${paperStyles[formData.paperSize as keyof typeof paperStyles].height} !important;
             width: ${paperStyles[formData.paperSize as keyof typeof paperStyles].width} !important;
             padding-top: 10mm !important;
@@ -1783,36 +1783,36 @@ const App = () => {
 
                 {selectedDocs.includes('LKPD') && (
                   <PageContainer key="LKPD" id="LKPD" title="LEMBAR KERJA PESERTA DIDIK (LKPD)">
-                    <div className="border-4 border-double border-indigo-900 p-8 rounded-lg min-h-[800px]">
-                      <div className="flex justify-between border-b pb-4 mb-6">
-                        <div className="space-y-1 font-bold">
+                    <div className="border-4 border-double border-indigo-900 p-4 print:p-2 rounded-lg min-h-[500px]">
+                      <div className="flex justify-between border-b pb-2 mb-4">
+                        <div className="space-y-0.5 font-bold text-[10px]">
                           <p>Nama Kelompok: .................................</p>
                           <p>Anggota: ...........................................</p>
                         </div>
-                        <div className="font-bold">{formData.kelas}</div>
+                        <div className="font-bold text-[10px]">{formData.kelas}</div>
                       </div>
 
-                      <h3 className="text-center text-xl font-black mb-10 tracking-widest uppercase">Eksplorasi Materi: {materiList[0].judul}</h3>
+                      <h3 className="text-center text-lg font-black mb-6 tracking-widest uppercase italic">Eksplorasi Materi: {materiList[0].judul}</h3>
                       
-                      <div className="space-y-6 text-sm">
+                      <div className="space-y-4 text-[11px] print:text-[10px]">
                         <p className="font-bold">A. Petunjuk Kerja:</p>
-                        <ol className="list-decimal ml-5 space-y-2">
+                        <ol className="list-decimal ml-5 space-y-1">
                           <li>Diskusikan bersama kelompok mengenai kaitan antara {materiList[0].judul} dengan lingkungan sekitar.</li>
                           <li>Lakukan pengamatan pada objek yang telah disediakan guru.</li>
                           <li>Isilah tabel pengamatan di bawah ini berdasarkan hasil diskusi.</li>
                         </ol>
 
-                        <div className="mt-8">
-                          <p className="font-bold mb-2">B. Tabel Pengamatan & Analisis:</p>
+                        <div className="mt-4">
+                          <p className="font-bold mb-1">B. Tabel Pengamatan & Analisis:</p>
                           <div className="grid grid-cols-3 border-2 border-black">
-                            <div className="border border-black p-4 font-bold bg-slate-100 uppercase text-center">Faktor Pengamatan</div>
-                            <div className="border border-black p-4 font-bold bg-slate-100 uppercase text-center">Data Temuan</div>
-                            <div className="border border-black p-4 font-bold bg-slate-100 uppercase text-center">Analisis Kritis</div>
-                            {[1,2,3,4].map(n => (
+                            <div className="border border-black p-2 font-bold bg-slate-100 uppercase text-center text-[9px]">Faktor Pengamatan</div>
+                            <div className="border border-black p-2 font-bold bg-slate-100 uppercase text-center text-[9px]">Data Temuan</div>
+                            <div className="border border-black p-2 font-bold bg-slate-100 uppercase text-center text-[9px]">Analisis Kritis</div>
+                            {[1,2,3].map(n => (
                               <React.Fragment key={n}>
-                                <div className="border border-black p-6"></div>
-                                <div className="border border-black p-6"></div>
-                                <div className="border border-black p-6"></div>
+                                <div className="border border-black p-4"></div>
+                                <div className="border border-black p-4"></div>
+                                <div className="border border-black p-4"></div>
                               </React.Fragment>
                             ))}
                           </div>
@@ -1820,22 +1820,22 @@ const App = () => {
                       </div>
                     </div>
                   </PageContainer>
-                )}
+                  )}
 
-                {selectedDocs.includes('ASESMEN_FORMATIF') && (
+                  {selectedDocs.includes('ASESMEN_FORMATIF') && (
                   <PageContainer key="ASESMEN_FORMATIF" id="ASESMEN_FORMATIF" title="ASESMEN FORMATIF (SIKAP & PROFIL)">
-                    <div className="space-y-10">
+                    <div className="space-y-4 print:space-y-2">
                       <section>
-                        <h4 className="font-bold text-indigo-900 border-b pb-1 mb-4">A. INSTRUMEN OBSERVASI SIKAP (FORMATIF)</h4>
-                        <p className="text-xs italic mb-4">Dilakukan selama proses pembelajaran berlangsung untuk memantau perkembangan karakter dan adab peserta didik.</p>
-                        <table className="w-full border-collapse border border-slate-300 text-[10px]">
+                        <h4 className="font-bold text-indigo-900 border-b pb-0.5 mb-2 text-xs">A. INSTRUMEN OBSERVASI SIKAP (FORMATIF)</h4>
+                        <p className="text-[9px] italic mb-2">Dilakukan selama proses pembelajaran berlangsung untuk memantau perkembangan karakter dan adab peserta didik.</p>
+                        <table className="w-full border-collapse border border-slate-300 text-[9px]">
                           <thead>
-                            <tr className="bg-slate-100">
-                              <th className="border p-2 w-8">No</th>
-                              <th className="border p-2">Aspek yang Diamati</th>
-                              <th className="border p-2 w-16">Ya</th>
-                              <th className="border p-2 w-16">Tidak</th>
-                              <th className="border p-2">Catatan Anekdot</th>
+                            <tr className="bg-slate-100 uppercase">
+                              <th className="border p-1 w-6">No</th>
+                              <th className="border p-1">Aspek yang Diamati</th>
+                              <th className="border p-1 w-12">Ya</th>
+                              <th className="border p-1 w-12">Tidak</th>
+                              <th className="border p-1">Catatan</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1847,11 +1847,11 @@ const App = () => {
                               'Menggunakan bahasa yang santun'
                             ].map((item, idx) => (
                               <tr key={idx}>
-                                <td className="border p-2 text-center">{idx + 1}</td>
-                                <td className="border p-2">{item}</td>
-                                <td className="border p-2"></td>
-                                <td className="border p-2"></td>
-                                <td className="border p-2"></td>
+                                <td className="border p-1 text-center">{idx + 1}</td>
+                                <td className="border p-1">{item}</td>
+                                <td className="border p-1"></td>
+                                <td className="border p-1"></td>
+                                <td className="border p-1 text-[8px] italic text-slate-400 text-center">...</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1859,28 +1859,28 @@ const App = () => {
                       </section>
 
                       <section>
-                        <h4 className="font-bold text-indigo-900 border-b pb-1 mb-4">B. RUBRIK PENILAIAN PROFIL PELAJAR</h4>
-                        <table className="w-full border-collapse border border-slate-300 text-xs">
+                        <h4 className="font-bold text-indigo-900 border-b pb-0.5 mb-2 text-xs">B. RUBRIK PENILAIAN PROFIL PELAJAR</h4>
+                        <table className="w-full border-collapse border border-slate-300 text-[9px]">
                           <thead>
-                            <tr className="bg-slate-100">
-                              <th className="border p-2">Dimensi</th>
-                              <th className="border p-2">Mulai Berkembang (1)</th>
-                              <th className="border p-2">Berkembang (2)</th>
-                              <th className="border p-2">Sangat Berkembang (3)</th>
+                            <tr className="bg-slate-100 uppercase">
+                              <th className="border p-1">Dimensi</th>
+                              <th className="border p-1">Mulai Berkembang</th>
+                              <th className="border p-1">Berkembang</th>
+                              <th className="border p-1">Sangat Berkembang</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr>
-                              <td className="border p-2 font-bold uppercase">Bernalar Kritis</td>
-                              <td className="border p-2 italic text-[10px]">Memerlukan bantuan untuk bertanya.</td>
-                              <td className="border p-2 italic text-[10px]">Mampu mengajukan pertanyaan dasar.</td>
-                              <td className="border p-2 italic text-[10px]">Mampu menganalisis argumen secara logis.</td>
+                              <td className="border p-1 font-bold uppercase w-1/4">Bernalar Kritis</td>
+                              <td className="border p-1 italic text-[8px]">Perlu bantuan bertanya.</td>
+                              <td className="border p-1 italic text-[8px]">Mampu bertanya dasar.</td>
+                              <td className="border p-1 italic text-[8px]">Mampu analisis logis.</td>
                             </tr>
                             <tr>
-                              <td className="border p-2 font-bold uppercase">Gotong Royong</td>
-                              <td className="border p-2 italic text-[10px]">Cenderung bekerja sendiri.</td>
-                              <td className="border p-2 italic text-[10px]">Aktif membantu jika diminta.</td>
-                              <td className="border p-2 italic text-[10px]">Inisiatif membantu tim tanpa diminta.</td>
+                              <td className="border p-1 font-bold uppercase">Gotong Royong</td>
+                              <td className="border p-1 italic text-[8px]">Bekerja sendiri.</td>
+                              <td className="border p-1 italic text-[8px]">Aktif jika diminta.</td>
+                              <td className="border p-1 italic text-[8px]">Inisiatif tanpa diminta.</td>
                             </tr>
                           </tbody>
                         </table>
