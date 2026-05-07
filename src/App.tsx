@@ -603,7 +603,7 @@ const App = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       id={id} 
-      className="bg-white shadow-2xl mx-auto my-8 border border-gray-100 print:shadow-none print:m-0 print:border-none relative"
+      className="page-container bg-white shadow-2xl mx-auto my-8 border border-gray-100 print:shadow-none print:m-0 print:border-none relative"
       style={{ 
         width: paperStyles[formData.paperSize as keyof typeof paperStyles].width,
         minHeight: paperStyles[formData.paperSize as keyof typeof paperStyles].height,
@@ -672,6 +672,16 @@ const App = () => {
           body {
             margin: 0;
             padding: 0;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          .page-container {
+            page-break-after: always !important;
+            break-after: page !important;
+            margin: 0 !important;
+            border: none !important;
+            position: relative !important;
+            overflow: hidden !important;
           }
         }
       ` }} />
@@ -1591,7 +1601,7 @@ const App = () => {
 
                   return (
                     <PageContainer key={`MODUL-${i}`} id={`MODUL-${i}`} title={`MODUL AJAR: ${sm.judul}`}>
-                      <div className="space-y-6">
+                      <div className="space-y-4">
                         {/* Informasi Umum */}
                         <div className="grid grid-cols-2 gap-4 text-[10px] font-bold border-b border-indigo-600 pb-2 mb-4">
                           <div className="space-y-1">
@@ -1609,10 +1619,10 @@ const App = () => {
                           </div>
                         </div>
 
-                        <div className="space-y-6">
+                        <div className="space-y-3">
                           {/* Panca Cinta - Kemenag Cinta */}
                           {formData.kurikulum === 'Kurikulum Berbasis Cinta' && (
-                            <div className="p-3 bg-rose-50 border-2 border-rose-200 rounded-lg space-y-2">
+                            <div className="p-2 bg-rose-50 border-2 border-rose-200 rounded-lg space-y-1">
                               <p className="text-[10px] font-black text-rose-700 uppercase flex items-center gap-2">
                                 <Heart size={14} className="fill-rose-700" /> Integrasi Panca Cinta (Cinta):
                               </p>
@@ -1649,14 +1659,14 @@ const App = () => {
                             </div>
                           </div>
                           
-                          <div className="space-y-2 border-l-2 border-indigo-200 pl-4">
-                            <p className="font-bold underline text-xs">1. Pertanyaan Pemantik:</p>
-                            <p className="italic text-slate-600 text-xs">"Pernahkah Anda terpikir bagaimana konsep {sm.judul} mempengaruhi kenyamanan hidup kita setiap harinya? Apa yang terjadi jika {sm.judul} tidak ada?"</p>
+                          <div className="space-y-4">
+                            <p className="font-bold underline text-[10pt]">1. Pertanyaan Pemantik:</p>
+                            <p className="italic text-slate-600 text-[10pt]">"Pernahkah Anda terpikir bagaimana konsep {sm.judul} mempengaruhi kenyamanan hidup kita setiap harinya? Apa yang terjadi jika {sm.judul} tidak ada?"</p>
                           </div>
 
-                          <div className="space-y-3 border-l-2 border-indigo-200 pl-4">
-                            <p className="font-bold underline text-xs uppercase">2. Rincian Kegiatan Pembelajaran:</p>
-                            <ul className="list-decimal ml-5 space-y-3 text-xs leading-relaxed">
+                          <div className="space-y-4 border-l-2 border-indigo-200 pl-4">
+                            <p className="font-bold underline text-[10pt] uppercase">2. Rincian Kegiatan Pembelajaran:</p>
+                            <ul className="list-decimal ml-5 space-y-2 text-[10pt] leading-relaxed">
                               <li>
                                 <span className="font-bold text-indigo-700 block mb-1">Kegiatan Awal (15 Menit):</span>
                                 <div className="space-y-0.5 pl-2">
