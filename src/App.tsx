@@ -336,19 +336,19 @@ const App = () => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const documentTypes = [
+    { id: 'PEKAN', name: 'PEKAN EFEKTIF', icon: <Calendar size={18} /> },
+    { id: 'PROTA', name: 'PROTA', icon: <FileText size={18} /> },
+    { id: 'PROSEM', name: 'PROMES', icon: <ClipboardList size={18} /> },
     { id: 'CP', name: 'CP', icon: <BookOpen size={18} /> },
     { id: 'TP', name: 'TP', icon: <Sparkles size={18} /> },
     { id: 'ATP', name: 'ATP', icon: <PenTool size={18} /> },
-    { id: 'MATRIX', name: 'Matrix CP/TP', icon: <Table size={18} /> },
-    { id: 'MODUL', name: 'Modul Ajar', icon: <FileText size={18} /> },
+    { id: 'MATRIX', name: 'MATRIX CP/TP', icon: <Table size={18} /> },
+    { id: 'MODUL', name: 'MODUL AJAR', icon: <FileText size={18} /> },
     { id: 'LKPD', name: 'LKPD', icon: <ClipboardList size={18} /> },
-    { id: 'ASESMEN_FORMATIF', name: 'Asesmen Formatif', icon: <UserCheck size={18} /> },
-    { id: 'ASESMEN_SUMATIF', name: 'Asesmen Sumatif', icon: <CheckSquare size={18} /> },
     { id: 'KKTP', name: 'KKTP', icon: <GraduationCap size={18} /> },
-    { id: 'PEKAN', name: 'Pekan Efektif', icon: <Calendar size={18} /> },
-    { id: 'PROTA', name: 'Prota', icon: <FileText size={18} /> },
-    { id: 'PROSEM', name: 'Promis', icon: <ClipboardList size={18} /> },
-    { id: 'ANALISIS', name: 'Analisis Hasil Ulangan', icon: <BarChart2 size={18} /> },
+    { id: 'ASESMEN_FORMATIF', name: 'ASESMEN FORMATIF', icon: <UserCheck size={18} /> },
+    { id: 'ASESMEN_SUMATIF', name: 'ASESMEN SUMATIF', icon: <CheckSquare size={18} /> },
+    { id: 'ANALISIS', name: 'ANALISIS HASIL ULANGAN', icon: <BarChart2 size={18} /> },
   ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -597,7 +597,7 @@ const App = () => {
   };
 
   // Modern PDF-style Page Wrapper
-  const PageContainer = ({ children, title, id }: { children: React.ReactNode, title: string, id: string, key?: React.Key }) => (
+  const PageContainer = ({ children, title, id, hideSignature = false }: { children: React.ReactNode, title: string, id: string, key?: React.Key, hideSignature?: boolean }) => (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -638,25 +638,27 @@ const App = () => {
           {children}
         </div>
 
-        <div className="mt-8 print:mt-4 grid grid-cols-2 gap-10 text-center print:break-inside-avoid">
-          <div className="print:break-inside-avoid">
-            <p className="mb-20 print:mb-16 text-[11px] print:text-[10px]">Mengetahui,<br/>
-              {formData.kelas.includes('VII') || formData.kelas.includes('VIII') || formData.kelas.includes('IX') ? 'Kepala MTs Darul Huda' : 
-               formData.kelas.includes('X') || formData.kelas.includes('XI') || formData.kelas.includes('XII') ? 'Kepala MA Darul Huda' : 'Kepala Sekolah'}
-            </p>
-            <p className="font-bold underline uppercase text-[11px] print:text-[10px]">{formData.namaKepalaSekolah || '..........................'}</p>
-            <p className="text-[10px] print:text-[9px] text-gray-500 italic">NIP. ..........................</p>
+        {!hideSignature && (
+          <div className="mt-8 print:mt-4 grid grid-cols-2 gap-10 text-center print:break-inside-avoid">
+            <div className="print:break-inside-avoid">
+              <p className="mb-28 print:mb-24 text-[11px] print:text-[10px]">Mengetahui,<br/>
+                {formData.kelas.includes('VII') || formData.kelas.includes('VIII') || formData.kelas.includes('IX') ? 'Kepala MTs Darul Huda' : 
+                 formData.kelas.includes('X') || formData.kelas.includes('XI') || formData.kelas.includes('XII') ? 'Kepala MA Darul Huda' : 'Kepala Sekolah'}
+              </p>
+              <p className="font-bold underline uppercase text-[11px] print:text-[10px]">{formData.namaKepalaSekolah || '..........................'}</p>
+              <p className="text-[10px] print:text-[9px] text-gray-500 italic">NIP. ..........................</p>
+            </div>
+            <div className="print:break-inside-avoid">
+              <p className="mb-28 print:mb-24 text-[11px] print:text-[10px]">
+                {formData.kabupaten || 'Bondowoso'}, {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(formData.tanggalTtd))}
+                <br/>
+                Guru Mata Pelajaran
+              </p>
+              <p className="font-bold underline uppercase text-[11px] print:text-[10px]">{formData.namaGuru || '..........................'}</p>
+              <p className="text-[10px] print:text-[9px] text-gray-500 italic">NIP. ..........................</p>
+            </div>
           </div>
-          <div className="print:break-inside-avoid">
-            <p className="mb-20 print:mb-16 text-[11px] print:text-[10px]">
-              {formData.kabupaten || 'Bondowoso'}, {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(formData.tanggalTtd))}
-              <br/>
-              Guru Mata Pelajaran
-            </p>
-            <p className="font-bold underline uppercase text-[11px] print:text-[10px]">{formData.namaGuru || '..........................'}</p>
-            <p className="text-[10px] print:text-[9px] text-gray-500 italic">NIP. ..........................</p>
-          </div>
-        </div>
+        )}
       </div>
     </motion.div>
   );
@@ -1407,606 +1409,6 @@ const App = () => {
           <AnimatePresence>
             {isGenerated && !isGenerating && (
               <>
-                {selectedDocs.includes('CP') && (
-                  <PageContainer key="CP" id="CP" title="CAPAIAN PEMBELAJARAN (CP)">
-                    <div className="space-y-8 text-justify">
-                      <div>
-                        <h4 className="font-bold text-indigo-900 mb-2 border-b-2 border-indigo-100 pb-1">I. RASIONALISASI</h4>
-                        <p>Mata pelajaran {formData.mapel || '[Mapel]'} merupakan pilar penting dalam membentuk kompetensi abad-21 bagi peserta didik pada {formData.fase}. Kurikulum <strong>{formData.kurikulum}</strong> menekankan pada penguasaan konsep esensial yang memungkinkan siswa untuk mengeksplorasi {formData.mapel} secara mendalam, kritis, dan reflektif. {formData.kurikulum === 'Deep Learning' ? 'Siswa didorong untuk melampaui sekadar hafalan dan mencapai pemahaman tingkat tinggi melalui penyelidikan terarah.' : ''}</p>
-                      </div>
-
-                      <div>
-                        <h4 className="font-bold text-indigo-900 mb-3 border-b-2 border-indigo-100 pb-1 uppercase">II. Capaian Per Materi Pokok</h4>
-                        <div className="space-y-4">
-                          {materiList.map((m, i) => (
-                            <div key={i} className="p-4 border rounded-lg bg-gray-50">
-                              <div className="mb-2">
-                                <span className="font-bold text-indigo-700 underline">Elemen:</span>
-                                {m.elemenCp && m.elemenCp.length > 0 ? (
-                                  <div className="flex flex-col ml-1">
-                                    {m.elemenCp.map((e, ei) => (
-                                      <span key={ei} className="font-bold text-indigo-700 uppercase leading-tight">- {e}</span>
-                                    ))}
-                                  </div>
-                                ) : (
-                                  <span className="font-bold text-indigo-700 uppercase ml-1">{m.judul || 'Materi Pokok'}</span>
-                                )}
-                              </div>
-                              <p className="text-sm mb-3">Pada akhir {formData.fase}, peserta didik mampu mendeskripsikan, menganalisis, serta mengevaluasi konsep-konsep yang berkaitan dengan <strong>{m.judul}</strong>. Peserta didik dapat mengintegrasikan pengetahuan tersebut untuk memecahkan masalah kontekstual dalam kehidupan masyarakat serta mampu mengomunikasikan ide secara terstruktur dan ilmiah.</p>
-                              
-                              <div className="mt-2 pt-2 border-t border-gray-200">
-                                <p className="text-[10px] font-black text-gray-400 uppercase mb-1">Rincian Sub-Kompetensi:</p>
-                                <div className="flex flex-wrap gap-2">
-                                  {m.subMateri.map((sub, sIdx) => (
-                                    <div key={sIdx} className="bg-white border rounded px-2 py-1 flex items-center gap-2 shadow-sm text-[10px]">
-                                      <span className="text-gray-600 italic">{sub.judul || '...'}</span>
-                                      {sub.praktik && <span className="text-[7px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase">Praktik</span>}
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </PageContainer>
-                )}
-
-                {selectedDocs.includes('TP') && (
-                  <PageContainer key="TP" id="TP" title="TUJUAN PEMBELAJARAN (TP)">
-                    <div className="space-y-8">
-                      <p className="font-semibold italic border-l-4 border-indigo-500 pl-4 py-2 bg-indigo-50 text-indigo-900 uppercase text-xs">Penjabaran Indikator Kompetensi ({formData.kurikulum})</p>
-                      
-                      {materiList.map((m, i) => (
-                        <div key={i} className="border border-slate-200 rounded-xl overflow-hidden">
-                          <div className="bg-slate-800 text-white px-4 py-2 font-bold text-sm flex justify-between">
-                            <span>UNIT 0{i+1}: {m.judul || '...'}</span>
-                            <span className="text-[10px] opacity-70">Fase {formData.fase.split(' ')[1]}</span>
-                          </div>
-                          <div className="p-4 space-y-3">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
-                              <div className="p-2 border rounded-md bg-green-50">
-                                <p className="font-black text-green-700 uppercase mb-1">Kognitif</p>
-                                <p>Mampu menganalisis struktur dan konsep dasar {m.judul}.</p>
-                              </div>
-                              <div className="p-2 border rounded-md bg-blue-50">
-                                <p className="font-black text-blue-700 uppercase mb-1">Psikomotor</p>
-                                <p>Terampil menyajikan data hasil eksperimen terkait {m.judul}.</p>
-                              </div>
-                              <div className="p-2 border rounded-md bg-amber-50">
-                                <p className="font-black text-amber-700 uppercase mb-1">Afektif</p>
-                                <p>Menunjukkan sikap gotong royong dan berpikir kritis.</p>
-                              </div>
-                            </div>
-                            <p className="text-sm font-medium leading-relaxed pt-2">
-                              <strong>Tujuan Akhir:</strong> Melalui serangkaian kegiatan mandiri dan kelompok, peserta didik dapat mengaplikasikan prinsip {m.judul} untuk menciptakan solusi nyata yang berdaya guna bagi lingkungan sekitar.
-                            </p>
-                            
-                            <div className="mt-2 pt-2 border-t border-slate-100">
-                              <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Alur Pencapaian Kompetensi:</p>
-                              <div className="space-y-1">
-                                {m.subMateri.map((sub, sIdx) => (
-                                  <div key={sIdx} className="flex items-center gap-2 text-[11px]">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
-                                    <span className="text-slate-700">{sub.judul || '...'}</span>
-                                    {sub.praktik && (
-                                      <span className="text-[8px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 uppercase flex items-center gap-1">
-                                        <CheckCircle2 size={8} /> Sesi Praktik
-                                      </span>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </PageContainer>
-                )}
-
-                {selectedDocs.includes('ATP') && (
-                  <PageContainer key="ATP" id="ATP" title="ALUR TUJUAN PEMBELAJARAN (ATP)">
-                     <div className="space-y-6">
-                      <table className="w-full border-collapse border-2 border-slate-800 text-[11px]">
-                        <thead className="bg-slate-800 text-white uppercase">
-                          <tr>
-                            <th className="border border-slate-600 p-2 w-12 text-center">No</th>
-                            <th className="border border-slate-600 p-2 text-left">Alur Tujuan Pembelajaran (ATP)</th>
-                            <th className="border border-slate-600 p-2 w-20 text-center">Estimasi JP</th>
-                            <th className="border border-slate-600 p-2 text-left">Profil Pelajar Pancasila</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {materiList.map((m, i) => (
-                            <tr key={i}>
-                              <td className="border border-slate-300 p-3 text-center font-bold">{i+1}</td>
-                              <td className="border border-slate-300 p-3 leading-relaxed">
-                                <strong>Materi: {m.judul}</strong><br/>
-                                <div className="mt-1 space-y-1">
-                                  {m.subMateri.map((sub, sIdx) => (
-                                    <div key={sIdx} className="flex items-center gap-2">
-                                      <span className="text-slate-400">•</span>
-                                      <span>{sub.judul || '...'}</span>
-                                      {sub.praktik && <span className="text-[7px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase">Praktik</span>}
-                                    </div>
-                                  ))}
-                                </div>
-                                <p className="mt-2 italic opacity-75">Menjelaskan hubungan antara konsep dasar {m.judul} dengan fenomena yang terjadi di masyarakat secara logis.</p>
-                              </td>
-                              <td className="border border-slate-300 p-3 text-center font-bold italic">{m.jp || '4'} JP</td>
-                              <td className="border border-slate-300 p-3 italic">Beriman, Mandiri, Bernalar Kritis, Kreatif.</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                      <div className="bg-indigo-50 p-4 border rounded italic text-xs">
-                        <strong>Catatan:</strong> Urutan materi disusun berdasarkan tingkat kesulitan dari yang paling konkret menuju abstrak untuk memastikan pemahaman berkelanjutan.
-                      </div>
-                    </div>
-                  </PageContainer>
-                )}
-
-                {selectedDocs.includes('MATRIX') && (
-                  <PageContainer key="MATRIX" id="MATRIX" title="MATRIX PEMETAAN CP & TP">
-                    <div className="space-y-6">
-                      <table className="w-full border-collapse border-2 border-slate-800 text-[10px]">
-                        <thead className="bg-slate-800 text-white uppercase font-black">
-                          <tr>
-                            <th className="border border-slate-600 p-2 w-32 text-left">Elemen CP</th>
-                            <th className="border border-slate-600 p-2 text-left">Capaian Pembelajaran (CP)</th>
-                            <th className="border border-slate-600 p-2 text-left">Tujuan Pembelajaran (TP)</th>
-                            <th className="border border-slate-600 p-2 w-16 text-center">Kelas / Smt</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {materiList.map((m, i) => (
-                            <tr key={i}>
-                              <td className="border border-slate-300 p-3 font-bold bg-slate-50 uppercase align-top">
-                                {m.elemenCp && m.elemenCp.length > 0 ? (
-                                  <div className="flex flex-col">
-                                    {m.elemenCp.map((e, ei) => (
-                                      <div key={ei}>{e}</div>
-                                    ))}
-                                  </div>
-                                ) : '...'}
-                              </td>
-                              <td className="border border-slate-300 p-3 italic leading-relaxed align-top">
-                                Peserta didik mampu menganalisis secara kritis, melakukan observasi, serta menjelaskan prinsip-prinsip dasar yang berkaitan dengan {m.judul} dalam konteks kehidupan sehari-hari.
-                              </td>
-                              <td className="border border-slate-300 p-3 font-medium align-top">
-                                <ul className="list-disc pl-4 space-y-1">
-                                  <li>Mendeskripsikan definisi dan ruang lingkup {m.judul}.</li>
-                                  <li>Mengidentifikasi karakteristik utama dari {m.judul}.</li>
-                                  <li>Menganalisis dampak {m.judul} terhadap masyarakat.</li>
-                                </ul>
-                                <div className="mt-2 pt-2 border-t border-slate-100 space-y-1">
-                                  {m.subMateri.map((sub, sIdx) => (
-                                    <div key={sIdx} className="flex items-center gap-1.5 text-[9px]">
-                                      <span className="text-slate-300">↳</span>
-                                      <span className="text-slate-500 uppercase font-black">{sub.judul || '...'}</span>
-                                      {sub.praktik && <span className="text-[7px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase">Praktik</span>}
-                                    </div>
-                                  ))}
-                                </div>
-                              </td>
-                              <td className="border border-slate-300 p-3 text-center font-bold align-top">{formData.kelas} / {formData.semester.join('-')}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                      <div className="bg-amber-50 p-4 border border-amber-200 text-amber-900 italic text-[9px] leading-relaxed">
-                        <strong>Keterangan:</strong> Matrix ini berfungsi untuk memastikan keselarasan (alignment) antara Capaian Pembelajaran yang ditetapkan Pemerintah dengan Tujuan Pembelajaran yang diturunkan secara mandiri oleh satuan pendidikan.
-                      </div>
-                    </div>
-                  </PageContainer>
-                )}
-
-                {selectedDocs.includes('MODUL') && flatSubMateriList.map((sm, i) => {
-                  const jpPerSessi = Number(formData.jpPerPertemuan) || 2;
-                  const totalJp = Number(sm.jp) || 0;
-                  const jmlPertemuan = Math.ceil(totalJp / jpPerSessi);
-
-                  return (
-                    <PageContainer key={`MODUL-${i}`} id={`MODUL-${i}`} title={`MODUL AJAR: ${sm.judul}`}>
-                      <div className="space-y-2 print:space-y-1">
-                        {/* Informasi Umum */}
-                        <div className="grid grid-cols-2 gap-4 text-[10px] font-bold border-b border-indigo-600 pb-1 mb-2 print:mb-1">
-                          <div className="space-y-1">
-                            <p>PENYUSUN: {formData.namaGuru}</p>
-                            <p>SEKOLAH: {formData.namaSekolah}</p>
-                            <p>JENJANG: {formData.kelas}</p>
-                            <p>MATERI: {sm.materiJudul}</p>
-                          </div>
-                          <div className="space-y-1 text-left">
-                            <p>MAPEL: {formData.mapel}</p>
-                            <p>KELAS: {formData.kelas}</p>
-                            <p>TAHUN: {formData.tahunAjaran}</p>
-                            <p>ALOKASI: {sm.jp} JP ({jmlPertemuan} Pertemuan)</p>
-                            <p>METODE: {formData.metode}</p>
-                          </div>
-                        </div>
-
-                        <div className="space-y-2 print:space-y-1">
-                          {/* Panca Cinta - Kemenag Cinta */}
-                          {formData.kurikulum === 'Kurikulum Berbasis Cinta' && (
-                            <div className="p-2 bg-rose-50 border-2 border-rose-200 rounded-lg space-y-1">
-                              <p className="text-[10px] font-black text-rose-700 uppercase flex items-center gap-2">
-                                <Heart size={14} className="fill-rose-700" /> Integrasi Panca Cinta (Cinta):
-                              </p>
-                              <div className="grid grid-cols-5 gap-1">
-                                {[
-                                  { t: 'Cinta Allah & Rasul', c: 'Religiusitas' },
-                                  { t: 'Cinta Orang Tua & Guru', c: 'Adab' },
-                                  { t: 'Cinta Sesama', c: 'Empati' },
-                                  { t: 'Cinta Tanah Air', c: 'Nasionalisme' },
-                                  { t: 'Cinta Ilmu & Tekno', c: 'Literasi' }
-                                ].map((love, lIdx) => (
-                                  <div key={lIdx} className="bg-white p-1.5 rounded border border-rose-100 text-center space-y-1">
-                                    <p className="text-[7px] font-black text-rose-800 leading-tight uppercase">{love.t}</p>
-                                    <div className="h-0.5 bg-rose-200 w-full rounded-full"></div>
-                                    <p className="text-[6px] font-bold text-rose-400 uppercase tracking-tighter">{love.c}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Checklist Pertemuan */}
-                          <div className="flex gap-4 p-2 bg-indigo-50/50 rounded-lg border border-indigo-100">
-                            <span className="text-[9px] font-black text-indigo-400 uppercase self-center">Pertemuan Ke:</span>
-                            <div className="flex gap-3 flex-wrap">
-                              {[...Array(jmlPertemuan || 1)].map((_, pIdx) => (
-                                <div key={pIdx} className="flex items-center gap-1.5">
-                                  <div className="w-4 h-4 border-2 border-indigo-300 rounded flex items-center justify-center">
-                                    <div className="w-2 h-2 bg-indigo-500 rounded-sm opacity-20"></div>
-                                  </div>
-                                  <span className="text-[10px] font-bold text-slate-600">{pIdx + 1}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                          
-                          <div className="space-y-3 print:space-y-2">
-                            <p className="font-bold underline text-[10pt]">1. Pertanyaan Pemantik:</p>
-                            <p className="italic text-slate-600 text-[10pt] leading-tight">"Pernahkah Anda terpikir bagaimana konsep {sm.judul} mempengaruhi kenyamanan hidup kita setiap harinya? Apa yang terjadi jika {sm.judul} tidak ada?"</p>
-                          </div>
-
-                          <div className="space-y-2 border-l-2 border-indigo-200 pl-4">
-                            <p className="font-bold underline text-[10pt] uppercase">2. Rincian Kegiatan Pembelajaran:</p>
-                            <ul className="list-decimal ml-5 space-y-1 text-[10pt] leading-snug">
-                              <li>
-                                <span className="font-bold text-indigo-700 block mb-0.5">Kegiatan Awal (15 Menit):</span>
-                                <div className="space-y-0 pl-2">
-                                  <p>• Salam</p>
-                                  <p>• Do'a sebelum belajar</p>
-                                  <p>• Absensi</p>
-                                  <p>• Motivasi</p>
-                                  <p>• Apersepsi</p>
-                                  <p>• Penyampaian tujuan pembelajaran menggunakan teknik pemetaan pikiran.</p>
-                                </div>
-                              </li>
-                              <li>
-                                <span className="font-bold text-indigo-700 block mb-0.5">Kegiatan Inti (50 Menit):</span>
-                                <div className="space-y-0.5 pl-2">
-                                  {formData.metode === 'Problem Based Learning' ? (
-                                    <>
-                                      <p>• Orientasi peserta didik pada masalah.</p>
-                                      <p>• Mengorganisasikan peserta didik untuk belajar.</p>
-                                      <p>• Membimbing penyelidikan individu maupun kelompok.</p>
-                                      <p>• Mengembangkan dan menyajikan hasil karya.</p>
-                                      <p>• Menganalisis dan mengevaluasi proses pemecahan masalah.</p>
-                                    </>
-                                  ) : formData.metode === 'Project Based Learning' ? (
-                                    <>
-                                      <p>• Pertanyaan mendasar.</p>
-                                      <p>• Mendesain perencanaan produk.</p>
-                                      <p>• Menyusun jadwal pembuatan.</p>
-                                      <p>• Memonitor keaktifan dan perkembangan proyek.</p>
-                                      <p>• Menguji hasil (Presentasi).</p>
-                                      <p>• Evaluasi pengalaman belajar.</p>
-                                    </>
-                                  ) : formData.metode === 'Discovery Learning' ? (
-                                    <>
-                                      <p>• Pemberian rangsangan (Stimulation).</p>
-                                      <p>• Pernyataan/Identifikasi masalah (Problem Statement).</p>
-                                      <p>• Pengumpulan data (Data Collection).</p>
-                                      <p>• Pengolahan data (Data Processing).</p>
-                                      <p>• Pembuktian (Verification).</p>
-                                      <p>• Menarik simpulan/generalisasi (Generalization).</p>
-                                    </>
-                                  ) : formData.metode === 'Inquiry Learning' ? (
-                                    <>
-                                      <p>• Orientasi masalah.</p>
-                                      <p>• Merumuskan masalah.</p>
-                                      <p>• Merumuskan hipotesis.</p>
-                                      <p>• Mengumpulkan data.</p>
-                                      <p>• Menguji hipotesis.</p>
-                                      <p>• Merumuskan kesimpulan.</p>
-                                    </>
-                                  ) : formData.metode === 'Exploration & Deep Thinking' ? (
-                                    <>
-                                      <p>• Mindful Learning: Kesadaran penuh dalam belajar.</p>
-                                      <p>• Mindful Teaching: Pendampingan guru yang bermakna.</p>
-                                      <p>• Joyful Learning: Menciptakan suasana belajar yang menyenangkan.</p>
-                                      <p>• Meaningful Learning: Menemukan makna dari materi yang dipelajari.</p>
-                                    </>
-                                  ) : formData.metode === 'Contextual Teaching and Learning' ? (
-                                    <>
-                                      <p>• Konstruktivisme: Membangun pemahaman.</p>
-                                      <p>• Inkuiri: Proses penemuan.</p>
-                                      <p>• Bertanya: Merangsang rasa ingin tahu.</p>
-                                      <p>• Masyarakat Belajar: Belajar berkelompok.</p>
-                                      <p>• Pemodelan: Contoh nyata.</p>
-                                      <p>• Refleksi & Penilaian Nyata.</p>
-                                    </>
-                                  ) : formData.metode === 'Direct Instruction' ? (
-                                    <>
-                                      <p>• Menyampaikan tujuan dan mempersiapkan siswa.</p>
-                                      <p>• Mendemonstrasikan pengetahuan atau keterampilan.</p>
-                                      <p>• Membimbing pelatihan.</p>
-                                      <p>• Mengecek pemahaman dan memberikan umpan balik.</p>
-                                      <p>• Memberikan kesempatan untuk pelatihan mandiri.</p>
-                                    </>
-                                  ) : (
-                                    <p>• Peserta didik mengeksplorasi materi melalui diskusi terprogram, demonstrasi, atau eksperimen langsung sesuai karakteristik metode {formData.metode}.</p>
-                                  )}
-                                </div>
-                              </li>
-                              {sm.praktik && (
-                                <li className="bg-emerald-50 p-2 rounded border border-emerald-100">
-                                  <span className="font-bold text-emerald-700 block mb-0.5">Sesi Praktik (Ekstensi):</span>
-                                  <p className="pl-2">• Mengadakan sesi praktik langsung terkait {sm.judul} untuk menguji pemahaman dan keterampilan teknis peserta didik di akhir pertemuan.</p>
-                                </li>
-                              )}
-                              <li>
-                                <span className="font-bold text-indigo-700 block mb-0.5">Kegiatan Penutup (15 Menit):</span>
-                                <div className="space-y-0 pl-2">
-                                  <p>• Refleksi bersama antara guru dan peserta didik.</p>
-                                  <p>• Penarikan kesimpulan kunci dari materi yang dipelajari.</p>
-                                  <p>• Pemberian tugas penguatan mandiri atau tindak lanjut.</p>
-                                </div>
-                              </li>
-                            </ul>
-                          </div>
-
-                          <div className="bg-slate-50 p-3 rounded text-[10px] border border-slate-200 italic font-medium">
-                            <p className="font-bold mb-1 not-italic">Media & Sumber Belajar:</p>
-                            <p>{sm.mediaSumberBelajar || 'Buku Paket Siswa, Lingkungan Sekitar, Media Digital (LMS/PMM), dan Instrumen Pengamatan.'}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </PageContainer>
-                  );
-                })}
-
-                {selectedDocs.includes('LKPD') && (
-                  <PageContainer key="LKPD" id="LKPD" title="LEMBAR KERJA PESERTA DIDIK (LKPD)">
-                    <div className="border-4 border-double border-indigo-900 p-4 print:p-2 rounded-lg min-h-[500px]">
-                      <div className="flex justify-between border-b pb-2 mb-4">
-                        <div className="space-y-0.5 font-bold text-[10px]">
-                          <p>Nama Kelompok: .................................</p>
-                          <p>Anggota: ...........................................</p>
-                        </div>
-                        <div className="font-bold text-[10px]">{formData.kelas}</div>
-                      </div>
-
-                      <h3 className="text-center text-lg font-black mb-6 tracking-widest uppercase italic">Eksplorasi Materi: {materiList[0].judul}</h3>
-                      
-                      <div className="space-y-4 text-[11px] print:text-[10px]">
-                        <p className="font-bold">A. Petunjuk Kerja:</p>
-                        <ol className="list-decimal ml-5 space-y-1">
-                          <li>Diskusikan bersama kelompok mengenai kaitan antara {materiList[0].judul} dengan lingkungan sekitar.</li>
-                          <li>Lakukan pengamatan pada objek yang telah disediakan guru.</li>
-                          <li>Isilah tabel pengamatan di bawah ini berdasarkan hasil diskusi.</li>
-                        </ol>
-
-                        <div className="mt-4">
-                          <p className="font-bold mb-1">B. Tabel Pengamatan & Analisis:</p>
-                          <div className="grid grid-cols-3 border-2 border-black">
-                            <div className="border border-black p-2 font-bold bg-slate-100 uppercase text-center text-[9px]">Faktor Pengamatan</div>
-                            <div className="border border-black p-2 font-bold bg-slate-100 uppercase text-center text-[9px]">Data Temuan</div>
-                            <div className="border border-black p-2 font-bold bg-slate-100 uppercase text-center text-[9px]">Analisis Kritis</div>
-                            {[1,2,3].map(n => (
-                              <React.Fragment key={n}>
-                                <div className="border border-black p-4"></div>
-                                <div className="border border-black p-4"></div>
-                                <div className="border border-black p-4"></div>
-                              </React.Fragment>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </PageContainer>
-                  )}
-
-                  {selectedDocs.includes('ASESMEN_FORMATIF') && (
-                  <PageContainer key="ASESMEN_FORMATIF" id="ASESMEN_FORMATIF" title="ASESMEN FORMATIF (SIKAP & PROFIL)">
-                    <div className="space-y-4 print:space-y-2">
-                      <section>
-                        <h4 className="font-bold text-indigo-900 border-b pb-0.5 mb-2 text-xs">A. INSTRUMEN OBSERVASI SIKAP (FORMATIF)</h4>
-                        <p className="text-[9px] italic mb-2">Dilakukan selama proses pembelajaran berlangsung untuk memantau perkembangan karakter dan adab peserta didik.</p>
-                        <table className="w-full border-collapse border border-slate-300 text-[9px]">
-                          <thead>
-                            <tr className="bg-slate-100 uppercase">
-                              <th className="border p-1 w-6">No</th>
-                              <th className="border p-1">Aspek yang Diamati</th>
-                              <th className="border p-1 w-12">Ya</th>
-                              <th className="border p-1 w-12">Tidak</th>
-                              <th className="border p-1">Catatan</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {[
-                              'Menunjukkan rasa ingin tahu terhadap materi',
-                              'Bekerja sama dalam diskusi kelompok',
-                              'Menghargai pendapat teman yang berbeda',
-                              'Menyelesaikan tugas tepat waktu',
-                              'Menggunakan bahasa yang santun'
-                            ].map((item, idx) => (
-                              <tr key={idx}>
-                                <td className="border p-1 text-center">{idx + 1}</td>
-                                <td className="border p-1">{item}</td>
-                                <td className="border p-1"></td>
-                                <td className="border p-1"></td>
-                                <td className="border p-1 text-[8px] italic text-slate-400 text-center">...</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </section>
-
-                      <section>
-                        <h4 className="font-bold text-indigo-900 border-b pb-0.5 mb-2 text-xs">B. RUBRIK PENILAIAN PROFIL PELAJAR</h4>
-                        <table className="w-full border-collapse border border-slate-300 text-[9px]">
-                          <thead>
-                            <tr className="bg-slate-100 uppercase">
-                              <th className="border p-1">Dimensi</th>
-                              <th className="border p-1">Mulai Berkembang</th>
-                              <th className="border p-1">Berkembang</th>
-                              <th className="border p-1">Sangat Berkembang</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td className="border p-1 font-bold uppercase w-1/4">Bernalar Kritis</td>
-                              <td className="border p-1 italic text-[8px]">Perlu bantuan bertanya.</td>
-                              <td className="border p-1 italic text-[8px]">Mampu bertanya dasar.</td>
-                              <td className="border p-1 italic text-[8px]">Mampu analisis logis.</td>
-                            </tr>
-                            <tr>
-                              <td className="border p-1 font-bold uppercase">Gotong Royong</td>
-                              <td className="border p-1 italic text-[8px]">Bekerja sendiri.</td>
-                              <td className="border p-1 italic text-[8px]">Aktif jika diminta.</td>
-                              <td className="border p-1 italic text-[8px]">Inisiatif tanpa diminta.</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </section>
-
-                      {materiList.some(m => m.subMateri.some(s => s.praktik)) && (
-                        <section className="bg-emerald-50 p-4 border border-emerald-200 rounded-lg animate-in fade-in zoom-in duration-500">
-                          <h4 className="font-bold text-emerald-900 border-b border-emerald-200 pb-1 mb-4 flex items-center gap-2 uppercase text-xs">
-                            <CheckCircle2 size={16} className="text-emerald-600" /> C. JURNAL PENILAIAN PRAKTIK / UNJUK KERJA
-                          </h4>
-                          <div className="space-y-4">
-                            {materiList.map((m, mIdx) => (
-                              m.subMateri.some(s => s.praktik) && (
-                                <div key={mIdx}>
-                                  <p className="text-[10px] font-bold text-emerald-700 bg-white px-2 py-0.5 inline-block mb-1.5 border border-emerald-100 rounded">Materi: {m.judul}</p>
-                                  <table className="w-full border-collapse border border-emerald-200 text-[9px] bg-white">
-                                    <thead>
-                                      <tr className="bg-emerald-100">
-                                        <th className="border border-emerald-200 p-1.5 w-8">No</th>
-                                        <th className="border border-emerald-200 p-1.5 text-left uppercase tracking-tighter">Sub-Materi Praktik</th>
-                                        <th className="border border-emerald-200 p-1.5 text-left uppercase tracking-tighter">Kriteria Ketuntasan Praktis</th>
-                                        <th className="border border-emerald-200 p-1.5 w-16 text-center uppercase tracking-tighter">Keterangan</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {m.subMateri.filter(s => s.praktik).map((sub, sIdx) => (
-                                        <tr key={sIdx}>
-                                          <td className="border border-emerald-200 p-2 text-center text-slate-400 font-mono">{sIdx + 1}</td>
-                                          <td className="border border-emerald-200 p-2 font-bold italic text-slate-800">{sub.judul}</td>
-                                          <td className="border border-emerald-200 p-2 text-slate-500 italic">Peserta didik mampu mendemonstrasikan keterampilan teknis dan prosedur kerja yang benar sesuai rubrik {sub.judul}.</td>
-                                          <td className="border border-emerald-200 p-2 text-center text-[7px] text-slate-400 font-black">TUNTAS / BELUM</td>
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-                                </div>
-                              )
-                            ))}
-                          </div>
-                        </section>
-                      )}
-                    </div>
-                  </PageContainer>
-                )}
-
-                {selectedDocs.includes('ASESMEN_SUMATIF') && (
-                  <PageContainer key="ASESMEN_SUMATIF" id="ASESMEN_SUMATIF" title="ASESMEN SUMATIF (KOGNITIF)">
-                    <div className="space-y-10">
-                      <section>
-                        <h4 className="font-bold text-indigo-900 border-b pb-1 mb-4">INSTRUMEN TES TERTULIS (SUMATIF MATERI)</h4>
-                        <div className="space-y-6">
-                          {materiList.map((m, i) => (
-                            <div key={i} className="pl-4">
-                              <p className="font-bold mb-2">{i+1}. Analisislah peran materi <strong>{m.judul}</strong> dalam konteks {formData.kurikulum}. Mengapa pemahaman ini menjadi prasyarat penting dalam penguasaan {formData.mapel}?</p>
-                              <div className="grid grid-cols-1 gap-1 text-xs opacity-80">
-                                <p>A. Jawaban pengecoh yang logis dan berhubungan</p>
-                                <p>B. Jawaban yang menunjukkan pemahaman parsial</p>
-                                <p>C. Jawaban yang paling komprehensif dan tepat</p>
-                                <p>D. Jawaban yang kurang relevan dengan materi</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </section>
-
-                      <div className="bg-slate-50 p-4 border-2 border-dashed border-slate-300 rounded-lg">
-                        <p className="text-center font-bold text-slate-400 uppercase tracking-widest text-[10px]">Lembar Kunci Jawaban & Bobot Nilai</p>
-                      </div>
-                    </div>
-                  </PageContainer>
-                )}
-
-                {selectedDocs.includes('KKTP') && (
-                  <PageContainer key="KKTP" id="KKTP" title="KRITERIA KETERCAPAIAN TUJUAN PEMBELAJARAN (KKTP)">
-                    <div className="space-y-8">
-                      <p className="text-justify bg-amber-50 p-4 border-l-4 border-amber-400 text-xs italic">
-                        KKTP ini disusun menggunakan pendekatan interval nilai untuk menentukan ketuntasan pemahaman peserta didik terhadap materi <strong>{formData.mapel}</strong> pada {formData.fase}.
-                      </p>
-
-                      {materiList.map((m, i) => (
-                        <div key={i} className="space-y-4">
-                          <h4 className="font-bold text-sm bg-slate-100 p-2 border rounded uppercase">Materi {i+1}: {m.judul}</h4>
-                          <table className="w-full border-collapse border border-slate-300 text-[11px]">
-                            <thead className="bg-slate-800 text-white uppercase">
-                              <tr>
-                                <th className="border p-2">Kriteria Ketuntasan</th>
-                                <th className="border p-2">0 - 64 (Perlu Bimbingan)</th>
-                                <th className="border p-2">65 - 75 (Cukup)</th>
-                                <th className="border p-2">76 - 85 (Baik)</th>
-                                <th className="border p-2">86 - 100 (Sangat Baik)</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <td className="border p-2 font-bold">Pemahaman Konsep {m.judul}</td>
-                                <td className="border p-2 text-center italic opacity-60">Belum mampu menjelaskan</td>
-                                <td className="border p-2 text-center font-medium bg-amber-50">Mampu menjelaskan secara parsial</td>
-                                <td className="border p-2 text-center font-medium bg-green-50 text-green-700">Mampu menjelaskan dengan detail</td>
-                                <td className="border p-2 text-center font-medium bg-indigo-50 text-indigo-700">Mampu menganalisis & mengaitkan</td>
-                              </tr>
-                              <tr>
-                                <td className="border p-2 font-bold">Aplikasi Praktis {m.judul}</td>
-                                <td className="border p-2 text-center italic opacity-60">Tidak dapat menerapkan</td>
-                                <td className="border p-2 text-center font-medium bg-amber-50">Menerapkan dengan bantuan</td>
-                                <td className="border p-2 text-center font-medium bg-green-50 text-green-700">Menerapkan secara mandiri</td>
-                                <td className="border p-2 text-center font-medium bg-indigo-50 text-indigo-700">Menciptakan solusi inovatif</td>
-                              </tr>
-                              {m.subMateri.filter(s => s.praktik).map((sub, sIdx) => (
-                                <tr key={`kktp-praktik-${sIdx}`} className="bg-emerald-50/30">
-                                  <td className="border p-2 font-bold flex items-center gap-1.5 uppercase text-[9px] text-emerald-800">
-                                    <CheckCircle2 size={10} /> {sub.judul} (Unjuk Kerja)
-                                  </td>
-                                  <td className="border p-2 text-center italic opacity-60">Prosedur langkah salah</td>
-                                  <td className="border p-2 text-center font-medium italic">Langkah benar tapi kurang rapih</td>
-                                  <td className="border p-2 text-center font-medium italic text-emerald-700">Langkah benar dan hasil akurat</td>
-                                  <td className="border p-2 text-center font-medium italic text-indigo-700 font-bold">Hasil presisi & teknik excelent</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      ))}
-                    </div>
-                  </PageContainer>
-                )}
-
                 {selectedDocs.includes('PEKAN') && (
                   <PageContainer key="PEKAN" id="PEKAN" title="ANALISIS PEKAN EFEKTIF">
                     <div className="space-y-8">
@@ -2421,6 +1823,610 @@ const App = () => {
                     </div>
                   </PageContainer>
                 )}
+
+                {selectedDocs.includes('CP') && (
+                  <PageContainer key="CP" id="CP" title="CAPAIAN PEMBELAJARAN (CP)">
+                    <div className="space-y-8 text-justify">
+                      <div>
+                        <h4 className="font-bold text-indigo-900 mb-2 border-b-2 border-indigo-100 pb-1">I. RASIONALISASI</h4>
+                        <p>Mata pelajaran {formData.mapel || '[Mapel]'} merupakan pilar penting dalam membentuk kompetensi abad-21 bagi peserta didik pada {formData.fase}. Kurikulum <strong>{formData.kurikulum}</strong> menekankan pada penguasaan konsep esensial yang memungkinkan siswa untuk mengeksplorasi {formData.mapel} secara mendalam, kritis, dan reflektif. {formData.kurikulum === 'Deep Learning' ? 'Siswa didorong untuk melampaui sekadar hafalan dan mencapai pemahaman tingkat tinggi melalui penyelidikan terarah.' : ''}</p>
+                      </div>
+
+                      <div>
+                        <h4 className="font-bold text-indigo-900 mb-3 border-b-2 border-indigo-100 pb-1 uppercase">II. Capaian Per Materi Pokok</h4>
+                        <div className="space-y-4">
+                          {materiList.map((m, i) => (
+                            <div key={i} className="p-4 border rounded-lg bg-gray-50">
+                              <div className="mb-2">
+                                <span className="font-bold text-indigo-700 underline">Elemen:</span>
+                                {m.elemenCp && m.elemenCp.length > 0 ? (
+                                  <div className="flex flex-col ml-1">
+                                    {m.elemenCp.map((e, ei) => (
+                                      <span key={ei} className="font-bold text-indigo-700 uppercase leading-tight">- {e}</span>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <span className="font-bold text-indigo-700 uppercase ml-1">{m.judul || 'Materi Pokok'}</span>
+                                )}
+                              </div>
+                              <p className="text-sm mb-3">Pada akhir {formData.fase}, peserta didik mampu mendeskripsikan, menganalisis, serta mengevaluasi konsep-konsep yang berkaitan dengan <strong>{m.judul}</strong>. Peserta didik dapat mengintegrasikan pengetahuan tersebut untuk memecahkan masalah kontekstual dalam kehidupan masyarakat serta mampu mengomunikasikan ide secara terstruktur dan ilmiah.</p>
+                              
+                              <div className="mt-2 pt-2 border-t border-gray-200">
+                                <p className="text-[10px] font-black text-gray-400 uppercase mb-1">Rincian Sub-Kompetensi:</p>
+                                <div className="flex flex-wrap gap-2">
+                                  {m.subMateri.map((sub, sIdx) => (
+                                    <div key={sIdx} className="bg-white border rounded px-2 py-1 flex items-center gap-2 shadow-sm text-[10px]">
+                                      <span className="text-gray-600 italic">{sub.judul || '...'}</span>
+                                      {sub.praktik && <span className="text-[7px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase">Praktik</span>}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </PageContainer>
+                )}
+
+                {selectedDocs.includes('TP') && (
+                  <PageContainer key="TP" id="TP" title="TUJUAN PEMBELAJARAN (TP)">
+                    <div className="space-y-8">
+                      <p className="font-semibold italic border-l-4 border-indigo-500 pl-4 py-2 bg-indigo-50 text-indigo-900 uppercase text-xs">Penjabaran Indikator Kompetensi ({formData.kurikulum})</p>
+                      
+                      {materiList.map((m, i) => (
+                        <div key={i} className="border border-slate-200 rounded-xl overflow-hidden">
+                          <div className="bg-slate-800 text-white px-4 py-2 font-bold text-sm flex justify-between">
+                            <span>UNIT 0{i+1}: {m.judul || '...'}</span>
+                            <span className="text-[10px] opacity-70">Fase {formData.fase.split(' ')[1]}</span>
+                          </div>
+                          <div className="p-4 space-y-3">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
+                              <div className="p-2 border rounded-md bg-green-50">
+                                <p className="font-black text-green-700 uppercase mb-1">Kognitif</p>
+                                <p>Mampu menganalisis struktur dan konsep dasar {m.judul}.</p>
+                              </div>
+                              <div className="p-2 border rounded-md bg-blue-50">
+                                <p className="font-black text-blue-700 uppercase mb-1">Psikomotor</p>
+                                <p>Terampil menyajikan data hasil eksperimen terkait {m.judul}.</p>
+                              </div>
+                              <div className="p-2 border rounded-md bg-amber-50">
+                                <p className="font-black text-amber-700 uppercase mb-1">Afektif</p>
+                                <p>Menunjukkan sikap gotong royong dan berpikir kritis.</p>
+                              </div>
+                            </div>
+                            <p className="text-sm font-medium leading-relaxed pt-2">
+                              <strong>Tujuan Akhir:</strong> Melalui serangkaian kegiatan mandiri dan kelompok, peserta didik dapat mengaplikasikan prinsip {m.judul} untuk menciptakan solusi nyata yang berdaya guna bagi lingkungan sekitar.
+                            </p>
+                            
+                            <div className="mt-2 pt-2 border-t border-slate-100">
+                              <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Alur Pencapaian Kompetensi:</p>
+                              <div className="space-y-1">
+                                {m.subMateri.map((sub, sIdx) => (
+                                  <div key={sIdx} className="flex items-center gap-2 text-[11px]">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
+                                    <span className="text-slate-700">{sub.judul || '...'}</span>
+                                    {sub.praktik && (
+                                      <span className="text-[8px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 uppercase flex items-center gap-1">
+                                        <CheckCircle2 size={8} /> Sesi Praktik
+                                      </span>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </PageContainer>
+                )}
+
+                {selectedDocs.includes('ATP') && (
+                  <PageContainer key="ATP" id="ATP" title="ALUR TUJUAN PEMBELAJARAN (ATP)">
+                     <div className="space-y-6">
+                      <table className="w-full border-collapse border-2 border-slate-800 text-[11px]">
+                        <thead className="bg-slate-800 text-white uppercase">
+                          <tr>
+                            <th className="border border-slate-600 p-2 w-12 text-center">No</th>
+                            <th className="border border-slate-600 p-2 text-left">Alur Tujuan Pembelajaran (ATP)</th>
+                            <th className="border border-slate-600 p-2 w-20 text-center">Estimasi JP</th>
+                            <th className="border border-slate-600 p-2 text-left">Profil Pelajar Pancasila</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {materiList.map((m, i) => (
+                            <tr key={i}>
+                              <td className="border border-slate-300 p-3 text-center font-bold">{i+1}</td>
+                              <td className="border border-slate-300 p-3 leading-relaxed">
+                                <strong>Materi: {m.judul}</strong><br/>
+                                <div className="mt-1 space-y-1">
+                                  {m.subMateri.map((sub, sIdx) => (
+                                    <div key={sIdx} className="flex items-center gap-2">
+                                      <span className="text-slate-400">•</span>
+                                      <span>{sub.judul || '...'}</span>
+                                      {sub.praktik && <span className="text-[7px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase">Praktik</span>}
+                                    </div>
+                                  ))}
+                                </div>
+                                <p className="mt-2 italic opacity-75">Menjelaskan hubungan antara konsep dasar {m.judul} dengan fenomena yang terjadi di masyarakat secara logis.</p>
+                              </td>
+                              <td className="border border-slate-300 p-3 text-center font-bold italic">{m.jp || '4'} JP</td>
+                              <td className="border border-slate-300 p-3 italic">Beriman, Mandiri, Bernalar Kritis, Kreatif.</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <div className="bg-indigo-50 p-4 border rounded italic text-xs">
+                        <strong>Catatan:</strong> Urutan materi disusun berdasarkan tingkat kesulitan dari yang paling konkret menuju abstrak untuk memastikan pemahaman berkelanjutan.
+                      </div>
+                    </div>
+                  </PageContainer>
+                )}
+
+                {selectedDocs.includes('MATRIX') && (
+                  <PageContainer key="MATRIX" id="MATRIX" title="MATRIX PEMETAAN CP & TP">
+                    <div className="space-y-6">
+                      <table className="w-full border-collapse border-2 border-slate-800 text-[10px]">
+                        <thead className="bg-slate-800 text-white uppercase font-black">
+                          <tr>
+                            <th className="border border-slate-600 p-2 w-32 text-left">Elemen CP</th>
+                            <th className="border border-slate-600 p-2 text-left">Capaian Pembelajaran (CP)</th>
+                            <th className="border border-slate-600 p-2 text-left">Tujuan Pembelajaran (TP)</th>
+                            <th className="border border-slate-600 p-2 w-16 text-center">Kelas / Smt</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {materiList.map((m, i) => (
+                            <tr key={i}>
+                              <td className="border border-slate-300 p-3 font-bold bg-slate-50 uppercase align-top">
+                                {m.elemenCp && m.elemenCp.length > 0 ? (
+                                  <div className="flex flex-col">
+                                    {m.elemenCp.map((e, ei) => (
+                                      <div key={ei}>{e}</div>
+                                    ))}
+                                  </div>
+                                ) : '...'}
+                              </td>
+                              <td className="border border-slate-300 p-3 italic leading-relaxed align-top">
+                                Peserta didik mampu menganalisis secara kritis, melakukan observasi, serta menjelaskan prinsip-prinsip dasar yang berkaitan dengan {m.judul} dalam konteks kehidupan sehari-hari.
+                              </td>
+                              <td className="border border-slate-300 p-3 font-medium align-top">
+                                <ul className="list-disc pl-4 space-y-1">
+                                  <li>Mendeskripsikan definisi dan ruang lingkup {m.judul}.</li>
+                                  <li>Mengidentifikasi karakteristik utama dari {m.judul}.</li>
+                                  <li>Menganalisis dampak {m.judul} terhadap masyarakat.</li>
+                                </ul>
+                                <div className="mt-2 pt-2 border-t border-slate-100 space-y-1">
+                                  {m.subMateri.map((sub, sIdx) => (
+                                    <div key={sIdx} className="flex items-center gap-1.5 text-[9px]">
+                                      <span className="text-slate-300">↳</span>
+                                      <span className="text-slate-500 uppercase font-black">{sub.judul || '...'}</span>
+                                      {sub.praktik && <span className="text-[7px] font-black text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 uppercase">Praktik</span>}
+                                    </div>
+                                  ))}
+                                </div>
+                              </td>
+                              <td className="border border-slate-300 p-3 text-center font-bold align-top">{formData.kelas} / {formData.semester.join('-')}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <div className="bg-amber-50 p-4 border border-amber-200 text-amber-900 italic text-[9px] leading-relaxed">
+                        <strong>Keterangan:</strong> Matrix ini berfungsi untuk memastikan keselarasan (alignment) antara Capaian Pembelajaran yang ditetapkan Pemerintah dengan Tujuan Pembelajaran yang diturunkan secara mandiri oleh satuan pendidikan.
+                      </div>
+                    </div>
+                  </PageContainer>
+                )}
+
+                {selectedDocs.includes('MODUL') && flatSubMateriList.map((sm, i) => {
+                  const jpPerSessi = Number(formData.jpPerPertemuan) || 2;
+                  const totalJp = Number(sm.jp) || 0;
+                  const jmlPertemuan = Math.ceil(totalJp / jpPerSessi);
+
+                  return (
+                    <PageContainer key={`MODUL-${i}`} id={`MODUL-${i}`} title={`MODUL AJAR: ${sm.judul}`} hideSignature={true}>
+                      <div className="space-y-2 print:space-y-1">
+                        {/* Informasi Umum */}
+                        <div className="grid grid-cols-2 gap-4 text-[10px] font-bold border-b border-indigo-600 pb-1 mb-2 print:mb-1">
+                          <div className="space-y-1">
+                            <p>PENYUSUN: {formData.namaGuru}</p>
+                            <p>SEKOLAH: {formData.namaSekolah}</p>
+                            <p>JENJANG: {formData.kelas}</p>
+                            <p>MATERI: {sm.materiJudul}</p>
+                          </div>
+                          <div className="space-y-1 text-left">
+                            <p>MAPEL: {formData.mapel}</p>
+                            <p>KELAS: {formData.kelas}</p>
+                            <p>TAHUN: {formData.tahunAjaran}</p>
+                            <p>ALOKASI: {sm.jp} JP ({jmlPertemuan} Pertemuan)</p>
+                            <p>METODE: {formData.metode}</p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2 print:space-y-1">
+                          {/* Panca Cinta - Kemenag Cinta */}
+                          {formData.kurikulum === 'Kurikulum Berbasis Cinta' && (
+                            <div className="p-2 bg-rose-50 border-2 border-rose-200 rounded-lg space-y-1">
+                              <p className="text-[10px] font-black text-rose-700 uppercase flex items-center gap-2">
+                                <Heart size={14} className="fill-rose-700" /> Integrasi Panca Cinta (Cinta):
+                              </p>
+                              <div className="grid grid-cols-5 gap-1">
+                                {[
+                                  { t: 'Cinta Allah & Rasul', c: 'Religiusitas' },
+                                  { t: 'Cinta Orang Tua & Guru', c: 'Adab' },
+                                  { t: 'Cinta Sesama', c: 'Empati' },
+                                  { t: 'Cinta Tanah Air', c: 'Nasionalisme' },
+                                  { t: 'Cinta Ilmu & Tekno', c: 'Literasi' }
+                                ].map((love, lIdx) => (
+                                  <div key={lIdx} className="bg-white p-1.5 rounded border border-rose-100 text-center space-y-1">
+                                    <p className="text-[7px] font-black text-rose-800 leading-tight uppercase">{love.t}</p>
+                                    <div className="h-0.5 bg-rose-200 w-full rounded-full"></div>
+                                    <p className="text-[6px] font-bold text-rose-400 uppercase tracking-tighter">{love.c}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Checklist Pertemuan */}
+                          <div className="flex gap-4 p-2 bg-indigo-50/50 rounded-lg border border-indigo-100">
+                            <span className="text-[9px] font-black text-indigo-400 uppercase self-center">Pertemuan Ke:</span>
+                            <div className="flex gap-3 flex-wrap">
+                              {[...Array(jmlPertemuan || 1)].map((_, pIdx) => (
+                                <div key={pIdx} className="flex items-center gap-1.5">
+                                  <div className="w-4 h-4 border-2 border-indigo-300 rounded flex items-center justify-center">
+                                    <div className="w-2 h-2 bg-indigo-500 rounded-sm opacity-20"></div>
+                                  </div>
+                                  <span className="text-[10px] font-bold text-slate-600">{pIdx + 1}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-3 print:space-y-2">
+                            <p className="font-bold underline text-[10pt]">1. Pertanyaan Pemantik:</p>
+                            <p className="italic text-slate-600 text-[10pt] leading-tight">"Pernahkah Anda terpikir bagaimana konsep {sm.judul} mempengaruhi kenyamanan hidup kita setiap harinya? Apa yang terjadi jika {sm.judul} tidak ada?"</p>
+                          </div>
+
+                          <div className="space-y-2 border-l-2 border-indigo-200 pl-4">
+                            <p className="font-bold underline text-[10pt] uppercase">2. Rincian Kegiatan Pembelajaran:</p>
+                            <ul className="list-decimal ml-5 space-y-1 text-[10pt] leading-snug">
+                              <li>
+                                <span className="font-bold text-indigo-700 block mb-0.5">Kegiatan Awal (15 Menit):</span>
+                                <div className="space-y-0 pl-2">
+                                  <p>• Salam</p>
+                                  <p>• Do'a sebelum belajar</p>
+                                  <p>• Absensi</p>
+                                  <p>• Motivasi</p>
+                                  <p>• Apersepsi</p>
+                                  <p>• Penyampaian tujuan pembelajaran menggunakan teknik pemetaan pikiran.</p>
+                                </div>
+                              </li>
+                              <li>
+                                <span className="font-bold text-indigo-700 block mb-0.5">Kegiatan Inti (50 Menit):</span>
+                                <div className="space-y-0.5 pl-2">
+                                  {formData.metode === 'Problem Based Learning' ? (
+                                    <>
+                                      <p>• Orientasi peserta didik pada masalah.</p>
+                                      <p>• Mengorganisasikan peserta didik untuk belajar.</p>
+                                      <p>• Membimbing penyelidikan individu maupun kelompok.</p>
+                                      <p>• Mengembangkan dan menyajikan hasil karya.</p>
+                                      <p>• Menganalisis dan mengevaluasi proses pemecahan masalah.</p>
+                                    </>
+                                  ) : formData.metode === 'Project Based Learning' ? (
+                                    <>
+                                      <p>• Pertanyaan mendasar.</p>
+                                      <p>• Mendesain perencanaan produk.</p>
+                                      <p>• Menyusun jadwal pembuatan.</p>
+                                      <p>• Memonitor keaktifan dan perkembangan proyek.</p>
+                                      <p>• Menguji hasil (Presentasi).</p>
+                                      <p>• Evaluasi pengalaman belajar.</p>
+                                    </>
+                                  ) : formData.metode === 'Discovery Learning' ? (
+                                    <>
+                                      <p>• Pemberian rangsangan (Stimulation).</p>
+                                      <p>• Pernyataan/Identifikasi masalah (Problem Statement).</p>
+                                      <p>• Pengumpulan data (Data Collection).</p>
+                                      <p>• Pengolahan data (Data Processing).</p>
+                                      <p>• Pembuktian (Verification).</p>
+                                      <p>• Menarik simpulan/generalisasi (Generalization).</p>
+                                    </>
+                                  ) : formData.metode === 'Inquiry Learning' ? (
+                                    <>
+                                      <p>• Orientasi masalah.</p>
+                                      <p>• Merumuskan masalah.</p>
+                                      <p>• Merumuskan hipotesis.</p>
+                                      <p>• Mengumpulkan data.</p>
+                                      <p>• Menguji hipotesis.</p>
+                                      <p>• Merumuskan kesimpulan.</p>
+                                    </>
+                                  ) : formData.metode === 'Exploration & Deep Thinking' ? (
+                                    <>
+                                      <p>• Mindful Learning: Kesadaran penuh dalam belajar.</p>
+                                      <p>• Mindful Teaching: Pendampingan guru yang bermakna.</p>
+                                      <p>• Joyful Learning: Menciptakan suasana belajar yang menyenangkan.</p>
+                                      <p>• Meaningful Learning: Menemukan makna dari materi yang dipelajari.</p>
+                                    </>
+                                  ) : formData.metode === 'Contextual Teaching and Learning' ? (
+                                    <>
+                                      <p>• Konstruktivisme: Membangun pemahaman.</p>
+                                      <p>• Inkuiri: Proses penemuan.</p>
+                                      <p>• Bertanya: Merangsang rasa ingin tahu.</p>
+                                      <p>• Masyarakat Belajar: Belajar berkelompok.</p>
+                                      <p>• Pemodelan: Contoh nyata.</p>
+                                      <p>• Refleksi & Penilaian Nyata.</p>
+                                    </>
+                                  ) : formData.metode === 'Direct Instruction' ? (
+                                    <>
+                                      <p>• Menyampaikan tujuan dan mempersiapkan siswa.</p>
+                                      <p>• Mendemonstrasikan pengetahuan atau keterampilan.</p>
+                                      <p>• Membimbing pelatihan.</p>
+                                      <p>• Mengecek pemahaman dan memberikan umpan balik.</p>
+                                      <p>• Memberikan kesempatan untuk pelatihan mandiri.</p>
+                                    </>
+                                  ) : (
+                                    <p>• Peserta didik mengeksplorasi materi melalui diskusi terprogram, demonstrasi, atau eksperimen langsung sesuai karakteristik metode {formData.metode}.</p>
+                                  )}
+                                </div>
+                              </li>
+                              {sm.praktik && (
+                                <li className="bg-emerald-50 p-2 rounded border border-emerald-100">
+                                  <span className="font-bold text-emerald-700 block mb-0.5">Sesi Praktik (Ekstensi):</span>
+                                  <p className="pl-2">• Mengadakan sesi praktik langsung terkait {sm.judul} untuk menguji pemahaman dan keterampilan teknis peserta didik di akhir pertemuan.</p>
+                                </li>
+                              )}
+                              <li>
+                                <span className="font-bold text-indigo-700 block mb-0.5">Kegiatan Penutup (15 Menit):</span>
+                                <div className="space-y-0 pl-2">
+                                  <p>• Refleksi bersama antara guru dan peserta didik.</p>
+                                  <p>• Penarikan kesimpulan kunci dari materi yang dipelajari.</p>
+                                  <p>• Pemberian tugas penguatan mandiri atau tindak lanjut.</p>
+                                </div>
+                              </li>
+                            </ul>
+                          </div>
+
+                          <div className="bg-slate-50 p-3 rounded text-[10px] border border-slate-200 italic font-medium">
+                            <p className="font-bold mb-1 not-italic">Media & Sumber Belajar:</p>
+                            <p>{sm.mediaSumberBelajar || 'Buku Paket Siswa, Lingkungan Sekitar, Media Digital (LMS/PMM), dan Instrumen Pengamatan.'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </PageContainer>
+                  );
+                })}
+
+                {selectedDocs.includes('LKPD') && (
+                  <PageContainer key="LKPD" id="LKPD" title="LEMBAR KERJA PESERTA DIDIK (LKPD)" hideSignature={true}>
+                    <div className="border-4 border-double border-indigo-900 p-4 print:p-2 rounded-lg min-h-[500px]">
+                      <div className="flex justify-between border-b pb-2 mb-4">
+                        <div className="space-y-0.5 font-bold text-[10px]">
+                          <p>Nama Kelompok: .................................</p>
+                          <p>Anggota: ...........................................</p>
+                        </div>
+                        <div className="font-bold text-[10px]">{formData.kelas}</div>
+                      </div>
+
+                      <h3 className="text-center text-lg font-black mb-6 tracking-widest uppercase italic">Eksplorasi Materi: {materiList[0].judul}</h3>
+                      
+                      <div className="space-y-4 text-[11px] print:text-[10px]">
+                        <p className="font-bold">A. Petunjuk Kerja:</p>
+                        <ol className="list-decimal ml-5 space-y-1">
+                          <li>Diskusikan bersama kelompok mengenai kaitan antara {materiList[0].judul} dengan lingkungan sekitar.</li>
+                          <li>Lakukan pengamatan pada objek yang telah disediakan guru.</li>
+                          <li>Isilah tabel pengamatan di bawah ini berdasarkan hasil diskusi.</li>
+                        </ol>
+
+                        <div className="mt-4">
+                          <p className="font-bold mb-1">B. Tabel Pengamatan & Analisis:</p>
+                          <div className="grid grid-cols-3 border-2 border-black">
+                            <div className="border border-black p-2 font-bold bg-slate-100 uppercase text-center text-[9px]">Faktor Pengamatan</div>
+                            <div className="border border-black p-2 font-bold bg-slate-100 uppercase text-center text-[9px]">Data Temuan</div>
+                            <div className="border border-black p-2 font-bold bg-slate-100 uppercase text-center text-[9px]">Analisis Kritis</div>
+                            {[1,2,3].map(n => (
+                              <React.Fragment key={n}>
+                                <div className="border border-black p-4"></div>
+                                <div className="border border-black p-4"></div>
+                                <div className="border border-black p-4"></div>
+                              </React.Fragment>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </PageContainer>
+                  )}
+
+
+                  {selectedDocs.includes('KKTP') && (
+                  <PageContainer key="KKTP" id="KKTP" title="KRITERIA KETERCAPAIAN TUJUAN PEMBELAJARAN (KKTP)">
+                    <div className="space-y-8">
+                      <p className="text-justify bg-amber-50 p-4 border-l-4 border-amber-400 text-xs italic">
+                        KKTP ini disusun menggunakan pendekatan interval nilai untuk menentukan ketuntasan pemahaman peserta didik terhadap materi <strong>{formData.mapel}</strong> pada {formData.fase}.
+                      </p>
+
+                      {materiList.map((m, i) => (
+                        <div key={i} className="space-y-4">
+                          <h4 className="font-bold text-sm bg-slate-100 p-2 border rounded uppercase">Materi {i+1}: {m.judul}</h4>
+                          <table className="w-full border-collapse border border-slate-300 text-[11px]">
+                            <thead className="bg-slate-800 text-white uppercase">
+                              <tr>
+                                <th className="border p-2">Kriteria Ketuntasan</th>
+                                <th className="border p-2">0 - 64 (Perlu Bimbingan)</th>
+                                <th className="border p-2">65 - 75 (Cukup)</th>
+                                <th className="border p-2">76 - 85 (Baik)</th>
+                                <th className="border p-2">86 - 100 (Sangat Baik)</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td className="border p-2 font-bold">Pemahaman Konsep {m.judul}</td>
+                                <td className="border p-2 text-center italic opacity-60">Belum mampu menjelaskan</td>
+                                <td className="border p-2 text-center font-medium bg-amber-50">Mampu menjelaskan secara parsial</td>
+                                <td className="border p-2 text-center font-medium bg-green-50 text-green-700">Mampu menjelaskan dengan detail</td>
+                                <td className="border p-2 text-center font-medium bg-indigo-50 text-indigo-700">Mampu menganalisis & mengaitkan</td>
+                              </tr>
+                              <tr>
+                                <td className="border p-2 font-bold">Aplikasi Praktis {m.judul}</td>
+                                <td className="border p-2 text-center italic opacity-60">Tidak dapat menerapkan</td>
+                                <td className="border p-2 text-center font-medium bg-amber-50">Menerapkan dengan bantuan</td>
+                                <td className="border p-2 text-center font-medium bg-green-50 text-green-700">Menerapkan secara mandiri</td>
+                                <td className="border p-2 text-center font-medium bg-indigo-50 text-indigo-700">Menciptakan solusi inovatif</td>
+                              </tr>
+                              {m.subMateri.filter(s => s.praktik).map((sub, sIdx) => (
+                                <tr key={`kktp-praktik-${sIdx}`} className="bg-emerald-50/30">
+                                  <td className="border p-2 font-bold flex items-center gap-1.5 uppercase text-[9px] text-emerald-800">
+                                    <CheckCircle2 size={10} /> {sub.judul} (Unjuk Kerja)
+                                  </td>
+                                  <td className="border p-2 text-center italic opacity-60">Prosedur langkah salah</td>
+                                  <td className="border p-2 text-center font-medium italic">Langkah benar tapi kurang rapih</td>
+                                  <td className="border p-2 text-center font-medium italic text-emerald-700">Langkah benar dan hasil akurat</td>
+                                  <td className="border p-2 text-center font-medium italic text-indigo-700 font-bold">Hasil presisi & teknik excelent</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ))}
+                    </div>
+                  </PageContainer>
+                )}
+
+                  {selectedDocs.includes('ASESMEN_FORMATIF') && (
+                  <PageContainer key="ASESMEN_FORMATIF" id="ASESMEN_FORMATIF" title="ASESMEN FORMATIF (SIKAP & PROFIL)" hideSignature={true}>
+                    <div className="space-y-4 print:space-y-2">
+                      <section>
+                        <h4 className="font-bold text-indigo-900 border-b pb-0.5 mb-2 text-xs">A. INSTRUMEN OBSERVASI SIKAP (FORMATIF)</h4>
+                        <p className="text-[9px] italic mb-2">Dilakukan selama proses pembelajaran berlangsung untuk memantau perkembangan karakter dan adab peserta didik.</p>
+                        <table className="w-full border-collapse border border-slate-300 text-[9px]">
+                          <thead>
+                            <tr className="bg-slate-100 uppercase">
+                              <th className="border p-1 w-6">No</th>
+                              <th className="border p-1">Aspek yang Diamati</th>
+                              <th className="border p-1 w-12">Ya</th>
+                              <th className="border p-1 w-12">Tidak</th>
+                              <th className="border p-1">Catatan</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {[
+                              'Menunjukkan rasa ingin tahu terhadap materi',
+                              'Bekerja sama dalam diskusi kelompok',
+                              'Menghargai pendapat teman yang berbeda',
+                              'Menyelesaikan tugas tepat waktu',
+                              'Menggunakan bahasa yang santun'
+                            ].map((item, idx) => (
+                              <tr key={idx}>
+                                <td className="border p-1 text-center">{idx + 1}</td>
+                                <td className="border p-1">{item}</td>
+                                <td className="border p-1"></td>
+                                <td className="border p-1"></td>
+                                <td className="border p-1 text-[8px] italic text-slate-400 text-center">...</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </section>
+
+                      <section>
+                        <h4 className="font-bold text-indigo-900 border-b pb-0.5 mb-2 text-xs">B. RUBRIK PENILAIAN PROFIL PELAJAR</h4>
+                        <table className="w-full border-collapse border border-slate-300 text-[9px]">
+                          <thead>
+                            <tr className="bg-slate-100 uppercase">
+                              <th className="border p-1">Dimensi</th>
+                              <th className="border p-1">Mulai Berkembang</th>
+                              <th className="border p-1">Berkembang</th>
+                              <th className="border p-1">Sangat Berkembang</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td className="border p-1 font-bold uppercase w-1/4">Bernalar Kritis</td>
+                              <td className="border p-1 italic text-[8px]">Perlu bantuan bertanya.</td>
+                              <td className="border p-1 italic text-[8px]">Mampu bertanya dasar.</td>
+                              <td className="border p-1 italic text-[8px]">Mampu analisis logis.</td>
+                            </tr>
+                            <tr>
+                              <td className="border p-1 font-bold uppercase">Gotong Royong</td>
+                              <td className="border p-1 italic text-[8px]">Bekerja sendiri.</td>
+                              <td className="border p-1 italic text-[8px]">Aktif jika diminta.</td>
+                              <td className="border p-1 italic text-[8px]">Inisiatif tanpa diminta.</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </section>
+
+                      {materiList.some(m => m.subMateri.some(s => s.praktik)) && (
+                        <section className="bg-emerald-50 p-4 border border-emerald-200 rounded-lg animate-in fade-in zoom-in duration-500">
+                          <h4 className="font-bold text-emerald-900 border-b border-emerald-200 pb-1 mb-4 flex items-center gap-2 uppercase text-xs">
+                            <CheckCircle2 size={16} className="text-emerald-600" /> C. JURNAL PENILAIAN PRAKTIK / UNJUK KERJA
+                          </h4>
+                          <div className="space-y-4">
+                            {materiList.map((m, mIdx) => (
+                              m.subMateri.some(s => s.praktik) && (
+                                <div key={mIdx}>
+                                  <p className="text-[10px] font-bold text-emerald-700 bg-white px-2 py-0.5 inline-block mb-1.5 border border-emerald-100 rounded">Materi: {m.judul}</p>
+                                  <table className="w-full border-collapse border border-emerald-200 text-[9px] bg-white">
+                                    <thead>
+                                      <tr className="bg-emerald-100">
+                                        <th className="border border-emerald-200 p-1.5 w-8">No</th>
+                                        <th className="border border-emerald-200 p-1.5 text-left uppercase tracking-tighter">Sub-Materi Praktik</th>
+                                        <th className="border border-emerald-200 p-1.5 text-left uppercase tracking-tighter">Kriteria Ketuntasan Praktis</th>
+                                        <th className="border border-emerald-200 p-1.5 w-16 text-center uppercase tracking-tighter">Keterangan</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {m.subMateri.filter(s => s.praktik).map((sub, sIdx) => (
+                                        <tr key={sIdx}>
+                                          <td className="border border-emerald-200 p-2 text-center text-slate-400 font-mono">{sIdx + 1}</td>
+                                          <td className="border border-emerald-200 p-2 font-bold italic text-slate-800">{sub.judul}</td>
+                                          <td className="border border-emerald-200 p-2 text-slate-500 italic">Peserta didik mampu mendemonstrasikan keterampilan teknis dan prosedur kerja yang benar sesuai rubrik {sub.judul}.</td>
+                                          <td className="border border-emerald-200 p-2 text-center text-[7px] text-slate-400 font-black">TUNTAS / BELUM</td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              )
+                            ))}
+                          </div>
+                        </section>
+                      )}
+                    </div>
+                  </PageContainer>
+                )}
+
+                {selectedDocs.includes('ASESMEN_SUMATIF') && (
+                  <PageContainer key="ASESMEN_SUMATIF" id="ASESMEN_SUMATIF" title="ASESMEN SUMATIF (KOGNITIF)">
+                    <div className="space-y-10">
+                      <section>
+                        <h4 className="font-bold text-indigo-900 border-b pb-1 mb-4">INSTRUMEN TES TERTULIS (SUMATIF MATERI)</h4>
+                        <div className="space-y-6">
+                          {materiList.map((m, i) => (
+                            <div key={i} className="pl-4">
+                              <p className="font-bold mb-2">{i+1}. Analisislah peran materi <strong>{m.judul}</strong> dalam konteks {formData.kurikulum}. Mengapa pemahaman ini menjadi prasyarat penting dalam penguasaan {formData.mapel}?</p>
+                              <div className="grid grid-cols-1 gap-1 text-xs opacity-80">
+                                <p>A. Jawaban pengecoh yang logis dan berhubungan</p>
+                                <p>B. Jawaban yang menunjukkan pemahaman parsial</p>
+                                <p>C. Jawaban yang paling komprehensif dan tepat</p>
+                                <p>D. Jawaban yang kurang relevan dengan materi</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </section>
+
+                      <div className="bg-slate-50 p-4 border-2 border-dashed border-slate-300 rounded-lg">
+                        <p className="text-center font-bold text-slate-400 uppercase tracking-widest text-[10px]">Lembar Kunci Jawaban & Bobot Nilai</p>
+                      </div>
+                    </div>
+                  </PageContainer>
+                )}
+
+
+
 
                 {selectedDocs.includes('ANALISIS') && (
                   <>
