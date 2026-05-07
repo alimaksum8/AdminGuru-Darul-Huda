@@ -75,7 +75,7 @@ const App = () => {
 
   const paperStyles = {
     A4: { width: '210mm', height: '297mm' },
-    F4: { width: '215mm', height: '330mm' },
+    F4: { width: '210mm', height: '330mm' },
     A3: { width: '297mm', height: '420mm' }
   };
 
