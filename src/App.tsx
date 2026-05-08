@@ -2487,7 +2487,7 @@ const App = () => {
                             </thead>
                             <tbody>
                               {(studentData.length > 0 ? studentData : [...Array(20)].map(() => ({ nama: '' }))).map((student, i) => (
-                                <tr key={i} className="h-8">
+                                <tr key={i} className="h-[11pt]">
                                   <td className="border p-1 text-center">{i + 1}</td>
                                   <td className="border p-1 uppercase text-[9px] font-medium">{student.nama}</td>
                                   {[...Array(10)].map((_, j) => (
@@ -2552,7 +2552,7 @@ const App = () => {
                             </thead>
                             <tbody>
                               {(studentData.length > 0 ? studentData : [...Array(20)].map(() => ({ nama: '' }))).map((student, i) => (
-                                <tr key={i} className="h-8">
+                                <tr key={i} className="h-[11pt]">
                                   <td className="border p-1 text-center">{i + 1}</td>
                                   <td className="border p-1 uppercase text-[9px] font-medium">{student.nama}</td>
                                   {[...Array(10)].map((_, j) => (
