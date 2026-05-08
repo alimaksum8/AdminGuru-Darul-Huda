@@ -2462,11 +2462,15 @@ const App = () => {
                     {[...Array(countAnalisisGanjil)].map((_, idx) => (
                       <PageContainer key={`ANALISIS-GANJIL-${idx}`} id={`ANALISIS-GANJIL-${idx}`} title={`ANALISIS HASIL ULANGAN ${idx + 1} (GANJIL)`}>
                         <div className="space-y-6">
-                          <div className="p-4 bg-slate-50 border rounded-lg text-xs space-y-1">
-                            <p>Mata Pelajaran: {formData.mapel}</p>
-                            <p>Kelas / Semester: {formData.kelas} / Ganjil</p>
-                            <p>Tahun Pelajaran: {formData.tahunAjaran}</p>
-                            <p>Materi: {materiGanjil[idx]?.judul || '...'}</p>
+                          <div className="p-4 bg-slate-50 border rounded-lg text-xs grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                              <p>Mata Pelajaran: {formData.mapel}</p>
+                              <p>Kelas / Semester: {formData.kelas} / Ganjil</p>
+                            </div>
+                            <div className="space-y-1">
+                              <p>Tahun Pelajaran: {formData.tahunAjaran}</p>
+                              <p>Materi: {materiGanjil[idx]?.judul || '...'}</p>
+                            </div>
                           </div>
 
                           <table className="w-full border-collapse border-2 border-slate-800 text-[10px]">
@@ -2527,11 +2531,15 @@ const App = () => {
                     {[...Array(countAnalisisGenap)].map((_, idx) => (
                       <PageContainer key={`ANALISIS-GENAP-${idx}`} id={`ANALISIS-GENAP-${idx}`} title={`ANALISIS HASIL ULANGAN ${idx + 1} (GENAP)`}>
                         <div className="space-y-6">
-                          <div className="p-4 bg-slate-50 border rounded-lg text-xs space-y-1">
-                            <p>Mata Pelajaran: {formData.mapel}</p>
-                            <p>Kelas / Semester: {formData.kelas} / Genap</p>
-                            <p>Tahun Pelajaran: {formData.tahunAjaran}</p>
-                            <p>Materi: {materiGenap[idx]?.judul || '...'}</p>
+                          <div className="p-4 bg-slate-50 border rounded-lg text-xs grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                              <p>Mata Pelajaran: {formData.mapel}</p>
+                              <p>Kelas / Semester: {formData.kelas} / Genap</p>
+                            </div>
+                            <div className="space-y-1">
+                              <p>Tahun Pelajaran: {formData.tahunAjaran}</p>
+                              <p>Materi: {materiGenap[idx]?.judul || '...'}</p>
+                            </div>
                           </div>
 
                           <table className="w-full border-collapse border-2 border-slate-800 text-[10px]">
