@@ -106,6 +106,40 @@ const App = () => {
   const [kaldikFile, setKaldikFile] = useState<File | null>(null);
   const [kaldikPreview, setKaldikPreview] = useState<string | null>(null);
   const [kaldikContent, setKaldikContent] = useState<string | null>(null);
+  const [studentData, setStudentData] = useState<{nama: string, nisn?: string}[]>([]);
+
+  const handleStudentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const data = new Uint8Array(event.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const jsonData = XLSX.utils.sheet_to_json(worksheet);
+          
+          const students = jsonData.map((row: any) => {
+            const keys = Object.keys(row);
+            const nameKey = keys.find(k => k.toLowerCase().includes('nama'));
+            const nisnKey = keys.find(k => k.toLowerCase().includes('nisn'));
+            return {
+              nama: nameKey ? String(row[nameKey]) : String(Object.values(row)[0]), 
+              nisn: nisnKey ? String(row[nisnKey]) : ''
+            };
+          }).filter(s => s.nama && s.nama.trim() !== "" && s.nama !== "undefined");
+
+          setStudentData(students);
+          alert(`Berhasil mengunggah ${students.length} data siswa.`);
+        } catch (err) {
+          console.error("Error parsing student data:", err);
+          alert("Gagal membaca file Excel Siswa.");
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  };
 
   const handleKaldikUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -349,6 +383,7 @@ const App = () => {
     { id: 'PROTA', name: 'Prota', icon: <FileText size={18} /> },
     { id: 'PROSEM', name: 'Promis', icon: <ClipboardList size={18} /> },
     { id: 'ANALISIS', name: 'Analisis Hasil Ulangan', icon: <BarChart2 size={18} /> },
+    { id: 'ABSENSI', name: 'Daftar Hadir', icon: <UserCheck size={18} /> },
   ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -2451,10 +2486,10 @@ const App = () => {
                               </tr>
                             </thead>
                             <tbody>
-                              {[...Array(20)].map((_, i) => (
+                              {(studentData.length > 0 ? studentData : [...Array(20)].map(() => ({ nama: '' }))).map((student, i) => (
                                 <tr key={i} className="h-8">
                                   <td className="border p-1 text-center">{i + 1}</td>
-                                  <td className="border p-1"></td>
+                                  <td className="border p-1 uppercase text-[9px] font-medium">{student.nama}</td>
                                   {[...Array(10)].map((_, j) => (
                                     <td key={j} className="border p-1 text-center"></td>
                                   ))}
@@ -2470,7 +2505,7 @@ const App = () => {
                             <div className="p-3 border rounded">
                               <p className="font-bold border-b mb-2">Statistik Hasil:</p>
                               <div className="space-y-1">
-                                <div className="flex justify-between"><span>Jumlah Peserta:</span> <span>........ Orang</span></div>
+                                <div className="flex justify-between"><span>Jumlah Peserta:</span> <span>{studentData.length || '........'} Orang</span></div>
                                 <div className="flex justify-between"><span>Rata-rata Nilai:</span> <span>........</span></div>
                                 <div className="flex justify-between"><span>Nilai Tertinggi:</span> <span>........</span></div>
                                 <div className="flex justify-between"><span>Nilai Terendah:</span> <span>........</span></div>
@@ -2516,10 +2551,10 @@ const App = () => {
                               </tr>
                             </thead>
                             <tbody>
-                              {[...Array(20)].map((_, i) => (
+                              {(studentData.length > 0 ? studentData : [...Array(20)].map(() => ({ nama: '' }))).map((student, i) => (
                                 <tr key={i} className="h-8">
                                   <td className="border p-1 text-center">{i + 1}</td>
-                                  <td className="border p-1"></td>
+                                  <td className="border p-1 uppercase text-[9px] font-medium">{student.nama}</td>
                                   {[...Array(10)].map((_, j) => (
                                     <td key={j} className="border p-1 text-center"></td>
                                   ))}
@@ -2535,7 +2570,7 @@ const App = () => {
                             <div className="p-3 border rounded">
                               <p className="font-bold border-b mb-2">Statistik Hasil:</p>
                               <div className="space-y-1">
-                                <div className="flex justify-between"><span>Jumlah Peserta:</span> <span>........ Orang</span></div>
+                                <div className="flex justify-between"><span>Jumlah Peserta:</span> <span>{studentData.length || '........'} Orang</span></div>
                                 <div className="flex justify-between"><span>Rata-rata Nilai:</span> <span>........</span></div>
                                 <div className="flex justify-between"><span>Nilai Tertinggi:</span> <span>........</span></div>
                                 <div className="flex justify-between"><span>Nilai Terendah:</span> <span>........</span></div>
@@ -2554,6 +2589,52 @@ const App = () => {
                       </PageContainer>
                     ))}
                   </>
+                )}
+
+                {selectedDocs.includes('ABSENSI') && (
+                  <PageContainer key="ABSENSI" id="ABSENSI" title="DAFTAR HADIR SISWA">
+                    <div className="space-y-6">
+                      <div className="p-4 bg-slate-50 border rounded-lg text-xs space-y-1">
+                        <p>Mata Pelajaran: {formData.mapel}</p>
+                        <p>Kelas / Semester: {formData.kelas} / {formData.semester.join(' & ')}</p>
+                        <p>Tahun Pelajaran: {formData.tahunAjaran}</p>
+                      </div>
+
+                      <table className="w-full border-collapse border-2 border-slate-800 text-[9px]">
+                        <thead className="bg-slate-100 text-center font-bold">
+                          <tr>
+                            <th className="border p-1 w-8">No</th>
+                            <th className="border p-1">Nama Peserta Didik</th>
+                            {[...Array(20)].map((_, i) => (
+                              <th key={i} className="border p-1 w-5 text-[7px]">{i + 1}</th>
+                            ))}
+                            <th className="border p-1 w-8">S</th>
+                            <th className="border p-1 w-8">I</th>
+                            <th className="border p-1 w-8">A</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(studentData.length > 0 ? studentData : [...Array(25)].map(() => ({ nama: '' }))).map((student, i) => (
+                            <tr key={i} className="h-7">
+                              <td className="border p-1 text-center font-mono">{i + 1}</td>
+                              <td className="border p-1 uppercase text-[8px] font-medium">{student.nama}</td>
+                              {[...Array(20)].map((_, j) => (
+                                <td key={j} className="border p-1"></td>
+                              ))}
+                              <td className="border p-1"></td>
+                              <td className="border p-1"></td>
+                              <td className="border p-1"></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <div className="flex justify-end gap-10 text-[8px] font-bold italic text-slate-500 uppercase">
+                        <span>S: Sakit</span>
+                        <span>I: Izin</span>
+                        <span>A: Alpa</span>
+                      </div>
+                    </div>
+                  </PageContainer>
                 )}
               </>
             )}
@@ -2631,6 +2712,34 @@ const App = () => {
                         min="1"
                         className="w-full p-3 bg-white border border-indigo-200 rounded-xl text-center font-black text-indigo-600 focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm"
                       />
+                    </div>
+                  </div>
+
+                  {/* Student Data Upload Section */}
+                  <div className="p-4 bg-emerald-50 rounded-xl border-2 border-dashed border-emerald-200 space-y-3">
+                    <div className="flex flex-col md:flex-row items-center gap-4">
+                      <div className="flex-1 w-full">
+                        <label className="block text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-2">Upload Data Siswa (Excel .xlsx, .xls)</label>
+                        <div className="flex gap-2">
+                          <label className="flex-1 flex items-center justify-center gap-2 p-3 bg-white border border-emerald-200 rounded-xl cursor-pointer hover:bg-emerald-50 transition-all group">
+                            <Table size={18} className="text-emerald-400 group-hover:text-emerald-600" />
+                            <span className="text-xs font-bold text-emerald-500">{studentData.length > 0 ? `${studentData.length} Siswa Terunggah` : 'Pilih File Data Siswa'}</span>
+                            <input type="file" className="hidden" accept=".xlsx, .xls" onChange={handleStudentUpload} />
+                          </label>
+                          {studentData.length > 0 && (
+                            <button 
+                              onClick={() => {
+                                if(confirm('Hapus data siswa?')) setStudentData([]);
+                              }} 
+                              className="p-3 bg-rose-100 text-rose-600 rounded-xl hover:bg-rose-200 transition-colors shadow-sm"
+                              title="Hapus Data Siswa"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          )}
+                        </div>
+                        <p className="mt-2 text-[9px] text-emerald-600 font-medium italic">*Sistem akan mencari kolom dengan judul 'Nama' atau mengambil kolom pertama.</p>
+                      </div>
                     </div>
                   </div>
 
